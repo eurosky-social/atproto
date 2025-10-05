@@ -31,13 +31,16 @@ COPY ./packages/internal/xrpc-utils ./packages/internal/xrpc-utils
 COPY ./services/bsky ./services/bsky
 
 # install all deps
-RUN pnpm install --frozen-lockfile > /dev/null
+RUN --mount=type=cache,target=/root/.pnpm-store \
+    pnpm install --frozen-lockfile > /dev/null
 # build all packages with external node_modules
-RUN pnpm build > /dev/null
+RUN --mount=type=cache,target=/root/.pnpm-store \
+    pnpm build > /dev/null
 # clean up
 RUN rm -rf node_modules
 # install only prod deps, hoisted to root node_modules dir
-RUN pnpm install --prod --shamefully-hoist --frozen-lockfile --prefer-offline > /dev/null
+RUN --mount=type=cache,target=/root/.pnpm-store \
+    pnpm install --prod --shamefully-hoist --frozen-lockfile --prefer-offline > /dev/null
 
 WORKDIR services/bsky
 
@@ -61,7 +64,7 @@ ENV NODE_ENV=production
 
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md#non-root-user
 USER node
-CMD ["node", "--heapsnapshot-signal=SIGUSR2", "--enable-source-maps", "api.js"]
+CMD ["node", "--heapsnapshot-signal=SIGUSR2", "--enable-source-maps", "api-zeppelin.js"]
 
 LABEL org.opencontainers.image.source=https://github.com/bluesky-social/atproto
 LABEL org.opencontainers.image.description="Bsky App View"
