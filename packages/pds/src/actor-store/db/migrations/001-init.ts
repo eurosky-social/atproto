@@ -1,6 +1,7 @@
-import { Kysely } from 'kysely'
+import { Kysely, sql } from 'kysely'
 
 export async function up(db: Kysely<unknown>): Promise<void> {
+  const isPostgres = !!process.env.DB_POSTGRES_URL || !!process.env.DATABASE_URL?.startsWith('postgres')
   await db.schema
     .createTable('repo_root')
     .addColumn('did', 'varchar', (col) => col.primaryKey())
@@ -9,13 +10,23 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('indexedAt', 'varchar', (col) => col.notNull())
     .execute()
 
-  await db.schema
+  let repoBlockTable = db.schema
     .createTable('repo_block')
     .addColumn('cid', 'varchar', (col) => col.primaryKey())
     .addColumn('repoRev', 'varchar', (col) => col.notNull())
     .addColumn('size', 'integer', (col) => col.notNull())
-    .addColumn('content', 'blob', (col) => col.notNull())
-    .execute()
+
+  if (isPostgres) {
+    repoBlockTable = repoBlockTable.addColumn('content', sql`bytea`, (col) =>
+      col.notNull(),
+    )
+  } else {
+    repoBlockTable = repoBlockTable.addColumn('content', 'blob', (col) =>
+      col.notNull(),
+    )
+  }
+
+  await repoBlockTable.execute()
 
   await db.schema
     .createIndex('repo_block_repo_rev_idx')
@@ -86,9 +97,19 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .columns(['path', 'linkTo'])
     .execute()
 
-  await db.schema
-    .createTable('account_pref')
-    .addColumn('id', 'integer', (col) => col.autoIncrement().primaryKey())
+  let accountPrefTable = db.schema.createTable('account_pref')
+
+  if (isPostgres) {
+    accountPrefTable = accountPrefTable.addColumn('id', 'serial', (col) =>
+      col.primaryKey(),
+    )
+  } else {
+    accountPrefTable = accountPrefTable.addColumn('id', 'integer', (col) =>
+      col.autoIncrement().primaryKey(),
+    )
+  }
+
+  await accountPrefTable
     .addColumn('name', 'varchar', (col) => col.notNull())
     .addColumn('valueJson', 'text', (col) => col.notNull())
     .execute()

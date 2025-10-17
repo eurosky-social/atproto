@@ -1,12 +1,26 @@
-import { Kysely } from 'kysely'
+import { Kysely, sql } from 'kysely'
 
 export async function up(db: Kysely<unknown>): Promise<void> {
-  await db.schema
-    .createTable('repo_seq')
-    .addColumn('seq', 'integer', (col) => col.autoIncrement().primaryKey())
-    .addColumn('did', 'varchar', (col) => col.notNull())
-    .addColumn('eventType', 'varchar', (col) => col.notNull())
-    .addColumn('event', 'blob', (col) => col.notNull())
+  const isPostgres = !!process.env.DB_POSTGRES_URL || !!process.env.DATABASE_URL?.startsWith('postgres')
+
+  let repoSeqTable = db.schema.createTable('repo_seq')
+
+  // Add auto-incrementing seq column (dialect-specific)
+  if (isPostgres) {
+    repoSeqTable = repoSeqTable
+      .addColumn('seq', 'serial', (col) => col.primaryKey())
+      .addColumn('did', 'varchar', (col) => col.notNull())
+      .addColumn('eventType', 'varchar', (col) => col.notNull())
+      .addColumn('event', sql`bytea`, (col) => col.notNull())
+  } else {
+    repoSeqTable = repoSeqTable
+      .addColumn('seq', 'integer', (col) => col.autoIncrement().primaryKey())
+      .addColumn('did', 'varchar', (col) => col.notNull())
+      .addColumn('eventType', 'varchar', (col) => col.notNull())
+      .addColumn('event', 'blob', (col) => col.notNull())
+  }
+
+  await repoSeqTable
     .addColumn('invalidated', 'int2', (col) => col.notNull().defaultTo(0))
     .addColumn('sequencedAt', 'varchar', (col) => col.notNull())
     .execute()
