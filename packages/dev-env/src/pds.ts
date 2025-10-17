@@ -15,6 +15,8 @@ export class TestPds {
     public url: string,
     public port: number,
     public server: pds.PDS,
+    private dbUrl?: string,
+    private schemasToCleanup?: string[],
   ) {}
 
   static async create(config: PdsConfig): Promise<TestPds> {
@@ -29,9 +31,33 @@ export class TestPds {
     const dataDirectory = path.join(os.tmpdir(), randomStr(8, 'base32'))
     await fs.mkdir(dataDirectory, { recursive: true })
 
+    // For PostgreSQL, generate unique schema names for test isolation
+    // Support both DATABASE_URL and DB_POSTGRES_URL env vars, plus databaseUrl from config
+    // TypeScript doesn't know about databaseUrl on PdsConfig, so we access it dynamically
+    const configDbUrl = (config as any).databaseUrl as string | undefined
+    let dbUrl = configDbUrl || process.env.DATABASE_URL || process.env.DB_POSTGRES_URL
+    let schemasToCleanup: string[] = []
+
+    if (dbUrl) {
+      const schemaPrefix = randomStr(8, 'base32').toLowerCase()
+      const accountSchema = `account_${schemaPrefix}`
+      const actorSchema = `actor_${schemaPrefix}`
+      const sequencerSchema = `sequencer_${schemaPrefix}`
+      const didCacheSchema = `did_cache_${schemaPrefix}`
+
+      schemasToCleanup = [accountSchema, actorSchema, sequencerSchema, didCacheSchema]
+
+      // Set environment variables for schema names - the db modules will read these
+      process.env.PDS_ACCOUNT_DB_SCHEMA = accountSchema
+      process.env.PDS_ACTOR_DB_SCHEMA = actorSchema
+      process.env.PDS_SEQUENCER_DB_SCHEMA = sequencerSchema
+      process.env.PDS_DID_CACHE_DB_SCHEMA = didCacheSchema
+    }
+
     const env: pds.ServerEnvironment = {
       devMode: true,
       port,
+      ...(dbUrl ? { databaseUrl: dbUrl } : {}), // Only set for PostgreSQL
       dataDirectory: dataDirectory,
       blobstoreDiskLocation: blobstoreLoc,
       recoveryDidKey: recoveryKey,
@@ -66,11 +92,26 @@ export class TestPds {
     const cfg = pds.envToCfg(env)
     const secrets = pds.envToSecrets(env)
 
+    // Create PostgreSQL schemas before starting server
+    if (dbUrl && schemasToCleanup.length > 0) {
+      // @ts-expect-error pg is dynamically imported and may not be installed
+      const pgModule: any = await import('pg')
+      const { Client } = pgModule
+      const client = new Client({ connectionString: dbUrl })
+      await client.connect()
+
+      for (const schema of schemasToCleanup) {
+        await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`)
+      }
+
+      await client.end()
+    }
+
     const server = await pds.PDS.create(cfg, secrets)
 
     await server.start()
 
-    return new TestPds(url, port, server)
+    return new TestPds(url, port, server, dbUrl, schemasToCleanup)
   }
 
   get ctx(): pds.AppContext {
@@ -109,5 +150,26 @@ export class TestPds {
 
   async close() {
     await this.server.destroy()
+
+    // Clean up PostgreSQL schemas if we created them
+    if (this.dbUrl && this.schemasToCleanup && this.schemasToCleanup.length > 0) {
+      try {
+        // Dynamic import to avoid requiring pg in all environments
+        // @ts-expect-error pg is dynamically imported and may not be installed
+        const pgModule: any = await import('pg')
+        const { Client } = pgModule
+        const client = new Client({ connectionString: this.dbUrl })
+        await client.connect()
+
+        for (const schema of this.schemasToCleanup) {
+          await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`)
+        }
+
+        await client.end()
+      } catch (err) {
+        // Ignore errors during cleanup
+        console.warn('Failed to clean up test schemas:', err)
+      }
+    }
   }
 }

@@ -1,6 +1,9 @@
 import { Kysely, sql } from 'kysely'
 
 export async function up(db: Kysely<unknown>): Promise<void> {
+  // Check dialect - PostgreSQL uses 'serial', SQLite uses 'integer' with autoincrement
+  // Use environment variable to detect if we're using PostgreSQL
+  const isPostgres = !!process.env.DB_POSTGRES_URL || !!process.env.DATABASE_URL?.startsWith('postgres')
   await db.schema
     .createTable('authorization_request')
     .addColumn('id', 'varchar', (col) => col.primaryKey())
@@ -25,6 +28,12 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .createIndex('authorization_request_expires_at_idx')
     .on('authorization_request')
     .column('expiresAt')
+    .execute()
+
+  await db.schema
+    .createIndex('authorization_request_did_idx')
+    .on('authorization_request')
+    .column('did')
     .execute()
 
   await db.schema
@@ -57,9 +66,17 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     )
     .execute()
 
-  await db.schema
-    .createTable('token')
-    .addColumn('id', 'integer', (col) => col.primaryKey().autoIncrement())
+  let tokenTable = db.schema.createTable('token')
+
+  if (isPostgres) {
+    tokenTable = tokenTable.addColumn('id', 'serial', (col) => col.primaryKey())
+  } else {
+    tokenTable = tokenTable.addColumn('id', 'integer', (col) =>
+      col.primaryKey().autoIncrement(),
+    )
+  }
+
+  await tokenTable
     .addColumn('did', 'varchar', (col) => col.notNull())
     .addColumn('tokenId', 'varchar', (col) => col.notNull())
     .addColumn('createdAt', 'varchar', (col) => col.notNull())

@@ -4,6 +4,7 @@ export class Migrator<T> extends KyselyMigrator {
   constructor(
     public db: Kysely<T>,
     migrations: Record<string, Migration>,
+    opts?: { migrationTableSchema?: string },
   ) {
     super({
       db,
@@ -12,6 +13,7 @@ export class Migrator<T> extends KyselyMigrator {
           return migrations
         },
       },
+      migrationTableSchema: opts?.migrationTableSchema,
     })
   }
 

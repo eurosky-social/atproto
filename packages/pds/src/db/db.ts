@@ -8,9 +8,11 @@ import {
   QueryResult,
   RootOperationNode,
   SqliteDialect,
+  PostgresDialect,
   UnknownRow,
   sql,
 } from 'kysely'
+import { Pool } from 'pg'
 import { dbLogger } from '../logger'
 import { retrySqlite } from './util'
 
@@ -44,6 +46,45 @@ export class Database<Schema> {
       }),
     })
     return new Database(db)
+  }
+
+  static postgres<T>(
+    url: string,
+    opts?: { max?: number; schema?: string },
+  ): Database<T> {
+    const schema = opts?.schema
+
+    // Validate schema name (alphanumeric and underscore only)
+    if (schema && !/^[a-z_][a-z0-9_]*$/i.test(schema)) {
+      throw new Error(
+        `PostgreSQL schema must only contain [A-Za-z0-9_]: ${schema}`,
+      )
+    }
+
+    const isTest = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined
+    const defaultPoolSize = isTest ? 1 : 10
+    const poolSize =
+      opts?.max ??
+      (process.env.PDS_POOL_SIZE ? parseInt(process.env.PDS_POOL_SIZE, 10) : defaultPoolSize)
+
+    const pool = new Pool({
+      connectionString: url,
+      max: poolSize,
+    })
+
+    // Set search_path on each connection for schema isolation
+    if (schema) {
+      pool.on('connect', (client) => {
+        // Shared objects such as extensions will go in the public schema
+        client.query(`SET search_path TO "${schema}",public;`)
+      })
+    }
+    const db = new Kysely<T>({
+      dialect: new PostgresDialect({
+        pool,
+      }),
+    })
+    return new DatabasePostgres(db, pool, schema)
   }
 
   async ensureWal() {
@@ -111,6 +152,37 @@ export class Database<Schema> {
     if (this.destroyed) return
     this.db
       .destroy()
+      .then(() => (this.destroyed = true))
+      .catch((err) => dbLogger.error({ err }, 'error closing db'))
+  }
+}
+
+class DatabasePostgres<Schema> extends Database<Schema> {
+  private pool: Pool
+
+  constructor(
+    db: Kysely<Schema>,
+    pool: Pool,
+    public schema?: string,
+  ) {
+    super(db)
+    this.pool = pool
+  }
+
+  async ensureWal() {
+    // PostgreSQL uses WAL by default - no-op
+  }
+
+  close(): void {
+    if (this.destroyed) return
+    this.db
+      .destroy()
+      .then(() => {
+        // Close PostgreSQL connection pool
+        if (this.pool) {
+          return this.pool.end()
+        }
+      })
       .then(() => (this.destroyed = true))
       .catch((err) => dbLogger.error({ err }, 'error closing db'))
   }

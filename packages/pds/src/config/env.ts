@@ -44,6 +44,7 @@ export const readEnv = (): ServerEnvironment => {
     successColorHue: envInt('PDS_SUCCESS_COLOR_HUE'),
 
     // database
+    databaseUrl: envStr('DATABASE_URL'), 
     dataDirectory: envStr('PDS_DATA_DIRECTORY'),
     disableWalAutoCheckpoint: envBool('PDS_SQLITE_DISABLE_WAL_AUTO_CHECKPOINT'),
     accountDbLocation: envStr('PDS_ACCOUNT_DB_LOCATION'),
@@ -195,6 +196,7 @@ export type ServerEnvironment = {
   successColorHue?: number
 
   // database
+  databaseUrl?: string // PostgreSQL connection string (if provided, overrides individual locations)
   dataDirectory?: string
   disableWalAutoCheckpoint?: boolean
   accountDbLocation?: string

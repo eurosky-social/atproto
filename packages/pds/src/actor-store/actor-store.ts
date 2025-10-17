@@ -17,25 +17,62 @@ import { ActorDb, getDb, getMigrator } from './db'
 
 export class ActorStore {
   reservedKeyDir: string
+  private usingPostgres: boolean
 
   constructor(
     public cfg: ActorStoreConfig,
     public resources: ActorStoreResources,
   ) {
     this.reservedKeyDir = path.join(cfg.directory, 'reserved_keys')
+    this.usingPostgres = !!(
+      cfg.databaseUrl &&
+      (cfg.databaseUrl.startsWith('postgres://') ||
+        cfg.databaseUrl.startsWith('postgresql://'))
+    )
+  }
+
+  // Generate PostgreSQL schema name from DID
+  private async getSchemaName(did: string): Promise<string> {
+    const didHash = await crypto.sha256Hex(did)
+    // Use hash prefix to avoid schema name length limits and special characters
+    return `actor_${didHash.slice(0, 16)}`
   }
 
   async getLocation(did: string) {
     const didHash = await crypto.sha256Hex(did)
     const directory = path.join(this.cfg.directory, didHash.slice(0, 2), did)
-    const dbLocation = path.join(directory, `store.sqlite`)
+
+    // For PostgreSQL, use the database URL with actor-specific schema
+    // For SQLite, use per-actor file
+    const dbLocation = this.cfg.databaseUrl
+      ? this.cfg.databaseUrl
+      : path.join(directory, `store.sqlite`)
+
     const keyLocation = path.join(directory, `key`)
     return { directory, dbLocation, keyLocation }
   }
 
   async exists(did: string): Promise<boolean> {
-    const location = await this.getLocation(did)
-    return await fileExists(location.dbLocation)
+    if (!this.usingPostgres) {
+      const location = await this.getLocation(did)
+      return await fileExists(location.dbLocation)
+    }
+
+    // For PostgreSQL, check if the schema exists
+    const schema = await this.getSchemaName(did)
+    const { dbLocation } = await this.getLocation(did)
+    const { Client } = await import('pg')
+    const client = new Client({ connectionString: dbLocation })
+    await client.connect()
+    try {
+      const result = await client.query(
+        `SELECT schema_name FROM information_schema.schemata WHERE schema_name = $1`,
+        [schema],
+      )
+      return result.rows.length > 0
+    } finally {
+      await client.end()
+    }
   }
 
   async keypair(did: string): Promise<Keypair> {
@@ -46,12 +83,18 @@ export class ActorStore {
 
   async openDb(did: string): Promise<ActorDb> {
     const { dbLocation } = await this.getLocation(did)
-    const exists = await fileExists(dbLocation)
-    if (!exists) {
-      throw new InvalidRequestError('Repo not found', 'NotFound')
+
+    // For SQLite, check file existence. For PostgreSQL, check schema existence
+    if (!this.usingPostgres) {
+      const exists = await fileExists(dbLocation)
+      if (!exists) {
+        throw new InvalidRequestError('Repo not found', 'NotFound')
+      }
     }
 
-    const db = getDb(dbLocation, this.cfg.disableWalAutoCheckpoint)
+    // For PostgreSQL, pass the actor-specific schema name
+    const schema = this.usingPostgres ? await this.getSchemaName(did) : undefined
+    const db = getDb(dbLocation, this.cfg.disableWalAutoCheckpoint, schema)
 
     // run a simple select with retry logic to ensure the db is ready (not in wal recovery mode)
     try {
@@ -83,7 +126,19 @@ export class ActorStore {
     const keypair = await this.keypair(did)
     const db = await this.openDb(did)
     try {
-      return await db.transaction((dbTxn) => {
+      return await db.transaction(async (dbTxn) => {
+        // For PostgreSQL, lock the repo_root row at the start of the transaction
+        // to serialize concurrent transactions for the same actor (mimics SQLite behavior)
+        // For SQLite, this is a no-op (SQLite serializes writes automatically)
+        const isPostgres = 'schema' in db && db.schema !== undefined
+        if (isPostgres) {
+          await dbTxn.db
+            .selectFrom('repo_root')
+            .where('did', '=', did)
+            .forUpdate()
+            .execute()
+        }
+
         return fn(new ActorStoreTransactor(did, dbTxn, keypair, this.resources))
       })
     } finally {
@@ -106,16 +161,32 @@ export class ActorStore {
 
   async create(did: string, keypair: ExportableKeypair) {
     const { directory, dbLocation, keyLocation } = await this.getLocation(did)
-    // ensure subdir exists
+
     await mkdir(directory, { recursive: true })
-    const exists = await fileExists(dbLocation)
-    if (exists) {
-      throw new InvalidRequestError('Repo already exists', 'AlreadyExists')
+
+    if (!this.usingPostgres) {
+      const exists = await fileExists(dbLocation)
+      if (exists) {
+        throw new InvalidRequestError('Repo already exists', 'AlreadyExists')
+      }
     }
+
     const privKey = await keypair.export()
     await fs.writeFile(keyLocation, privKey)
 
-    const db: ActorDb = getDb(dbLocation, this.cfg.disableWalAutoCheckpoint)
+    const schema = this.usingPostgres ? await this.getSchemaName(did) : undefined
+    if (this.usingPostgres && schema) {
+      const { Client } = await import('pg')
+      const client = new Client({ connectionString: dbLocation })
+      await client.connect()
+      try {
+        await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`)
+      } finally {
+        await client.end()
+      }
+    }
+
+    const db: ActorDb = getDb(dbLocation, this.cfg.disableWalAutoCheckpoint, schema)
     try {
       await db.ensureWal()
       const migrator = getMigrator(db)
@@ -138,6 +209,21 @@ export class ActorStore {
       })
     }
 
+    // For PostgreSQL, drop the schema. For SQLite, delete the directory
+    if (this.usingPostgres) {
+      const schema = await this.getSchemaName(did)
+      const { dbLocation } = await this.getLocation(did)
+      const { Client } = await import('pg')
+      const client = new Client({ connectionString: dbLocation })
+      await client.connect()
+      try {
+        await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`)
+      } finally {
+        await client.end()
+      }
+    }
+
+    // Always clean up keypair directory
     const { directory } = await this.getLocation(did)
     await rmIfExists(directory, true)
   }

@@ -95,6 +95,7 @@ export class SqlRepoTransactor extends SqlRepoReader implements RepoStorage {
           rev: rev,
           indexedAt: this.now,
         })
+        .where('did', '=', this.did)
         .execute()
     }
   }
