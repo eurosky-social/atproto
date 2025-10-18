@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - divy/etcd-dp-host-list
+      - flashes-appview
+
 env:
   REGISTRY: ghcr.io
   USERNAME: ${{ github.actor }}
@@ -55,9 +56,9 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,enable=true,priority=100,prefix=bsky-,suffix=,format=long
-            type=raw,value=bsky-{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
-            bsky-latest
+            type=sha,enable=true,priority=100,prefix=bsky-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }},suffix=,format=long
+            type=raw,value=bsky-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
+            type=raw,value=bsky-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}latest
 
       - name: Build and push by digest
         id: build
@@ -123,9 +124,9 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,enable=true,priority=100,prefix=bsky-,suffix=,format=long
-            type=raw,value=bsky-{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
-            bsky-latest
+            type=sha,enable=true,priority=100,prefix=bsky-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }},suffix=,format=long
+            type=raw,value=bsky-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
+            type=raw,value=bsky-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}latest
 
       - name: Create manifest list and push
         id: merge
