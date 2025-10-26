@@ -58,6 +58,7 @@ export interface ServerConfigValues {
   modServiceDid: string
   adminPasswords: string[]
   labelsFromIssuerDids?: string[]
+  defaultLabelerDid?: string
   indexedAtEpoch?: Date
   // misc/dev
   blobCacheLocation?: string
@@ -181,6 +182,7 @@ export class ServerConfig {
     )
     const modServiceDid = process.env.MOD_SERVICE_DID
     assert(modServiceDid)
+    const defaultLabelerDid = process.env.ATP_DEFAULT_LABELER_DID || undefined
     const statsigKey =
       process.env.NODE_ENV === 'test'
         ? 'secret-key'
@@ -314,6 +316,7 @@ export class ServerConfig {
       blobRateLimitBypassHostname,
       adminPasswords,
       modServiceDid,
+      defaultLabelerDid,
       statsigKey,
       statsigEnv,
       clientCheckEmailConfirmed,
@@ -484,6 +487,10 @@ export class ServerConfig {
 
   get modServiceDid() {
     return this.cfg.modServiceDid
+  }
+
+  get defaultLabelerDid() {
+    return this.cfg.defaultLabelerDid
   }
 
   get labelsFromIssuerDids() {

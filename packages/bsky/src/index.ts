@@ -58,6 +58,14 @@ export class BskyAppView {
     signingKey: Keypair
   }): BskyAppView {
     const { config, signingKey } = opts
+
+    // Configure default labeler at runtime
+    if (config.defaultLabelerDid) {
+      AtpAgent.configure({
+        appLabelers: [config.defaultLabelerDid],
+      })
+    }
+
     const app = express()
     app.set('trust proxy', true)
     app.use(cors({ maxAge: DAY / SECOND }))
