@@ -1,0 +1,96 @@
+{
+  "lexicon": 1,
+  "id": "app.flashes.embed.record",
+  "description": "A representation of a record embedded in a Bluesky record (eg, a post). For example, a quote-post, or sharing a feed generator record.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": ["record"],
+      "properties": {
+        "record": { "type": "ref", "ref": "com.atproto.repo.strongRef" }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": ["record"],
+      "properties": {
+        "record": {
+          "type": "union",
+          "refs": [
+            "#viewRecord",
+            "#viewNotFound",
+            "#viewBlocked",
+            "#viewDetached",
+            "app.flashes.feed.defs#generatorView",
+            "app.flashes.graph.defs#listView",
+            "app.flashes.labeler.defs#labelerView",
+            "app.flashes.graph.defs#starterPackViewBasic"
+          ]
+        }
+      }
+    },
+    "viewRecord": {
+      "type": "object",
+      "required": ["uri", "cid", "author", "value", "indexedAt"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "author": {
+          "type": "ref",
+          "ref": "app.flashes.actor.defs#profileViewBasic"
+        },
+        "value": {
+          "type": "unknown",
+          "description": "The record data itself."
+        },
+        "labels": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
+        },
+        "replyCount": { "type": "integer" },
+        "repostCount": { "type": "integer" },
+        "likeCount": { "type": "integer" },
+        "quoteCount": { "type": "integer" },
+        "embeds": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.flashes.embed.images#view",
+              "app.flashes.embed.video#view",
+              "app.flashes.embed.external#view",
+              "app.flashes.embed.record#view",
+              "app.flashes.embed.recordWithMedia#view"
+            ]
+          }
+        },
+        "indexedAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "viewNotFound": {
+      "type": "object",
+      "required": ["uri", "notFound"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "notFound": { "type": "boolean", "const": true }
+      }
+    },
+    "viewBlocked": {
+      "type": "object",
+      "required": ["uri", "blocked", "author"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "blocked": { "type": "boolean", "const": true },
+        "author": { "type": "ref", "ref": "app.flashes.feed.defs#blockedAuthor" }
+      }
+    },
+    "viewDetached": {
+      "type": "object",
+      "required": ["uri", "detached"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "detached": { "type": "boolean", "const": true }
+      }
+    }
+  }
+}

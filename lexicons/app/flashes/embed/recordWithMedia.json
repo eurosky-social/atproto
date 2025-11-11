@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "app.flashes.embed.recordWithMedia",
+  "description": "A representation of a record embedded in a Bluesky record (eg, a post), alongside other compatible embeds. For example, a quote post and image, or a quote post and external URL card.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": ["record", "media"],
+      "properties": {
+        "record": {
+          "type": "ref",
+          "ref": "app.flashes.embed.record"
+        },
+        "media": {
+          "type": "union",
+          "refs": [
+            "app.flashes.embed.images",
+            "app.flashes.embed.video",
+            "app.flashes.embed.external"
+          ]
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": ["record", "media"],
+      "properties": {
+        "record": {
+          "type": "ref",
+          "ref": "app.flashes.embed.record#view"
+        },
+        "media": {
+          "type": "union",
+          "refs": [
+            "app.flashes.embed.images#view",
+            "app.flashes.embed.video#view",
+            "app.flashes.embed.external#view"
+          ]
+        }
+      }
+    }
+  }
+}

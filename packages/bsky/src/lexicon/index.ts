@@ -97,6 +97,93 @@ import * as AppBskyUnspeccedSearchStarterPacksSkeleton from './types/app/bsky/un
 import * as AppBskyVideoGetJobStatus from './types/app/bsky/video/getJobStatus.js'
 import * as AppBskyVideoGetUploadLimits from './types/app/bsky/video/getUploadLimits.js'
 import * as AppBskyVideoUploadVideo from './types/app/bsky/video/uploadVideo.js'
+import * as AppFlashesActorGetPreferences from './types/app/flashes/actor/getPreferences.js'
+import * as AppFlashesActorGetProfile from './types/app/flashes/actor/getProfile.js'
+import * as AppFlashesActorGetProfiles from './types/app/flashes/actor/getProfiles.js'
+import * as AppFlashesActorGetSuggestions from './types/app/flashes/actor/getSuggestions.js'
+import * as AppFlashesActorPutPreferences from './types/app/flashes/actor/putPreferences.js'
+import * as AppFlashesActorSearchActors from './types/app/flashes/actor/searchActors.js'
+import * as AppFlashesActorSearchActorsTypeahead from './types/app/flashes/actor/searchActorsTypeahead.js'
+import * as AppFlashesBookmarkCreateBookmark from './types/app/flashes/bookmark/createBookmark.js'
+import * as AppFlashesBookmarkDeleteBookmark from './types/app/flashes/bookmark/deleteBookmark.js'
+import * as AppFlashesBookmarkGetBookmarks from './types/app/flashes/bookmark/getBookmarks.js'
+import * as AppFlashesFeedDescribeFeedGenerator from './types/app/flashes/feed/describeFeedGenerator.js'
+import * as AppFlashesFeedGetActorFeeds from './types/app/flashes/feed/getActorFeeds.js'
+import * as AppFlashesFeedGetActorLikes from './types/app/flashes/feed/getActorLikes.js'
+import * as AppFlashesFeedGetAuthorFeed from './types/app/flashes/feed/getAuthorFeed.js'
+import * as AppFlashesFeedGetFeed from './types/app/flashes/feed/getFeed.js'
+import * as AppFlashesFeedGetFeedGenerator from './types/app/flashes/feed/getFeedGenerator.js'
+import * as AppFlashesFeedGetFeedGenerators from './types/app/flashes/feed/getFeedGenerators.js'
+import * as AppFlashesFeedGetFeedSkeleton from './types/app/flashes/feed/getFeedSkeleton.js'
+import * as AppFlashesFeedGetLikes from './types/app/flashes/feed/getLikes.js'
+import * as AppFlashesFeedGetListFeed from './types/app/flashes/feed/getListFeed.js'
+import * as AppFlashesFeedGetPostThread from './types/app/flashes/feed/getPostThread.js'
+import * as AppFlashesFeedGetPosts from './types/app/flashes/feed/getPosts.js'
+import * as AppFlashesFeedGetQuotes from './types/app/flashes/feed/getQuotes.js'
+import * as AppFlashesFeedGetRepostedBy from './types/app/flashes/feed/getRepostedBy.js'
+import * as AppFlashesFeedGetSuggestedFeeds from './types/app/flashes/feed/getSuggestedFeeds.js'
+import * as AppFlashesFeedGetTimeline from './types/app/flashes/feed/getTimeline.js'
+import * as AppFlashesFeedSearchPosts from './types/app/flashes/feed/searchPosts.js'
+import * as AppFlashesFeedSendInteractions from './types/app/flashes/feed/sendInteractions.js'
+import * as AppFlashesGraphGetActorStarterPacks from './types/app/flashes/graph/getActorStarterPacks.js'
+import * as AppFlashesGraphGetBlocks from './types/app/flashes/graph/getBlocks.js'
+import * as AppFlashesGraphGetFollowers from './types/app/flashes/graph/getFollowers.js'
+import * as AppFlashesGraphGetFollows from './types/app/flashes/graph/getFollows.js'
+import * as AppFlashesGraphGetKnownFollowers from './types/app/flashes/graph/getKnownFollowers.js'
+import * as AppFlashesGraphGetList from './types/app/flashes/graph/getList.js'
+import * as AppFlashesGraphGetListBlocks from './types/app/flashes/graph/getListBlocks.js'
+import * as AppFlashesGraphGetListMutes from './types/app/flashes/graph/getListMutes.js'
+import * as AppFlashesGraphGetLists from './types/app/flashes/graph/getLists.js'
+import * as AppFlashesGraphGetListsWithMembership from './types/app/flashes/graph/getListsWithMembership.js'
+import * as AppFlashesGraphGetMutes from './types/app/flashes/graph/getMutes.js'
+import * as AppFlashesGraphGetRelationships from './types/app/flashes/graph/getRelationships.js'
+import * as AppFlashesGraphGetStarterPack from './types/app/flashes/graph/getStarterPack.js'
+import * as AppFlashesGraphGetStarterPacks from './types/app/flashes/graph/getStarterPacks.js'
+import * as AppFlashesGraphGetStarterPacksWithMembership from './types/app/flashes/graph/getStarterPacksWithMembership.js'
+import * as AppFlashesGraphGetSuggestedFollowsByActor from './types/app/flashes/graph/getSuggestedFollowsByActor.js'
+import * as AppFlashesGraphMuteActor from './types/app/flashes/graph/muteActor.js'
+import * as AppFlashesGraphMuteActorList from './types/app/flashes/graph/muteActorList.js'
+import * as AppFlashesGraphMuteThread from './types/app/flashes/graph/muteThread.js'
+import * as AppFlashesGraphSearchStarterPacks from './types/app/flashes/graph/searchStarterPacks.js'
+import * as AppFlashesGraphUnmuteActor from './types/app/flashes/graph/unmuteActor.js'
+import * as AppFlashesGraphUnmuteActorList from './types/app/flashes/graph/unmuteActorList.js'
+import * as AppFlashesGraphUnmuteThread from './types/app/flashes/graph/unmuteThread.js'
+import * as AppFlashesLabelerGetServices from './types/app/flashes/labeler/getServices.js'
+import * as AppFlashesNotificationGetPreferences from './types/app/flashes/notification/getPreferences.js'
+import * as AppFlashesNotificationGetUnreadCount from './types/app/flashes/notification/getUnreadCount.js'
+import * as AppFlashesNotificationListActivitySubscriptions from './types/app/flashes/notification/listActivitySubscriptions.js'
+import * as AppFlashesNotificationListNotifications from './types/app/flashes/notification/listNotifications.js'
+import * as AppFlashesNotificationPutActivitySubscription from './types/app/flashes/notification/putActivitySubscription.js'
+import * as AppFlashesNotificationPutPreferences from './types/app/flashes/notification/putPreferences.js'
+import * as AppFlashesNotificationPutPreferencesV2 from './types/app/flashes/notification/putPreferencesV2.js'
+import * as AppFlashesNotificationRegisterPush from './types/app/flashes/notification/registerPush.js'
+import * as AppFlashesNotificationUnregisterPush from './types/app/flashes/notification/unregisterPush.js'
+import * as AppFlashesNotificationUpdateSeen from './types/app/flashes/notification/updateSeen.js'
+import * as AppFlashesUnspeccedGetAgeAssuranceState from './types/app/flashes/unspecced/getAgeAssuranceState.js'
+import * as AppFlashesUnspeccedGetConfig from './types/app/flashes/unspecced/getConfig.js'
+import * as AppFlashesUnspeccedGetOnboardingSuggestedStarterPacks from './types/app/flashes/unspecced/getOnboardingSuggestedStarterPacks.js'
+import * as AppFlashesUnspeccedGetOnboardingSuggestedStarterPacksSkeleton from './types/app/flashes/unspecced/getOnboardingSuggestedStarterPacksSkeleton.js'
+import * as AppFlashesUnspeccedGetPopularFeedGenerators from './types/app/flashes/unspecced/getPopularFeedGenerators.js'
+import * as AppFlashesUnspeccedGetPostThreadOtherV2 from './types/app/flashes/unspecced/getPostThreadOtherV2.js'
+import * as AppFlashesUnspeccedGetPostThreadV2 from './types/app/flashes/unspecced/getPostThreadV2.js'
+import * as AppFlashesUnspeccedGetSuggestedFeeds from './types/app/flashes/unspecced/getSuggestedFeeds.js'
+import * as AppFlashesUnspeccedGetSuggestedFeedsSkeleton from './types/app/flashes/unspecced/getSuggestedFeedsSkeleton.js'
+import * as AppFlashesUnspeccedGetSuggestedStarterPacks from './types/app/flashes/unspecced/getSuggestedStarterPacks.js'
+import * as AppFlashesUnspeccedGetSuggestedStarterPacksSkeleton from './types/app/flashes/unspecced/getSuggestedStarterPacksSkeleton.js'
+import * as AppFlashesUnspeccedGetSuggestedUsers from './types/app/flashes/unspecced/getSuggestedUsers.js'
+import * as AppFlashesUnspeccedGetSuggestedUsersSkeleton from './types/app/flashes/unspecced/getSuggestedUsersSkeleton.js'
+import * as AppFlashesUnspeccedGetSuggestionsSkeleton from './types/app/flashes/unspecced/getSuggestionsSkeleton.js'
+import * as AppFlashesUnspeccedGetTaggedSuggestions from './types/app/flashes/unspecced/getTaggedSuggestions.js'
+import * as AppFlashesUnspeccedGetTrendingTopics from './types/app/flashes/unspecced/getTrendingTopics.js'
+import * as AppFlashesUnspeccedGetTrends from './types/app/flashes/unspecced/getTrends.js'
+import * as AppFlashesUnspeccedGetTrendsSkeleton from './types/app/flashes/unspecced/getTrendsSkeleton.js'
+import * as AppFlashesUnspeccedInitAgeAssurance from './types/app/flashes/unspecced/initAgeAssurance.js'
+import * as AppFlashesUnspeccedSearchActorsSkeleton from './types/app/flashes/unspecced/searchActorsSkeleton.js'
+import * as AppFlashesUnspeccedSearchPostsSkeleton from './types/app/flashes/unspecced/searchPostsSkeleton.js'
+import * as AppFlashesUnspeccedSearchStarterPacksSkeleton from './types/app/flashes/unspecced/searchStarterPacksSkeleton.js'
+import * as AppFlashesVideoGetJobStatus from './types/app/flashes/video/getJobStatus.js'
+import * as AppFlashesVideoGetUploadLimits from './types/app/flashes/video/getUploadLimits.js'
+import * as AppFlashesVideoUploadVideo from './types/app/flashes/video/uploadVideo.js'
 import * as ChatBskyActorDeleteAccount from './types/chat/bsky/actor/deleteAccount.js'
 import * as ChatBskyActorExportAccountData from './types/chat/bsky/actor/exportAccountData.js'
 import * as ChatBskyConvoAcceptConvo from './types/chat/bsky/convo/acceptConvo.js'
@@ -229,6 +316,30 @@ export const APP_BSKY_GRAPH = {
   DefsCuratelist: 'app.bsky.graph.defs#curatelist',
   DefsReferencelist: 'app.bsky.graph.defs#referencelist',
 }
+export const APP_FLASHES_ACTOR = {
+  StatusLive: 'app.flashes.actor.status#live',
+}
+export const APP_FLASHES_FEED = {
+  DefsRequestLess: 'app.flashes.feed.defs#requestLess',
+  DefsRequestMore: 'app.flashes.feed.defs#requestMore',
+  DefsClickthroughItem: 'app.flashes.feed.defs#clickthroughItem',
+  DefsClickthroughAuthor: 'app.flashes.feed.defs#clickthroughAuthor',
+  DefsClickthroughReposter: 'app.flashes.feed.defs#clickthroughReposter',
+  DefsClickthroughEmbed: 'app.flashes.feed.defs#clickthroughEmbed',
+  DefsContentModeUnspecified: 'app.flashes.feed.defs#contentModeUnspecified',
+  DefsContentModeVideo: 'app.flashes.feed.defs#contentModeVideo',
+  DefsInteractionSeen: 'app.flashes.feed.defs#interactionSeen',
+  DefsInteractionLike: 'app.flashes.feed.defs#interactionLike',
+  DefsInteractionRepost: 'app.flashes.feed.defs#interactionRepost',
+  DefsInteractionReply: 'app.flashes.feed.defs#interactionReply',
+  DefsInteractionQuote: 'app.flashes.feed.defs#interactionQuote',
+  DefsInteractionShare: 'app.flashes.feed.defs#interactionShare',
+}
+export const APP_FLASHES_GRAPH = {
+  DefsModlist: 'app.flashes.graph.defs#modlist',
+  DefsCuratelist: 'app.flashes.graph.defs#curatelist',
+  DefsReferencelist: 'app.flashes.graph.defs#referencelist',
+}
 export const COM_ATPROTO_MODERATION = {
   DefsReasonSpam: 'com.atproto.moderation.defs#reasonSpam',
   DefsReasonViolation: 'com.atproto.moderation.defs#reasonViolation',
@@ -260,10 +371,12 @@ export class Server {
 export class AppNS {
   _server: Server
   bsky: AppBskyNS
+  flashes: AppFlashesNS
 
   constructor(server: Server) {
     this._server = server
     this.bsky = new AppBskyNS(server)
+    this.flashes = new AppFlashesNS(server)
   }
 }
 
@@ -1415,6 +1528,1159 @@ export class AppBskyVideoNS {
     >,
   ) {
     const nsid = 'app.bsky.video.uploadVideo' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesNS {
+  _server: Server
+  actor: AppFlashesActorNS
+  bookmark: AppFlashesBookmarkNS
+  embed: AppFlashesEmbedNS
+  feed: AppFlashesFeedNS
+  graph: AppFlashesGraphNS
+  labeler: AppFlashesLabelerNS
+  notification: AppFlashesNotificationNS
+  richtext: AppFlashesRichtextNS
+  unspecced: AppFlashesUnspeccedNS
+  video: AppFlashesVideoNS
+
+  constructor(server: Server) {
+    this._server = server
+    this.actor = new AppFlashesActorNS(server)
+    this.bookmark = new AppFlashesBookmarkNS(server)
+    this.embed = new AppFlashesEmbedNS(server)
+    this.feed = new AppFlashesFeedNS(server)
+    this.graph = new AppFlashesGraphNS(server)
+    this.labeler = new AppFlashesLabelerNS(server)
+    this.notification = new AppFlashesNotificationNS(server)
+    this.richtext = new AppFlashesRichtextNS(server)
+    this.unspecced = new AppFlashesUnspeccedNS(server)
+    this.video = new AppFlashesVideoNS(server)
+  }
+}
+
+export class AppFlashesActorNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  getPreferences<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorGetPreferences.QueryParams,
+      AppFlashesActorGetPreferences.HandlerInput,
+      AppFlashesActorGetPreferences.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.getPreferences' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getProfile<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorGetProfile.QueryParams,
+      AppFlashesActorGetProfile.HandlerInput,
+      AppFlashesActorGetProfile.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.getProfile' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getProfiles<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorGetProfiles.QueryParams,
+      AppFlashesActorGetProfiles.HandlerInput,
+      AppFlashesActorGetProfiles.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.getProfiles' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorGetSuggestions.QueryParams,
+      AppFlashesActorGetSuggestions.HandlerInput,
+      AppFlashesActorGetSuggestions.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.getSuggestions' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putPreferences<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorPutPreferences.QueryParams,
+      AppFlashesActorPutPreferences.HandlerInput,
+      AppFlashesActorPutPreferences.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.putPreferences' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchActors<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorSearchActors.QueryParams,
+      AppFlashesActorSearchActors.HandlerInput,
+      AppFlashesActorSearchActors.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.searchActors' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchActorsTypeahead<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesActorSearchActorsTypeahead.QueryParams,
+      AppFlashesActorSearchActorsTypeahead.HandlerInput,
+      AppFlashesActorSearchActorsTypeahead.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.actor.searchActorsTypeahead' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesBookmarkNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  createBookmark<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesBookmarkCreateBookmark.QueryParams,
+      AppFlashesBookmarkCreateBookmark.HandlerInput,
+      AppFlashesBookmarkCreateBookmark.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.bookmark.createBookmark' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  deleteBookmark<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesBookmarkDeleteBookmark.QueryParams,
+      AppFlashesBookmarkDeleteBookmark.HandlerInput,
+      AppFlashesBookmarkDeleteBookmark.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.bookmark.deleteBookmark' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getBookmarks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesBookmarkGetBookmarks.QueryParams,
+      AppFlashesBookmarkGetBookmarks.HandlerInput,
+      AppFlashesBookmarkGetBookmarks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.bookmark.getBookmarks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesEmbedNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+}
+
+export class AppFlashesFeedNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  describeFeedGenerator<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedDescribeFeedGenerator.QueryParams,
+      AppFlashesFeedDescribeFeedGenerator.HandlerInput,
+      AppFlashesFeedDescribeFeedGenerator.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.describeFeedGenerator' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getActorFeeds<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetActorFeeds.QueryParams,
+      AppFlashesFeedGetActorFeeds.HandlerInput,
+      AppFlashesFeedGetActorFeeds.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getActorFeeds' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getActorLikes<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetActorLikes.QueryParams,
+      AppFlashesFeedGetActorLikes.HandlerInput,
+      AppFlashesFeedGetActorLikes.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getActorLikes' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getAuthorFeed<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetAuthorFeed.QueryParams,
+      AppFlashesFeedGetAuthorFeed.HandlerInput,
+      AppFlashesFeedGetAuthorFeed.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getAuthorFeed' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getFeed<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetFeed.QueryParams,
+      AppFlashesFeedGetFeed.HandlerInput,
+      AppFlashesFeedGetFeed.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getFeed' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getFeedGenerator<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetFeedGenerator.QueryParams,
+      AppFlashesFeedGetFeedGenerator.HandlerInput,
+      AppFlashesFeedGetFeedGenerator.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getFeedGenerator' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getFeedGenerators<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetFeedGenerators.QueryParams,
+      AppFlashesFeedGetFeedGenerators.HandlerInput,
+      AppFlashesFeedGetFeedGenerators.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getFeedGenerators' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getFeedSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetFeedSkeleton.QueryParams,
+      AppFlashesFeedGetFeedSkeleton.HandlerInput,
+      AppFlashesFeedGetFeedSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getFeedSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getLikes<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetLikes.QueryParams,
+      AppFlashesFeedGetLikes.HandlerInput,
+      AppFlashesFeedGetLikes.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getLikes' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getListFeed<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetListFeed.QueryParams,
+      AppFlashesFeedGetListFeed.HandlerInput,
+      AppFlashesFeedGetListFeed.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getListFeed' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getPostThread<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetPostThread.QueryParams,
+      AppFlashesFeedGetPostThread.HandlerInput,
+      AppFlashesFeedGetPostThread.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getPostThread' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getPosts<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetPosts.QueryParams,
+      AppFlashesFeedGetPosts.HandlerInput,
+      AppFlashesFeedGetPosts.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getPosts' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getQuotes<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetQuotes.QueryParams,
+      AppFlashesFeedGetQuotes.HandlerInput,
+      AppFlashesFeedGetQuotes.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getQuotes' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getRepostedBy<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetRepostedBy.QueryParams,
+      AppFlashesFeedGetRepostedBy.HandlerInput,
+      AppFlashesFeedGetRepostedBy.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getRepostedBy' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedFeeds<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetSuggestedFeeds.QueryParams,
+      AppFlashesFeedGetSuggestedFeeds.HandlerInput,
+      AppFlashesFeedGetSuggestedFeeds.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getSuggestedFeeds' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getTimeline<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedGetTimeline.QueryParams,
+      AppFlashesFeedGetTimeline.HandlerInput,
+      AppFlashesFeedGetTimeline.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.getTimeline' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchPosts<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedSearchPosts.QueryParams,
+      AppFlashesFeedSearchPosts.HandlerInput,
+      AppFlashesFeedSearchPosts.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.searchPosts' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  sendInteractions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesFeedSendInteractions.QueryParams,
+      AppFlashesFeedSendInteractions.HandlerInput,
+      AppFlashesFeedSendInteractions.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.feed.sendInteractions' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesGraphNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  getActorStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetActorStarterPacks.QueryParams,
+      AppFlashesGraphGetActorStarterPacks.HandlerInput,
+      AppFlashesGraphGetActorStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getActorStarterPacks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getBlocks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetBlocks.QueryParams,
+      AppFlashesGraphGetBlocks.HandlerInput,
+      AppFlashesGraphGetBlocks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getBlocks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getFollowers<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetFollowers.QueryParams,
+      AppFlashesGraphGetFollowers.HandlerInput,
+      AppFlashesGraphGetFollowers.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getFollowers' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getFollows<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetFollows.QueryParams,
+      AppFlashesGraphGetFollows.HandlerInput,
+      AppFlashesGraphGetFollows.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getFollows' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getKnownFollowers<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetKnownFollowers.QueryParams,
+      AppFlashesGraphGetKnownFollowers.HandlerInput,
+      AppFlashesGraphGetKnownFollowers.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getKnownFollowers' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getList<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetList.QueryParams,
+      AppFlashesGraphGetList.HandlerInput,
+      AppFlashesGraphGetList.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getList' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getListBlocks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetListBlocks.QueryParams,
+      AppFlashesGraphGetListBlocks.HandlerInput,
+      AppFlashesGraphGetListBlocks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getListBlocks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getListMutes<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetListMutes.QueryParams,
+      AppFlashesGraphGetListMutes.HandlerInput,
+      AppFlashesGraphGetListMutes.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getListMutes' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getLists<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetLists.QueryParams,
+      AppFlashesGraphGetLists.HandlerInput,
+      AppFlashesGraphGetLists.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getLists' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getListsWithMembership<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetListsWithMembership.QueryParams,
+      AppFlashesGraphGetListsWithMembership.HandlerInput,
+      AppFlashesGraphGetListsWithMembership.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getListsWithMembership' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getMutes<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetMutes.QueryParams,
+      AppFlashesGraphGetMutes.HandlerInput,
+      AppFlashesGraphGetMutes.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getMutes' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getRelationships<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetRelationships.QueryParams,
+      AppFlashesGraphGetRelationships.HandlerInput,
+      AppFlashesGraphGetRelationships.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getRelationships' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getStarterPack<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetStarterPack.QueryParams,
+      AppFlashesGraphGetStarterPack.HandlerInput,
+      AppFlashesGraphGetStarterPack.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getStarterPack' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetStarterPacks.QueryParams,
+      AppFlashesGraphGetStarterPacks.HandlerInput,
+      AppFlashesGraphGetStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getStarterPacks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getStarterPacksWithMembership<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetStarterPacksWithMembership.QueryParams,
+      AppFlashesGraphGetStarterPacksWithMembership.HandlerInput,
+      AppFlashesGraphGetStarterPacksWithMembership.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getStarterPacksWithMembership' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedFollowsByActor<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphGetSuggestedFollowsByActor.QueryParams,
+      AppFlashesGraphGetSuggestedFollowsByActor.HandlerInput,
+      AppFlashesGraphGetSuggestedFollowsByActor.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.getSuggestedFollowsByActor' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  muteActor<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphMuteActor.QueryParams,
+      AppFlashesGraphMuteActor.HandlerInput,
+      AppFlashesGraphMuteActor.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.muteActor' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  muteActorList<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphMuteActorList.QueryParams,
+      AppFlashesGraphMuteActorList.HandlerInput,
+      AppFlashesGraphMuteActorList.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.muteActorList' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  muteThread<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphMuteThread.QueryParams,
+      AppFlashesGraphMuteThread.HandlerInput,
+      AppFlashesGraphMuteThread.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.muteThread' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphSearchStarterPacks.QueryParams,
+      AppFlashesGraphSearchStarterPacks.HandlerInput,
+      AppFlashesGraphSearchStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.searchStarterPacks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  unmuteActor<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphUnmuteActor.QueryParams,
+      AppFlashesGraphUnmuteActor.HandlerInput,
+      AppFlashesGraphUnmuteActor.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.unmuteActor' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  unmuteActorList<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphUnmuteActorList.QueryParams,
+      AppFlashesGraphUnmuteActorList.HandlerInput,
+      AppFlashesGraphUnmuteActorList.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.unmuteActorList' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  unmuteThread<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesGraphUnmuteThread.QueryParams,
+      AppFlashesGraphUnmuteThread.HandlerInput,
+      AppFlashesGraphUnmuteThread.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.graph.unmuteThread' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesLabelerNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  getServices<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesLabelerGetServices.QueryParams,
+      AppFlashesLabelerGetServices.HandlerInput,
+      AppFlashesLabelerGetServices.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.labeler.getServices' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesNotificationNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  getPreferences<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationGetPreferences.QueryParams,
+      AppFlashesNotificationGetPreferences.HandlerInput,
+      AppFlashesNotificationGetPreferences.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.getPreferences' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getUnreadCount<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationGetUnreadCount.QueryParams,
+      AppFlashesNotificationGetUnreadCount.HandlerInput,
+      AppFlashesNotificationGetUnreadCount.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.getUnreadCount' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  listActivitySubscriptions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationListActivitySubscriptions.QueryParams,
+      AppFlashesNotificationListActivitySubscriptions.HandlerInput,
+      AppFlashesNotificationListActivitySubscriptions.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.listActivitySubscriptions' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  listNotifications<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationListNotifications.QueryParams,
+      AppFlashesNotificationListNotifications.HandlerInput,
+      AppFlashesNotificationListNotifications.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.listNotifications' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putActivitySubscription<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationPutActivitySubscription.QueryParams,
+      AppFlashesNotificationPutActivitySubscription.HandlerInput,
+      AppFlashesNotificationPutActivitySubscription.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.putActivitySubscription' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putPreferences<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationPutPreferences.QueryParams,
+      AppFlashesNotificationPutPreferences.HandlerInput,
+      AppFlashesNotificationPutPreferences.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.putPreferences' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putPreferencesV2<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationPutPreferencesV2.QueryParams,
+      AppFlashesNotificationPutPreferencesV2.HandlerInput,
+      AppFlashesNotificationPutPreferencesV2.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.putPreferencesV2' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  registerPush<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationRegisterPush.QueryParams,
+      AppFlashesNotificationRegisterPush.HandlerInput,
+      AppFlashesNotificationRegisterPush.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.registerPush' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  unregisterPush<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationUnregisterPush.QueryParams,
+      AppFlashesNotificationUnregisterPush.HandlerInput,
+      AppFlashesNotificationUnregisterPush.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.unregisterPush' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  updateSeen<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesNotificationUpdateSeen.QueryParams,
+      AppFlashesNotificationUpdateSeen.HandlerInput,
+      AppFlashesNotificationUpdateSeen.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.notification.updateSeen' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesRichtextNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+}
+
+export class AppFlashesUnspeccedNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  getAgeAssuranceState<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetAgeAssuranceState.QueryParams,
+      AppFlashesUnspeccedGetAgeAssuranceState.HandlerInput,
+      AppFlashesUnspeccedGetAgeAssuranceState.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getAgeAssuranceState' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getConfig<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetConfig.QueryParams,
+      AppFlashesUnspeccedGetConfig.HandlerInput,
+      AppFlashesUnspeccedGetConfig.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getConfig' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getOnboardingSuggestedStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetOnboardingSuggestedStarterPacks.QueryParams,
+      AppFlashesUnspeccedGetOnboardingSuggestedStarterPacks.HandlerInput,
+      AppFlashesUnspeccedGetOnboardingSuggestedStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getOnboardingSuggestedStarterPacks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getOnboardingSuggestedStarterPacksSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetOnboardingSuggestedStarterPacksSkeleton.QueryParams,
+      AppFlashesUnspeccedGetOnboardingSuggestedStarterPacksSkeleton.HandlerInput,
+      AppFlashesUnspeccedGetOnboardingSuggestedStarterPacksSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid =
+      'app.flashes.unspecced.getOnboardingSuggestedStarterPacksSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getPopularFeedGenerators<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetPopularFeedGenerators.QueryParams,
+      AppFlashesUnspeccedGetPopularFeedGenerators.HandlerInput,
+      AppFlashesUnspeccedGetPopularFeedGenerators.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getPopularFeedGenerators' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getPostThreadOtherV2<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetPostThreadOtherV2.QueryParams,
+      AppFlashesUnspeccedGetPostThreadOtherV2.HandlerInput,
+      AppFlashesUnspeccedGetPostThreadOtherV2.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getPostThreadOtherV2' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getPostThreadV2<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetPostThreadV2.QueryParams,
+      AppFlashesUnspeccedGetPostThreadV2.HandlerInput,
+      AppFlashesUnspeccedGetPostThreadV2.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getPostThreadV2' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedFeeds<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestedFeeds.QueryParams,
+      AppFlashesUnspeccedGetSuggestedFeeds.HandlerInput,
+      AppFlashesUnspeccedGetSuggestedFeeds.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestedFeeds' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedFeedsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestedFeedsSkeleton.QueryParams,
+      AppFlashesUnspeccedGetSuggestedFeedsSkeleton.HandlerInput,
+      AppFlashesUnspeccedGetSuggestedFeedsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestedFeedsSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestedStarterPacks.QueryParams,
+      AppFlashesUnspeccedGetSuggestedStarterPacks.HandlerInput,
+      AppFlashesUnspeccedGetSuggestedStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestedStarterPacks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedStarterPacksSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestedStarterPacksSkeleton.QueryParams,
+      AppFlashesUnspeccedGetSuggestedStarterPacksSkeleton.HandlerInput,
+      AppFlashesUnspeccedGetSuggestedStarterPacksSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestedStarterPacksSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedUsers<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestedUsers.QueryParams,
+      AppFlashesUnspeccedGetSuggestedUsers.HandlerInput,
+      AppFlashesUnspeccedGetSuggestedUsers.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestedUsers' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestedUsersSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestedUsersSkeleton.QueryParams,
+      AppFlashesUnspeccedGetSuggestedUsersSkeleton.HandlerInput,
+      AppFlashesUnspeccedGetSuggestedUsersSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestedUsersSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getSuggestionsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetSuggestionsSkeleton.QueryParams,
+      AppFlashesUnspeccedGetSuggestionsSkeleton.HandlerInput,
+      AppFlashesUnspeccedGetSuggestionsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getSuggestionsSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getTaggedSuggestions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetTaggedSuggestions.QueryParams,
+      AppFlashesUnspeccedGetTaggedSuggestions.HandlerInput,
+      AppFlashesUnspeccedGetTaggedSuggestions.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getTaggedSuggestions' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getTrendingTopics<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetTrendingTopics.QueryParams,
+      AppFlashesUnspeccedGetTrendingTopics.HandlerInput,
+      AppFlashesUnspeccedGetTrendingTopics.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getTrendingTopics' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getTrends<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetTrends.QueryParams,
+      AppFlashesUnspeccedGetTrends.HandlerInput,
+      AppFlashesUnspeccedGetTrends.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getTrends' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getTrendsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedGetTrendsSkeleton.QueryParams,
+      AppFlashesUnspeccedGetTrendsSkeleton.HandlerInput,
+      AppFlashesUnspeccedGetTrendsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.getTrendsSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  initAgeAssurance<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedInitAgeAssurance.QueryParams,
+      AppFlashesUnspeccedInitAgeAssurance.HandlerInput,
+      AppFlashesUnspeccedInitAgeAssurance.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.initAgeAssurance' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchActorsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedSearchActorsSkeleton.QueryParams,
+      AppFlashesUnspeccedSearchActorsSkeleton.HandlerInput,
+      AppFlashesUnspeccedSearchActorsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.searchActorsSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchPostsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedSearchPostsSkeleton.QueryParams,
+      AppFlashesUnspeccedSearchPostsSkeleton.HandlerInput,
+      AppFlashesUnspeccedSearchPostsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.searchPostsSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  searchStarterPacksSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesUnspeccedSearchStarterPacksSkeleton.QueryParams,
+      AppFlashesUnspeccedSearchStarterPacksSkeleton.HandlerInput,
+      AppFlashesUnspeccedSearchStarterPacksSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.unspecced.searchStarterPacksSkeleton' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class AppFlashesVideoNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+
+  getJobStatus<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesVideoGetJobStatus.QueryParams,
+      AppFlashesVideoGetJobStatus.HandlerInput,
+      AppFlashesVideoGetJobStatus.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.video.getJobStatus' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getUploadLimits<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesVideoGetUploadLimits.QueryParams,
+      AppFlashesVideoGetUploadLimits.HandlerInput,
+      AppFlashesVideoGetUploadLimits.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.video.getUploadLimits' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  uploadVideo<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppFlashesVideoUploadVideo.QueryParams,
+      AppFlashesVideoUploadVideo.HandlerInput,
+      AppFlashesVideoUploadVideo.HandlerOutput
+    >,
+  ) {
+    const nsid = 'app.flashes.video.uploadVideo' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 }
