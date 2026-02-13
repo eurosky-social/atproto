@@ -55,7 +55,7 @@ RUN --mount=type=cache,target=/root/.pnpm-store \
     pnpm install --frozen-lockfile > /dev/null
 # build all packages with external node_modules
 RUN --mount=type=cache,target=/root/.pnpm-store \
-    pnpm run --recursive --stream --filter '@atproto/pds...' build > /dev/null
+    pnpm run --recursive --stream --filter '@atproto/pds...' build
 # clean up
 RUN rm -rf node_modules
 # install only prod deps, hoisted to root node_modules dir
