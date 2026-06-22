@@ -1,5 +1,17 @@
 # @atproto/did
 
+## 0.5.1
+
+### Patch Changes
+
+- [#4967](https://github.com/bluesky-social/atproto/pull/4967) [`9fc720c`](https://github.com/bluesky-social/atproto/commit/9fc720ce75f3ee88a5e48a9be919b07c7647f6f5) Thanks [@matthieusieben](https://github.com/matthieusieben)! - Use TypeScript 7 to build package
+
+## 0.5.0
+
+### Minor Changes
+
+- [#4992](https://github.com/bluesky-social/atproto/pull/4992) [`622d365`](https://github.com/bluesky-social/atproto/commit/622d365aeb240133f40763a3b1c43981112837fc) Thanks [@devinivy](https://github.com/devinivy)! - **BREAKING:** Remove `AtprotoAudience` and `isAtprotoAudience`. They are superseded by `AtprotoDidRefAbsolute` and `isAtprotoDidRefAbsolute`. Adds the related `DidRefAbsolute` and `DidRefRelative` types and predicates.
+
 ## 0.4.0
 
 ### Minor Changes

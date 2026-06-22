@@ -47,11 +47,16 @@ deps: ## Installs dependent libs using 'pnpm install'
 	pnpm install --frozen-lockfile
 
 .PHONY: clean
-clean: ## Deletes all 'dist' and 'node_package' directories (including nested)
-	rm -rf **/dist **/node_packages
+clean: ## Deletes all 'dist' and 'node_modules' directories (including nested)
+	find . -type d \( -name "dist" -o -name "node_modules" \) -prune -exec rm -rf {} +
 
 .PHONY: nvm-setup
 nvm-setup: ## Use NVM to install and activate node+pnpm
-	nvm install 18
-	nvm use 18
+	nvm install
+	nvm use
 	corepack enable
+	corepack install
+
+.PHONY: signing-key
+signing-key:
+	@openssl ecparam --name secp256k1 --genkey --noout --outform DER | tail --bytes=+8 | head --bytes=32 | xxd --plain --cols 32
