@@ -1,0 +1,121 @@
+name: Sync from upstream
+
+# Replays our fork commits on top of bluesky-social/atproto (the `upstream`
+# remote) by rebasing `main` onto the requested upstream ref, producing
+# "upstream + our custom changes" with a clean, linear history. It then opens a
+# PR back into `main` so CI (.github/workflows/repo.yaml) validates the result
+# before a human merges it.
+#
+# This assumes `main` is a small, linear set of fork commits on top of a prior
+# upstream snapshot (see new-main). If a rebase hits conflicts, the job fails so
+# they can be resolved deliberately in a local rebase rather than committed as
+# markers.
+#
+# Requirements:
+#   - An `upstream` reference to bluesky-social/atproto. This workflow adds it at
+#     runtime, so no remote config is needed in the repo.
+#   - A GitHub App installed on this repo with these repository permissions:
+#       * Contents:      Read and write   (push the sync branch)
+#       * Pull requests: Read and write   (open the PR)
+#       * Workflows:     Read and write   (REQUIRED: the sync branch carries
+#                        .github/workflows/* changes from upstream, and the
+#                        default GITHUB_TOKEN is categorically forbidden from
+#                        pushing workflow files)
+#     Store the App ID in the `SYNC_UPSTREAM_APP_ID` repository variable and the
+#     private key in the `SYNC_UPSTREAM_PK` secret.
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_ref:
+        description: 'Upstream ref to sync from (branch, tag, or SHA)'
+        required: true
+        default: 'main'
+      branch_suffix:
+        description: 'Optional suffix for the sync branch name'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.SYNC_UPSTREAM_APP_ID }}
+          private-key: ${{ secrets.SYNC_UPSTREAM_PK }}
+
+      - name: Checkout main (full history)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          # App token is required to push the sync branch, which contains
+          # .github/workflows/* changes that GITHUB_TOKEN may not write.
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Add upstream and fetch
+        run: |
+          git remote add upstream https://github.com/bluesky-social/atproto.git
+          git fetch upstream --no-tags "${{ github.event.inputs.upstream_ref }}"
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create sync branch from main
+        id: branch
+        run: |
+          DATE="$(date +'%Y-%m-%d')"
+          SUFFIX="${{ github.event.inputs.branch_suffix }}"
+          BRANCH="sync/upstream-${DATE}"
+          if [ -n "$SUFFIX" ]; then
+            BRANCH="${BRANCH}-${SUFFIX}"
+          fi
+          # Disambiguate if a branch for today already exists.
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            BRANCH="${BRANCH}-${{ github.run_number }}"
+          fi
+          echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH" origin/main
+
+      - name: Rebase fork commits onto upstream
+        run: |
+          # Replay our fork commits on top of the upstream ref. On conflict,
+          # abort and fail the job so a human resolves it in a local rebase.
+          if ! git rebase FETCH_HEAD; then
+            echo "::error::Rebase onto ${{ github.event.inputs.upstream_ref }} hit conflicts."
+            git diff --name-only --diff-filter=U | sed 's/^/  - /'
+            git rebase --abort
+            exit 1
+          fi
+
+      - name: Push sync branch
+        # The sync branch name is unique per run, so this is always a fresh
+        # branch with no remote history to overwrite.
+        run: git push origin "${{ steps.branch.outputs.name }}"
+
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          UPSTREAM_REF: ${{ github.event.inputs.upstream_ref }}
+        run: |
+          TITLE="Sync upstream (${UPSTREAM_REF})"
+          BODY=$(cat <<EOF
+          Automated upstream sync.
+
+          Our fork commits were rebased cleanly onto \`upstream/${UPSTREAM_REF}\`,
+          giving a linear "upstream + fork changes" history.
+
+          CI runs automatically; merge once it is green.
+          EOF
+          )
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" --title "$TITLE" --body "$BODY"
