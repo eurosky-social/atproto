@@ -77,7 +77,7 @@ RUN pnpm run --recursive --stream --workspace-concurrency 1 --filter 'bsky-app-v
 RUN pnpm install --prod --shamefully-hoist --frozen-lockfile --prefer-offline --config.confirmModulesPurge=false
 
 # Uses assets from build stage to reduce build size
-FROM node:24.18-alpine3.23
+FROM node:24.15-alpine3.23 AS release
 
 # dumb-init is used to handle signals properly.
 # runit is installed so it can be (optionally) used for logging via svlogd.
@@ -100,3 +100,13 @@ CMD ["node", "--heapsnapshot-signal=SIGUSR2", "--enable-source-maps", "--import=
 LABEL org.opencontainers.image.source=https://github.com/bluesky-social/atproto
 LABEL org.opencontainers.image.description="Bsky App View"
 LABEL org.opencontainers.image.licenses=MIT
+
+# Eurosky variant: same runtime as `release`, but boots the custom
+# api-zeppelin.js entrypoint instead of upstream's tracer + api.ts.
+# Not built by default — opt in with `docker build --target eurosky`.
+FROM release AS eurosky
+CMD ["node", "--heapsnapshot-signal=SIGUSR2", "--enable-source-maps", "--import=./tracer.ts", "api-zeppelin.ts"]
+
+# Default target: plain upstream `release` (api.ts). Kept last so a
+# bare `docker build` produces the upstream image and skips eurosky.
+FROM release AS default
