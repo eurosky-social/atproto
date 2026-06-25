@@ -71,6 +71,9 @@ jobs:
   changeset:
     name: Changeset
     runs-on: ubuntu-latest
+    # Disabled on the fork: PRs (including upstream syncs) do not carry
+    # changesets, so upstream's `pnpm changeset status` check would always fail.
+    if: false
     steps:
       - uses: actions/checkout@v4
         with:
