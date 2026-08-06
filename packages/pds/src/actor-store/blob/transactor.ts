@@ -346,7 +346,9 @@ async function mimeTypeFromStream(
   blobStream: stream.Readable,
 ): Promise<string | undefined> {
   const fileType = await fileTypeFromStream(blobStream)
-  blobStream.destroy()
+  // @NOTE Drain, don't destroy: destroying can strand this clone in the shared
+  // source's `awaitDrainWriters`, pausing the upload body forever.
+  blobStream.resume()
   return fileType?.mime
 }
 
