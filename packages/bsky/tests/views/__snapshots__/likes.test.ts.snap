@@ -2,7 +2,6 @@
 
 exports[`pds like views > fetches post likes 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "likes": [
     {
       "actor": {
@@ -17,6 +16,8 @@ exports[`pds like views > fetches post likes 1`] = `
         "viewer": {
           "blockedBy": false,
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "createdAt": "1970-01-01T00:00:00.000Z",
@@ -39,6 +40,8 @@ exports[`pds like views > fetches post likes 1`] = `
           "blockedBy": false,
           "following": "record(0)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "createdAt": "1970-01-01T00:00:00.000Z",
@@ -59,6 +62,8 @@ exports[`pds like views > fetches post likes 1`] = `
           "followedBy": "record(2)",
           "following": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "createdAt": "1970-01-01T00:00:00.000Z",
@@ -84,6 +89,8 @@ exports[`pds like views > fetches post likes 1`] = `
           "followedBy": "record(4)",
           "following": "record(3)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "createdAt": "1970-01-01T00:00:00.000Z",
@@ -96,7 +103,6 @@ exports[`pds like views > fetches post likes 1`] = `
 
 exports[`pds like views > fetches reply likes 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "likes": [
     {
       "actor": {
@@ -113,6 +119,8 @@ exports[`pds like views > fetches reply likes 1`] = `
           "followedBy": "record(1)",
           "following": "record(0)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "createdAt": "1970-01-01T00:00:00.000Z",

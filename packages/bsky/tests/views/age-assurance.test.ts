@@ -1,10 +1,9 @@
 import crypto from 'node:crypto'
 import { once } from 'node:events'
-import { Server, createServer } from 'node:http'
-import { AddressInfo } from 'node:net'
-import express, { Application, RequestHandler } from 'express'
-// eslint-disable-next-line import/default
-import httpTerminator from 'http-terminator'
+import { type Server, createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import express, { type Application, type RequestHandler } from 'express'
+import { type HttpTerminator, createHttpTerminator } from 'http-terminator'
 import {
   afterAll,
   afterEach,
@@ -15,9 +14,9 @@ import {
   it,
   vi,
 } from 'vitest'
-import { AtpAgent, ids } from '@atproto/api'
-import { SeedClient, TestNetwork, basicSeed } from '@atproto/dev-env'
-import {
+import { type AtpAgent, ids } from '@atproto/api'
+import { type SeedClient, TestNetwork, basicSeed } from '@atproto/dev-env'
+import type {
   KwsExternalPayload,
   KwsVerificationQuery,
   KwsWebhookBody,
@@ -382,7 +381,7 @@ class MockKwsServer {
   private webhookSecret: string
   private app: Application
   private server: Server
-  private terminator: httpTerminator.HttpTerminator
+  private terminator: HttpTerminator
 
   constructor({
     verificationSecret,
@@ -403,7 +402,7 @@ class MockKwsServer {
       .post('/v1/verifications/send-email', sendEmailMock)
 
     this.server = createServer(this.app)
-    this.terminator = httpTerminator.createHttpTerminator({
+    this.terminator = createHttpTerminator({
       server: this.server,
     })
   }

@@ -1,35 +1,41 @@
-import { KeyObject, createPublicKey, createSecretKey } from 'node:crypto'
-import { IncomingMessage, ServerResponse } from 'node:http'
+import { type KeyObject, createPublicKey, createSecretKey } from 'node:crypto'
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import { secp256k1 } from '@noble/curves/secp256k1'
 import * as jose from 'jose'
-import KeyEncoderModule from 'key-encoder'
 import { getVerificationMaterial } from '@atproto/common'
-import { IdResolver, getDidKeyFromMultibase } from '@atproto/identity'
-import { AtIdentifierString, DidString, isDidString } from '@atproto/lex'
+import { type IdResolver, getDidKeyFromMultibase } from '@atproto/identity'
+import {
+  type AtIdentifierString,
+  type DidString,
+  isDidString,
+} from '@atproto/lex'
 import {
   OAuthError,
+  WWWAuthenticateError,
+} from '@atproto/oauth-provider/errors'
+import type {
   OAuthVerifier,
   VerifyTokenPayloadOptions,
-  WWWAuthenticateError,
-} from '@atproto/oauth-provider'
+} from '@atproto/oauth-provider/verifier'
 import {
-  ScopePermissions,
+  type ScopePermissions,
   ScopePermissionsTransition,
 } from '@atproto/oauth-scopes'
 import {
   AuthRequiredError,
-  Awaitable,
+  type Awaitable,
   ForbiddenError,
   InvalidRequestError,
-  MethodAuthContext,
-  MethodAuthVerifier,
-  Params,
+  type MethodAuthContext,
+  type MethodAuthVerifier,
+  type Params,
   XRPCError,
   parseReqNsid,
   verifyJwt as verifyServiceJwt,
 } from '@atproto/xrpc-server'
-import { AccountManager } from './account-manager/account-manager.js'
-import { ActorAccount } from './account-manager/helpers/account.js'
-import {
+import type { AccountManager } from './account-manager/account-manager.js'
+import type { ActorAccount } from './account-manager/helpers/account.js'
+import type {
   AccessOutput,
   AdminTokenOutput,
   ModServiceOutput,
@@ -41,10 +47,7 @@ import {
 import { ACCESS_STANDARD, AuthScope, isAuthScope } from './auth-scope.js'
 import { softDeleted } from './db/index.js'
 import { appendVary } from './util/http.js'
-import { WithRequired } from './util/types.js'
-
-// key-encoder is CJS with exports.default; Node ESM interop wraps it as { default: Class }
-const KeyEncoder = ((m) => m.default ?? m)(KeyEncoderModule)
+import type { WithRequired } from './util/types.js'
 
 export type VerifiedOptions = {
   checkTakedown?: boolean
@@ -128,6 +131,7 @@ export class AuthVerifier {
     }
   }
 
+  /** @deprecated We are steering away from this auth method */
   public adminToken: MethodAuthVerifier<AdminTokenOutput> = async (ctx) => {
     setAuthHeaders(ctx.res)
     const parsed = parseBasicAuth(ctx.req)
@@ -158,6 +162,7 @@ export class AuthVerifier {
     }
   }
 
+  /** @deprecated We are steering away from {@link adminToken} auth. Use {@link modService} instead. */
   public moderator: MethodAuthVerifier<AdminTokenOutput | ModServiceOutput> =
     async (ctx) => {
       const type = extractAuthType(ctx.req)
@@ -272,6 +277,22 @@ export class AuthVerifier {
       }
 
       throw new AuthRequiredError(undefined, 'AuthMissing')
+    }
+  }
+
+  public authorizationOrModService<P extends Params>(
+    opts: VerifiedOptions & ExtraScopedOptions & AuthorizedOptions<P>,
+  ): MethodAuthVerifier<AccessOutput | OAuthOutput | ModServiceOutput, P> {
+    const authorization = this.authorization(opts)
+    return async (ctx) => {
+      try {
+        return await this.modService(ctx)
+      } catch (err) {
+        if (err instanceof AuthRequiredError) {
+          return authorization(ctx)
+        }
+        throw err
+      }
     }
   }
 
@@ -656,10 +677,19 @@ export const createSecretKeyObject = (secret: string): KeyObject => {
   return createSecretKey(Buffer.from(secret))
 }
 
-const keyEncoder = new KeyEncoder('secp256k1')
 export const createPublicKeyObject = (publicKeyHex: string): KeyObject => {
-  const key = keyEncoder.encodePublic(publicKeyHex, 'raw', 'pem')
-  return createPublicKey({ format: 'pem', key })
+  // accepts compressed or uncompressed keys; validates the point is on-curve
+  const point =
+    secp256k1.ProjectivePoint.fromHex(publicKeyHex).toRawBytes(false)
+  return createPublicKey({
+    format: 'jwk',
+    key: {
+      kty: 'EC',
+      crv: 'secp256k1',
+      x: Buffer.from(point.subarray(1, 33)).toString('base64url'),
+      y: Buffer.from(point.subarray(33, 65)).toString('base64url'),
+    },
+  })
 }
 
 function setAuthHeaders(res: ServerResponse) {

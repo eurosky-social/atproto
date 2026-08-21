@@ -1,15 +1,15 @@
 import { createPrivateKey } from 'node:crypto'
-import * as http from 'node:http'
+import type * as http from 'node:http'
 import * as plcLib from '@did-plc/lib'
-import { HttpTerminator, createHttpTerminator } from 'http-terminator'
+import { secp256k1 } from '@noble/curves/secp256k1'
+import { type HttpTerminator, createHttpTerminator } from 'http-terminator'
 import * as jose from 'jose'
-import KeyEncoderModule from 'key-encoder'
 import * as ui8 from 'uint8arrays'
 import { AtpAgent } from '@atproto/api'
 import { getVerificationMaterial } from '@atproto/common'
-import { Secp256k1Keypair, randomStr } from '@atproto/crypto'
+import { type Secp256k1Keypair, randomStr } from '@atproto/crypto'
 import { IdResolver, getDidKeyFromMultibase } from '@atproto/identity'
-import { DidString, HandleString } from '@atproto/syntax'
+import type { DidString, HandleString } from '@atproto/syntax'
 import {
   AuthRequiredError,
   createServer,
@@ -21,9 +21,6 @@ import {
   createPublicKeyObject,
 } from '../src/auth-verifier.js'
 import { com } from '../src/lexicons/index.js'
-
-// key-encoder is CJS with exports.default; Node ESM interop wraps it as { default: Class }
-const KeyEncoder = ((m) => m.default ?? m)(KeyEncoderModule)
 
 interface Account {
   did: DidString
@@ -51,9 +48,9 @@ export class MockEntryway {
   public plcRotationKey: Secp256k1Keypair
   public idResolver: IdResolver
 
-  private server: http.Server
-  private terminator: HttpTerminator
-  private accounts = new Map<string, Account>()
+  protected server: http.Server
+  protected terminator: HttpTerminator
+  protected accounts = new Map<string, Account>()
 
   private constructor(
     server: http.Server,
@@ -70,10 +67,18 @@ export class MockEntryway {
   }
 
   static async create(opts: MockEntrywayOpts): Promise<MockEntryway> {
-    const keyEncoder = new KeyEncoder('secp256k1')
-    const privateKeyHex = ui8.toString(await opts.jwtSigningKey.export(), 'hex')
-    const privatePem = keyEncoder.encodePrivate(privateKeyHex, 'raw', 'pem')
-    const jwtPrivateKey = createPrivateKey({ format: 'pem', key: privatePem })
+    const privateKeyRaw = await opts.jwtSigningKey.export()
+    const publicKeyRaw = secp256k1.getPublicKey(privateKeyRaw, false)
+    const jwtPrivateKey = createPrivateKey({
+      format: 'jwk',
+      key: {
+        kty: 'EC',
+        crv: 'secp256k1',
+        d: ui8.toString(privateKeyRaw, 'base64url'),
+        x: ui8.toString(publicKeyRaw.subarray(1, 33), 'base64url'),
+        y: ui8.toString(publicKeyRaw.subarray(33, 65), 'base64url'),
+      },
+    })
     const jwtPublicKey = createPublicKeyObject(
       opts.jwtSigningKey.publicKeyStr('hex'),
     )
@@ -304,6 +309,18 @@ export class MockEntryway {
       },
     })
 
+    server.routes.get('/.well-known/atproto-did', (req, res) => {
+      const handle = req.hostname
+      const account = [...accounts.values()].find(
+        (acc) => acc.handle === handle,
+      )
+      if (!account) {
+        res.status(404).send('User not found')
+        return
+      }
+      res.type('text/plain').send(account.did)
+    })
+
     const httpServer = server.listen(opts.port)
     const terminator = createHttpTerminator({ server: httpServer })
 
@@ -315,6 +332,11 @@ export class MockEntryway {
 
   getAccount(did: string): Account | undefined {
     return this.accounts.get(did)
+  }
+
+  // e.g. for representing accounts on other pdses behind the entryway
+  addAccount(account: Account): void {
+    this.accounts.set(account.did, account)
   }
 
   async destroy(): Promise<void> {

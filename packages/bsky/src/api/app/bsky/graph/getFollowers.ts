@@ -1,23 +1,23 @@
 import { mapDefined } from '@atproto/common'
-import { AtUriString, DidString } from '@atproto/syntax'
-import { InvalidRequestError, Server } from '@atproto/xrpc-server'
-import { AppContext } from '../../../../context.js'
+import type { AtUriString, DidString } from '@atproto/syntax'
+import { InvalidRequestError, type Server } from '@atproto/xrpc-server'
+import type { AppContext } from '../../../../context.js'
 import {
-  HydrateCtx,
-  Hydrator,
+  type HydrateCtx,
+  type Hydrator,
   mergeStates,
 } from '../../../../hydration/hydrator.js'
 import { app } from '../../../../lexicons/index.js'
 import {
-  HydrationFnInput,
-  PresentationFnInput,
-  RulesFnInput,
-  SkeletonFnInput,
+  type HydrationFnInput,
+  type PresentationFnInput,
+  type RulesFnInput,
+  type SkeletonFnInput,
   createPipeline,
 } from '../../../../pipeline.js'
 import { uriToDid as didFromUri } from '../../../../util/uris.js'
-import { Views } from '../../../../views/index.js'
-import { clearlyBadCursor, resHeaders } from '../../../util.js'
+import type { Views } from '../../../../views/index.js'
+import { clearlyBadCursor, fillPage, resHeaders } from '../../../util.js'
 
 export default function (server: Server, ctx: AppContext) {
   const getFollowers = createPipeline(
@@ -39,7 +39,21 @@ export default function (server: Server, ctx: AppContext) {
         skipViewerBlocks,
       })
 
-      const result = await getFollowers({ ...params, hydrateCtx }, ctx)
+      const result = await fillPage({
+        cursor: params.cursor,
+        limit: params.limit,
+        fetch: ({ cursor, limit }) =>
+          getFollowers(
+            {
+              ...params,
+              cursor,
+              limit,
+              hydrateCtx,
+            },
+            ctx,
+          ),
+        items: (r) => r.followers,
+      })
 
       return {
         encoding: 'application/json',
@@ -65,6 +79,7 @@ const skeleton = async (
     did: subjectDid,
     cursor: params.cursor,
     limit: params.limit,
+    sort: params.sort,
   })
   return {
     subjectDid,

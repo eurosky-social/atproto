@@ -36,6 +36,8 @@ exports[`pds views with blocking from block lists > blocks record embeds 1`] = `
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "bookmarkCount": 0,
@@ -59,6 +61,8 @@ exports[`pds views with blocking from block lists > blocks record embeds 1`] = `
             "viewer": {
               "blockedBy": false,
               "muted": false,
+              "mutedOnlyQuoteposts": false,
+              "mutedOnlyReposts": false,
             },
           },
           "cid": "cids(3)",
@@ -200,6 +204,8 @@ exports[`pds views with blocking from block lists > blocks thread parent 1`] = `
           "followedBy": "record(2)",
           "following": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "bookmarkCount": 0,
@@ -274,6 +280,8 @@ exports[`pds views with blocking from block lists > blocks thread reply 1`] = `
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "bookmarkCount": 0,
@@ -331,7 +339,6 @@ exports[`pds views with blocking from block lists > blocks thread reply 1`] = `
 
 exports[`pds views with blocking from block lists > returns a users own list blocks 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "lists": [
     {
       "cid": "cids(0)",
@@ -368,6 +375,8 @@ exports[`pds views with blocking from block lists > returns a users own list blo
           "blockedBy": false,
           "followedBy": "record(2)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "blah blah",
@@ -418,6 +427,8 @@ exports[`pds views with blocking from block lists > returns a users own list blo
           "blockedBy": false,
           "followedBy": "record(2)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "big list of blocks",
@@ -438,7 +449,6 @@ exports[`pds views with blocking from block lists > returns a users own list blo
 
 exports[`pds views with blocking from block lists > returns lists associated with a user 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "lists": [
     {
       "cid": "cids(0)",
@@ -475,6 +485,8 @@ exports[`pds views with blocking from block lists > returns lists associated wit
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "blah blah",
@@ -524,6 +536,8 @@ exports[`pds views with blocking from block lists > returns lists associated wit
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "big list of blocks",
@@ -544,7 +558,6 @@ exports[`pds views with blocking from block lists > returns lists associated wit
 
 exports[`pds views with blocking from block lists > returns the contents of a list 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "items": [
     {
       "subject": {
@@ -562,6 +575,8 @@ exports[`pds views with blocking from block lists > returns the contents of a li
         "viewer": {
           "blockedBy": false,
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "uri": "record(4)",
@@ -594,6 +609,8 @@ exports[`pds views with blocking from block lists > returns the contents of a li
             },
           },
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "uri": "record(5)",
@@ -631,6 +648,8 @@ exports[`pds views with blocking from block lists > returns the contents of a li
             },
           },
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "uri": "record(6)",
@@ -672,6 +691,8 @@ exports[`pds views with blocking from block lists > returns the contents of a li
         "blockedBy": false,
         "followedBy": "record(2)",
         "muted": false,
+        "mutedOnlyQuoteposts": false,
+        "mutedOnlyReposts": false,
       },
     },
     "description": "big list of blocks",

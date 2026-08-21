@@ -1,10 +1,10 @@
 import { DAY } from '@atproto/common'
 import {
-  Server,
+  type Server,
   UpstreamTimeoutError,
   parseReqEncoding,
 } from '@atproto/xrpc-server'
-import { AppContext } from '../../../../context.js'
+import type { AppContext } from '../../../../context.js'
 import { com } from '../../../../lexicons/index.js'
 
 export default function (server: Server, ctx: AppContext) {
@@ -32,7 +32,11 @@ export default function (server: Server, ctx: AppContext) {
         requester,
         async (store) => {
           const metadata = await store.repo.blob
-            .uploadBlobAndGetMetadata(input.encoding, input.body)
+            .uploadBlobAndGetMetadata(
+              input.body,
+              input.encoding,
+              ctx.cfg.service.blobUploadLimit,
+            )
             .catch(throwAbortAsUpstreamError)
 
           return store.transact(async (actorTxn) => {
@@ -58,8 +62,15 @@ export default function (server: Server, ctx: AppContext) {
 }
 
 function throwAbortAsUpstreamError(err: unknown): never {
-  if (err?.['name'] === 'AbortError') {
-    throw new UpstreamTimeoutError('Operation timed out, please try again.')
+  // Blob store timeouts surface as AbortError (total upload timeout) or
+  // TimeoutError (stalled connection), possibly wrapped as an error cause
+  // (e.g. S3BlobStore's "Blob upload timed out" error). The depth limit
+  // guards against (pathological) cyclic cause chains.
+  for (let e = err, depth = 0; e instanceof Error && depth < 10; depth++) {
+    if (e.name === 'AbortError' || e.name === 'TimeoutError') {
+      throw new UpstreamTimeoutError('Operation timed out, please try again.')
+    }
+    e = e.cause
   }
   throw err
 }

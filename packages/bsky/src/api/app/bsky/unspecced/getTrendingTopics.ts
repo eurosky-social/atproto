@@ -1,17 +1,17 @@
 import { noUndefinedVals } from '@atproto/common'
-import { Client } from '@atproto/lex'
-import { MethodNotImplementedError, Server } from '@atproto/xrpc-server'
-import { AppContext } from '../../../../context.js'
-import { HydrateCtx, Hydrator } from '../../../../hydration/hydrator.js'
+import type { Client } from '@atproto/lex'
+import { MethodNotImplementedError, type Server } from '@atproto/xrpc-server'
+import type { AppContext } from '../../../../context.js'
+import type { HydrateCtx, Hydrator } from '../../../../hydration/hydrator.js'
 import { app } from '../../../../lexicons/index.js'
 import {
-  HydrationFn,
-  PresentationFn,
-  RulesFn,
-  SkeletonFn,
+  type HydrationFn,
+  type PresentationFn,
+  type RulesFn,
+  type SkeletonFn,
   createPipeline,
 } from '../../../../pipeline.js'
-import { Views } from '../../../../views/index.js'
+import type { Views } from '../../../../views/index.js'
 
 export default function (server: Server, ctx: AppContext) {
   const getTrendingTopics = createPipeline(
@@ -48,12 +48,12 @@ export default function (server: Server, ctx: AppContext) {
 const skeleton: SkeletonFn<Context, Params, SkeletonState> = async (input) => {
   const { params, ctx } = input
 
-  if (!ctx.topicsClient) {
+  if (!ctx.irisClient) {
     // Use 501 instead of 500 as these are not considered retry-able by clients
     throw new MethodNotImplementedError('Topics agent not available')
   }
 
-  return ctx.topicsClient.call(
+  return ctx.irisClient.call(
     app.bsky.unspecced.getTrendingTopics,
     {
       limit: params.limit,
@@ -85,7 +85,7 @@ const presentation: PresentationFn<
 type Context = {
   hydrator: Hydrator
   views: Views
-  topicsClient: Client | undefined
+  irisClient: Client | undefined
 }
 
 type Params = Omit<app.bsky.unspecced.getTrendingTopics.$Params, 'viewer'> & {

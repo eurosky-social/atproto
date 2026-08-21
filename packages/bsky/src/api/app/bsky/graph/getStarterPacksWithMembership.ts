@@ -1,22 +1,22 @@
 import { mapDefined } from '@atproto/common'
-import { AtUriString, DidString } from '@atproto/syntax'
-import { InvalidRequestError, Server } from '@atproto/xrpc-server'
-import { AppContext } from '../../../../context.js'
+import type { AtUriString, DidString } from '@atproto/syntax'
+import { InvalidRequestError, type Server } from '@atproto/xrpc-server'
+import type { AppContext } from '../../../../context.js'
 import {
-  HydrateCtxWithViewer,
-  Hydrator,
+  type HydrateCtxWithViewer,
+  type Hydrator,
   mergeManyStates,
 } from '../../../../hydration/hydrator.js'
 import { app } from '../../../../lexicons/index.js'
 import {
-  HydrationFnInput,
-  PresentationFnInput,
-  SkeletonFnInput,
+  type HydrationFnInput,
+  type PresentationFnInput,
+  type SkeletonFnInput,
   createPipeline,
   noRules,
 } from '../../../../pipeline.js'
-import { Views } from '../../../../views/index.js'
-import { clearlyBadCursor, resHeaders } from '../../../util.js'
+import type { Views } from '../../../../views/index.js'
+import { clearlyBadCursor, fillPage, resHeaders } from '../../../util.js'
 
 export default function (server: Server, ctx: AppContext) {
   const getStarterPacksWithMembership = createPipeline(
@@ -34,10 +34,16 @@ export default function (server: Server, ctx: AppContext) {
         labelers,
         viewer,
       })
-      const result = await getStarterPacksWithMembership(
-        { ...params, hydrateCtx },
-        ctx,
-      )
+      const result = await fillPage({
+        cursor: params.cursor,
+        limit: params.limit,
+        fetch: ({ cursor, limit }) =>
+          getStarterPacksWithMembership(
+            { ...params, cursor, limit, hydrateCtx },
+            ctx,
+          ),
+        items: (r) => r.starterPacksWithMembership,
+      })
 
       return {
         encoding: 'application/json',

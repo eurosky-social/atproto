@@ -1,21 +1,24 @@
 import { mapDefined } from '@atproto/common'
-import { AtUriString, Client } from '@atproto/lex'
-import { Server } from '@atproto/xrpc-server'
-import { AppContext } from '../../../../context.js'
-import { DataPlaneClient } from '../../../../data-plane/index.js'
-import { HydrateCtx, Hydrator } from '../../../../hydration/hydrator.js'
+import type { AtUriString, Client } from '@atproto/lex'
+import type { Server } from '@atproto/xrpc-server'
+import type { AppContext } from '../../../../context.js'
+import {
+  type DataPlaneClient,
+  asInvalidRequest,
+} from '../../../../data-plane/index.js'
+import type { HydrateCtx, Hydrator } from '../../../../hydration/hydrator.js'
 import { parseString } from '../../../../hydration/util.js'
 import { app } from '../../../../lexicons/index.js'
 import {
-  HydrationFnInput,
-  PresentationFnInput,
-  RulesFnInput,
-  SkeletonFnInput,
+  type HydrationFnInput,
+  type PresentationFnInput,
+  type RulesFnInput,
+  type SkeletonFnInput,
   createPipeline,
 } from '../../../../pipeline.js'
 import { uriToDid as creatorFromUri } from '../../../../util/uris.js'
-import { Views } from '../../../../views/index.js'
-import { resHeaders, resolveSearchV2Override } from '../../../util.js'
+import type { Views } from '../../../../views/index.js'
+import { fillPage, resHeaders, resolveSearchV2Override } from '../../../util.js'
 
 export default function (server: Server, ctx: AppContext) {
   const searchStarterPacks = createPipeline(
@@ -42,14 +45,22 @@ export default function (server: Server, ctx: AppContext) {
           }),
         ),
       })
-      const results = await searchStarterPacks(
-        {
-          ...params,
-          hydrateCtx,
-          isV2Override: resolveSearchV2Override(req, ctx.cfg),
-        },
-        ctx,
-      )
+      const results = await fillPage({
+        cursor: params.cursor,
+        limit: params.limit,
+        fetch: ({ cursor, limit }) =>
+          searchStarterPacks(
+            {
+              ...params,
+              cursor,
+              limit,
+              hydrateCtx,
+              isV2Override: resolveSearchV2Override(req, ctx.cfg),
+            },
+            ctx,
+          ),
+        items: (r) => r.starterPacks,
+      })
       return {
         encoding: 'application/json',
         body: results,
@@ -99,14 +110,17 @@ const skeletonV2 = async (
   const { ctx, params } = inputs
   const { q } = params
 
-  const res = await ctx.dataplane.searchStarterPacksV2({
-    params: {
-      query: q,
-      viewer: params.hydrateCtx.viewer ?? undefined,
-      limit: params.limit,
-      cursor: params.cursor,
-    },
-  })
+  // Surface dataplane InvalidArgument errors as a 400 rather than a 500.
+  const res = await ctx.dataplane
+    .searchStarterPacksV2({
+      params: {
+        query: q,
+        viewer: params.hydrateCtx.viewer ?? undefined,
+        limit: params.limit,
+        cursor: params.cursor,
+      },
+    })
+    .catch(asInvalidRequest())
   return {
     uris: res.starterPacks.map(({ uri }) => uri as AtUriString),
     cursor: parseString(res.pageInfo?.cursor),

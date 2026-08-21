@@ -1,5 +1,4 @@
 import { Client as PlcClient } from '@did-plc/lib'
-import getPort from 'get-port'
 import * as ui8 from 'uint8arrays'
 import { AtpAgent } from '@atproto/api'
 import * as bsky from '@atproto/bsky'
@@ -7,7 +6,8 @@ import { Secp256k1Keypair } from '@atproto/crypto'
 import { Client } from '@atproto/lex'
 import type { DidString } from '@atproto/syntax'
 import { ADMIN_PASSWORD, EXAMPLE_LABELER } from './const.js'
-import { BskyConfig } from './types.js'
+import getPort from './get-port.js'
+import type { BskyConfig } from './types.js'
 export * from '@atproto/bsky'
 
 export class TestBsky {
@@ -83,6 +83,7 @@ export class TestBsky {
       maxThreadParents: cfg.maxThreadParents ?? 50,
       disableSsrfProtection: true,
       searchTagsHide: new Set(),
+      searchTagsHideAll: new Set(),
       threadTagsBumpDown: new Set(),
       threadTagsHide: new Set(),
       visibilityTagHide: '',

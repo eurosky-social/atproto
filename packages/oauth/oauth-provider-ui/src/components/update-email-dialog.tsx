@@ -1,11 +1,10 @@
 import { Trans } from '@lingui/react/macro'
-import { CheckIcon } from '@phosphor-icons/react'
-import { ReactNode, useEffect, useState } from 'react'
-import { FormField } from '#/components/forms/form-field.tsx'
-import { InputEmailAddress } from '#/components/forms/input-email-address.tsx'
-import { InputToken } from '#/components/forms/input-token.tsx'
-import { SmartForm } from '#/components/forms/smart-form.tsx'
-import { DialogSimple } from '#/components/utils/dialog-simple.tsx'
+import { CheckIcon } from 'lucide-react'
+import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
+import { DialogShell } from '#/components/dialogs/dialog-shell.tsx'
+import { EmailField } from '#/components/forms/fields/email-field.tsx'
+import { TokenField } from '#/components/forms/fields/token-field.tsx'
+import { FormShell } from '#/components/forms/form-shell.tsx'
 import { UpdateEmailForm } from './update-email-form.tsx'
 
 export type UpdateEmailDialogProps = {
@@ -16,7 +15,7 @@ export type UpdateEmailDialogProps = {
   onUpdateConfirm: (data: { email: string; token?: string }) => Promise<void>
   onVerifyRequest?: () => Promise<void>
   onVerifyConfirm?: (data: { email: string; token: string }) => Promise<void>
-  children: Exclude<ReactNode, false | null | undefined>
+  children: ReactElement
   introMessage?: ReactNode
 }
 
@@ -49,16 +48,29 @@ export function UpdateEmailDialog({
 
   const dismissable = !submitting
 
+  // @NOTE Naming the current address here is the only place it can be read in
+  // full: the settings row that opens this dialog truncates it, and on a touch
+  // screen there is no hover to reveal the rest.
+  const chooseDescription = emailCurrent ? (
+    <Trans>
+      Your account currently uses{' '}
+      <strong className="break-words">{emailCurrent}</strong>. Choose a new
+      email address to associate with it.
+    </Trans>
+  ) : (
+    <Trans>Choose a new email address to associate with your account.</Trans>
+  )
+
   if (step === Step.Verify && email && onVerifyConfirm) {
     return (
-      <DialogSimple
+      <DialogShell
         trigger={children}
         open={open}
         onOpenChange={setOpen}
         dismissable={dismissable}
         title={
           <>
-            <CheckIcon className="text-success mr-2 inline" weight="bold" />
+            <CheckIcon className="text-success mr-2 inline size-4" />
             <Trans>Email address successfully updated</Trans>
           </>
         }
@@ -66,58 +78,39 @@ export function UpdateEmailDialog({
           <Trans>
             Your email address has been successfully updated and needs to be
             verified. Please enter the verification code that was sent to{' '}
-            <strong>{email}</strong>.
+            <strong className="break-words">{email}</strong>.
           </Trans>
         }
       >
-        <SmartForm
+        <VerifyStepForm
+          email={email}
           onCancel={() => setOpen(false)}
-          cancelLabel={<Trans context="verify email">Later</Trans>}
-          submitLabel={<Trans context="verify email">Verify now</Trans>}
           onLoadingChange={setSubmitting}
-          validate={({ token }: { token?: string }) =>
-            token ? { token, email } : undefined
-          }
+          onResend={onVerifyRequest}
           handler={async (data) => {
             await onVerifyConfirm(data)
             setOpen(false)
           }}
-          fields={({ values, set }) => (
-            <FormField label={<Trans>Verification code</Trans>}>
-              <InputToken
-                name="code"
-                required
-                autoFocus
-                defaultValue={values.token ?? undefined}
-                onToken={(value) => set('token', value ?? undefined)}
-                onResend={onVerifyRequest}
-              />
-            </FormField>
-          )}
         />
-      </DialogSimple>
+      </DialogShell>
     )
   }
 
   if (step === Step.Token) {
     return (
-      <DialogSimple
+      <DialogShell
         trigger={children}
         open={open}
         onOpenChange={setOpen}
         dismissable={dismissable}
         title={<Trans>Update your email</Trans>}
-        description={
-          <Trans>
-            Choose a new email address to associate with your account.
-          </Trans>
-        }
+        description={chooseDescription}
       >
         <UpdateEmailForm
           emailCurrent={emailCurrent}
           requestPending={requestPending}
           confirmPending={confirmPending}
-          values={{ email }}
+          newEmailDefault={email}
           onLoadingChange={setSubmitting}
           onCancel={() => setOpen(false)}
           onResend={async () => {
@@ -132,30 +125,26 @@ export function UpdateEmailDialog({
             else setOpen(false)
           }}
         />
-      </DialogSimple>
+      </DialogShell>
     )
   }
 
   return (
-    <DialogSimple
+    <DialogShell
       trigger={children}
       open={open}
       onOpenChange={setOpen}
       dismissable={dismissable}
       title={<Trans>Update your email</Trans>}
-      description={
-        <Trans>
-          Choose a new email address to associate with your account.
-        </Trans>
-      }
+      description={chooseDescription}
     >
-      <SmartForm
+      <EmailRequestForm
+        emailDefault={email}
         disabled={requestPending}
-        values={{ email }}
         onLoadingChange={setSubmitting}
-        validate={({ email }) => (email ? { email } : undefined)}
         onCancel={() => setOpen(false)}
-        handler={async (data: { email: string; token?: string }) => {
+        introMessage={introMessage}
+        handler={async (data) => {
           const { tokenRequired } = await onUpdateRequest()
 
           setEmail(data.email)
@@ -163,8 +152,8 @@ export function UpdateEmailDialog({
           // If the previous email was not verified, we can skip asking for a
           // token to confirm ownership of that old email (since it was not
           // verified in the first place). In that case, we can directly go to
-          // confirming the new email, and optionally verifying it if `onVerifyConfirm`
-          // is provided.
+          // confirming the new email, and optionally verifying it if
+          // `onVerifyConfirm` is provided.
 
           if (tokenRequired) setStep(Step.Token)
           else {
@@ -174,22 +163,70 @@ export function UpdateEmailDialog({
             else setOpen(false)
           }
         }}
-        fields={({ values, set }) => (
-          <>
-            {introMessage}
-
-            <FormField label={<Trans>New email address</Trans>}>
-              <InputEmailAddress
-                name="email"
-                required
-                autoFocus
-                defaultValue={values.email}
-                onEmail={(email) => set('email', email)}
-              />
-            </FormField>
-          </>
-        )}
       />
-    </DialogSimple>
+    </DialogShell>
+  )
+}
+
+function EmailRequestForm({
+  emailDefault,
+  introMessage,
+  handler,
+  ...props
+}: {
+  emailDefault?: string
+  introMessage?: ReactNode
+  disabled?: boolean
+  onCancel?: () => void
+  onLoadingChange?: (loading: boolean) => void
+  handler: (data: { email: string }, signal: AbortSignal) => Promise<void>
+}) {
+  return (
+    <FormShell<{ email: string }> {...props} onSubmit={handler}>
+      {introMessage}
+
+      <EmailField
+        name="email"
+        defaultValue={emailDefault ?? ''}
+        label={<Trans>New email address</Trans>}
+        required
+        autoFocus
+      />
+    </FormShell>
+  )
+}
+
+function VerifyStepForm({
+  email,
+  onResend,
+  handler,
+  ...props
+}: {
+  email: string
+  onResend?: () => Promise<void>
+  onCancel?: () => void
+  onLoadingChange?: (loading: boolean) => void
+  handler: (
+    data: { email: string; token: string },
+    signal: AbortSignal,
+  ) => Promise<void>
+}) {
+  return (
+    <FormShell<{ code: string }>
+      {...props}
+      cancelLabel={<Trans context="verify email">Later</Trans>}
+      submitLabel={<Trans context="verify email">Verify now</Trans>}
+      onSubmit={(values, signal) =>
+        handler({ email, token: values.code }, signal)
+      }
+    >
+      <TokenField
+        name="code"
+        label={<Trans>Verification code</Trans>}
+        required
+        autoFocus
+        onResend={onResend}
+      />
+    </FormShell>
   )
 }

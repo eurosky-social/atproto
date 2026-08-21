@@ -1,25 +1,25 @@
 import { mapDefined } from '@atproto/common'
-import { AtUriString, DatetimeString, DidString } from '@atproto/syntax'
-import { InvalidRequestError, Server } from '@atproto/xrpc-server'
-import { ServerConfig } from '../../../../config.js'
-import { AppContext } from '../../../../context.js'
-import {
+import type { AtUriString, DatetimeString, DidString } from '@atproto/syntax'
+import { InvalidRequestError, type Server } from '@atproto/xrpc-server'
+import type { ServerConfig } from '../../../../config.js'
+import type { AppContext } from '../../../../context.js'
+import type {
   HydrateCtxWithViewer,
   Hydrator,
 } from '../../../../hydration/hydrator.js'
 import { app } from '../../../../lexicons/index.js'
 import {
-  HydrationFnInput,
-  PresentationFnInput,
-  RulesFnInput,
-  SkeletonFnInput,
+  type HydrationFnInput,
+  type PresentationFnInput,
+  type RulesFnInput,
+  type SkeletonFnInput,
   createPipeline,
 } from '../../../../pipeline.js'
-import { Notification } from '../../../../proto/bsky_pb.js'
+import type { Notification } from '../../../../proto/bsky_pb.js'
 import { uriToDid as didFromUri } from '../../../../util/uris.js'
-import { Views } from '../../../../views/index.js'
+import type { Views } from '../../../../views/index.js'
 import { isPostRecordType } from '../../../../views/types.js'
-import { resHeaders } from '../../../util.js'
+import { fillPage, resHeaders } from '../../../util.js'
 
 export default function (server: Server, ctx: AppContext) {
   const listNotifications = createPipeline(
@@ -34,7 +34,13 @@ export default function (server: Server, ctx: AppContext) {
       const viewer = auth.credentials.iss
       const labelers = ctx.reqLabelers(req)
       const hydrateCtx = await ctx.hydrator.createContext({ labelers, viewer })
-      const result = await listNotifications({ ...params, hydrateCtx }, ctx)
+      const result = await fillPage({
+        cursor: params.cursor,
+        limit: params.limit,
+        fetch: ({ cursor, limit }) =>
+          listNotifications({ ...params, cursor, limit, hydrateCtx }, ctx),
+        items: (r) => r.notifications,
+      })
       return {
         encoding: 'application/json',
         body: result,
@@ -54,43 +60,17 @@ const paginateNotifications = async (opts: {
 }) => {
   const { ctx, priority, reasons, limit, viewer } = opts
 
-  // if not filtering, then just pass through the response from dataplane
-  if (!reasons) {
-    const res = await ctx.hydrator.dataplane.getNotifications({
-      actorDid: viewer,
-      priority,
-      cursor: opts.cursor,
-      limit,
-    })
-    return {
-      notifications: res.notifications,
-      cursor: res.cursor,
-    }
-  }
-
-  let nextCursor: string | undefined = opts.cursor
-  let toReturn: Notification[] = []
-  const maxAttempts = 10
-  const attemptSize = Math.ceil(limit / 2)
-  for (let i = 0; i < maxAttempts; i++) {
-    const res = await ctx.hydrator.dataplane.getNotifications({
-      actorDid: viewer,
-      priority,
-      cursor: nextCursor,
-      limit,
-    })
-    const filtered = res.notifications.filter((notif) =>
-      reasons.includes(notif.reason),
-    )
-    toReturn = [...toReturn, ...filtered]
-    nextCursor = res.cursor ?? undefined
-    if (toReturn.length >= attemptSize || !nextCursor) {
-      break
-    }
-  }
+  const res = await ctx.hydrator.dataplane.getNotifications({
+    actorDid: viewer,
+    priority,
+    cursor: opts.cursor,
+    limit,
+  })
   return {
-    notifications: toReturn,
-    cursor: nextCursor,
+    notifications: reasons
+      ? res.notifications.filter((notif) => reasons.includes(notif.reason))
+      : res.notifications,
+    cursor: res.cursor,
   }
 }
 

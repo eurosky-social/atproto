@@ -32,6 +32,8 @@ exports[`bsky views with mutes from mute lists > embeds lists in posts 1`] = `
     "viewer": {
       "blockedBy": false,
       "muted": false,
+      "mutedOnlyQuoteposts": false,
+      "mutedOnlyReposts": false,
     },
   },
   "bookmarkCount": 0,
@@ -73,6 +75,8 @@ exports[`bsky views with mutes from mute lists > embeds lists in posts 1`] = `
         "viewer": {
           "blockedBy": false,
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "new descript",
@@ -149,6 +153,8 @@ exports[`bsky views with mutes from mute lists > flags mutes in threads 1`] = `
         "blockedBy": false,
         "followedBy": "record(1)",
         "muted": false,
+        "mutedOnlyQuoteposts": false,
+        "mutedOnlyReposts": false,
       },
     },
     "bookmarkCount": 0,
@@ -204,6 +210,8 @@ exports[`bsky views with mutes from mute lists > flags mutes in threads 1`] = `
                 "muted": true,
               },
             },
+            "mutedOnlyQuoteposts": false,
+            "mutedOnlyReposts": false,
           },
         },
         "bookmarkCount": 0,
@@ -270,6 +278,8 @@ exports[`bsky views with mutes from mute lists > flags mutes in threads 1`] = `
                 "muted": true,
               },
             },
+            "mutedOnlyQuoteposts": false,
+            "mutedOnlyReposts": false,
           },
         },
         "bookmarkCount": 0,
@@ -352,7 +362,6 @@ exports[`bsky views with mutes from mute lists > flags mutes in threads 1`] = `
 
 exports[`bsky views with mutes from mute lists > returns a users own list mutes 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "lists": [
     {
       "cid": "cids(0)",
@@ -389,6 +398,8 @@ exports[`bsky views with mutes from mute lists > returns a users own list mutes 
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "blah blah",
@@ -438,6 +449,8 @@ exports[`bsky views with mutes from mute lists > returns a users own list mutes 
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "big list of mutes",
@@ -457,7 +470,6 @@ exports[`bsky views with mutes from mute lists > returns a users own list mutes 
 
 exports[`bsky views with mutes from mute lists > returns lists associated with a user 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "lists": [
     {
       "cid": "cids(0)",
@@ -494,6 +506,8 @@ exports[`bsky views with mutes from mute lists > returns lists associated with a
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "blah blah",
@@ -543,6 +557,8 @@ exports[`bsky views with mutes from mute lists > returns lists associated with a
           "blockedBy": false,
           "followedBy": "record(1)",
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "description": "big list of mutes",
@@ -562,7 +578,6 @@ exports[`bsky views with mutes from mute lists > returns lists associated with a
 
 exports[`bsky views with mutes from mute lists > returns the contents of a list 1`] = `
 {
-  "cursor": "0000000000000__bafycid",
   "items": [
     {
       "subject": {
@@ -580,6 +595,8 @@ exports[`bsky views with mutes from mute lists > returns the contents of a list 
         "viewer": {
           "blockedBy": false,
           "muted": false,
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "uri": "record(3)",
@@ -611,6 +628,8 @@ exports[`bsky views with mutes from mute lists > returns the contents of a list 
               "muted": true,
             },
           },
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "uri": "record(4)",
@@ -647,6 +666,8 @@ exports[`bsky views with mutes from mute lists > returns the contents of a list 
               "muted": true,
             },
           },
+          "mutedOnlyQuoteposts": false,
+          "mutedOnlyReposts": false,
         },
       },
       "uri": "record(6)",
@@ -688,6 +709,8 @@ exports[`bsky views with mutes from mute lists > returns the contents of a list 
         "blockedBy": false,
         "followedBy": "record(1)",
         "muted": false,
+        "mutedOnlyQuoteposts": false,
+        "mutedOnlyReposts": false,
       },
     },
     "description": "big list of mutes",

@@ -1,13 +1,13 @@
-import { PlainMessage, Timestamp } from '@bufbuild/protobuf'
-import { ServiceImpl } from '@connectrpc/connect'
+import { type PlainMessage, Timestamp } from '@bufbuild/protobuf'
+import type { ServiceImpl } from '@connectrpc/connect'
 import { keyBy } from '@atproto/common'
-import { Service } from '../../../proto/bsky_connect.js'
+import type { Service } from '../../../proto/bsky_connect.js'
 import {
-  Bookmark,
+  type Bookmark,
   GetBookmarksByActorAndSubjectsResponse,
 } from '../../../proto/bsky_pb.js'
 import { Namespaces } from '../../../stash.js'
-import { Database } from '../db/index.js'
+import type { Database } from '../db/index.js'
 import { StashKeyKey } from '../db/pagination.js'
 
 export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
@@ -26,13 +26,13 @@ export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
       limit,
     })
 
-    const res = await builder.execute()
+    const page = key.page(await builder.execute(), limit)
     return {
-      bookmarks: res.map((b) => ({
+      bookmarks: page.items.map((b) => ({
         key: b.key,
         subject: b.subjectUri,
       })),
-      cursor: key.packFromResult(res),
+      cursor: page.cursor,
     }
   },
 

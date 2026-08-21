@@ -1,21 +1,21 @@
 import { mapDefined } from '@atproto/common'
-import { Server } from '@atproto/xrpc-server'
-import { AppContext } from '../../../../context.js'
-import {
+import type { Server } from '@atproto/xrpc-server'
+import type { AppContext } from '../../../../context.js'
+import type {
   HydrateCtxWithViewer,
   Hydrator,
 } from '../../../../hydration/hydrator.js'
 import { app } from '../../../../lexicons/index.js'
 import {
-  HydrationFnInput,
-  PresentationFnInput,
-  SkeletonFnInput,
+  type HydrationFnInput,
+  type PresentationFnInput,
+  type SkeletonFnInput,
   createPipeline,
   noRules,
 } from '../../../../pipeline.js'
-import { BookmarkInfo } from '../../../../proto/bsky_pb.js'
-import { Views } from '../../../../views/index.js'
-import { resHeaders } from '../../../util.js'
+import type { BookmarkInfo } from '../../../../proto/bsky_pb.js'
+import type { Views } from '../../../../views/index.js'
+import { fillPage, resHeaders } from '../../../util.js'
 
 export default function (server: Server, ctx: AppContext) {
   const getBookmarks = createPipeline(
@@ -34,7 +34,13 @@ export default function (server: Server, ctx: AppContext) {
         viewer,
       })
 
-      const result = await getBookmarks({ ...params, hydrateCtx }, ctx)
+      const result = await fillPage({
+        cursor: params.cursor,
+        limit: params.limit,
+        fetch: ({ cursor, limit }) =>
+          getBookmarks({ ...params, cursor, limit, hydrateCtx }, ctx),
+        items: (r) => r.bookmarks,
+      })
 
       return {
         encoding: 'application/json',

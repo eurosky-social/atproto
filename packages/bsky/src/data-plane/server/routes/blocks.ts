@@ -1,6 +1,6 @@
-import { ServiceImpl } from '@connectrpc/connect'
-import { Service } from '../../../proto/bsky_connect.js'
-import { Database } from '../db/index.js'
+import type { ServiceImpl } from '@connectrpc/connect'
+import type { Service } from '../../../proto/bsky_connect.js'
+import type { Database } from '../db/index.js'
 import { TimeCidKeyset, paginate } from '../db/pagination.js'
 
 export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
@@ -48,10 +48,10 @@ export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
       keyset,
     })
 
-    const blocks = await builder.execute()
+    const page = keyset.page(await builder.execute(), limit)
     return {
-      blockUris: blocks.map((b) => b.uri),
-      cursor: keyset.packFromResult(blocks),
+      blockUris: page.items.map((b) => b.uri),
+      cursor: page.cursor,
     }
   },
 
@@ -117,11 +117,11 @@ export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
       cursor,
       keyset,
     })
-    const lists = await builder.execute()
+    const page = keyset.page(await builder.execute(), limit)
 
     return {
-      listUris: lists.map((l) => l.uri),
-      cursor: keyset.packFromResult(lists),
+      listUris: page.items.map((l) => l.uri),
+      cursor: page.cursor,
     }
   },
 })

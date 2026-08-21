@@ -1,10 +1,10 @@
 import assert from 'node:assert'
 import * as plc from '@did-plc/lib'
-import express from 'express'
-import { Redis } from 'ioredis'
+import type express from 'express'
+import type { Redis } from 'ioredis'
 import * as nodemailer from 'nodemailer'
 import * as ui8 from 'uint8arrays'
-import * as undici from 'undici'
+import type * as undici from 'undici'
 import { KmsKeypair, S3BlobStore } from '@atproto/aws'
 import * as crypto from '@atproto/crypto'
 import { IdResolver } from '@atproto/identity'
@@ -14,14 +14,14 @@ import {
   JoseKey,
   LexResolver,
   OAuthProvider,
-  OAuthVerifier,
-} from '@atproto/oauth-provider'
-import { BlobStore } from '@atproto/repo'
+} from '@atproto/oauth-provider/provider'
+import { OAuthVerifier } from '@atproto/oauth-provider/verifier'
+import type { BlobStore } from '@atproto/repo'
 import {
   createServiceAuthHeaders,
   createServiceJwt,
 } from '@atproto/xrpc-server'
-import { Fetch, safeFetchWrap } from '@atproto-labs/fetch-node'
+import { type Fetch, safeFetchWrap } from '@atproto-labs/fetch-node'
 import { AccountManager } from './account-manager/account-manager.js'
 import { OAuthStore } from './account-manager/oauth-store.js'
 import { ScopeReferenceGetter } from './account-manager/scope-reference-getter.js'
@@ -34,16 +34,27 @@ import {
 } from './auth-verifier.js'
 import { BackgroundQueue } from './background.js'
 import { BskyAppView } from './bsky-app-view.js'
-import { ServerConfig, ServerSecrets } from './config/index.js'
+import {
+  type ServerConfig,
+  type ServerEnvironment,
+  type ServerSecrets,
+  envToCfg,
+  envToSecrets,
+  readEnv,
+} from './config/index.js'
 import { Crawlers } from './crawlers.js'
 import { DidSqliteCache } from './did-cache/index.js'
 import { DiskBlobStore } from './disk-blobstore.js'
+import { events } from './events.js'
 import { ImageUrlBuilder } from './image/image-url-builder.js'
 import { fetchLogger, lexiconResolverLogger, oauthLogger } from './logger.js'
 import { ServerMailer } from './mailer/index.js'
 import { ModerationMailer } from './mailer/moderation.js'
 import { buildProxyAgent } from './pipethrough.js'
-import { LocalViewer, LocalViewerCreator } from './read-after-write/viewer.js'
+import {
+  LocalViewer,
+  type LocalViewerCreator,
+} from './read-after-write/viewer.js'
 import { getRedisClient } from './redis.js'
 import { Sequencer } from './sequencer/index.js'
 
@@ -74,7 +85,7 @@ export type AppContextOptions = {
   cfg: ServerConfig
 }
 
-export class AppContext {
+export class AppContext implements AsyncDisposable {
   public actorStore: ActorStore
   public blobstore: (did: string) => BlobStore
   public localViewer: LocalViewerCreator
@@ -127,11 +138,21 @@ export class AppContext {
     this.cfg = opts.cfg
   }
 
+  static async fromEnv(
+    env: ServerEnvironment = readEnv(),
+  ): Promise<AppContext> {
+    const cfg = envToCfg(env)
+    const secrets = envToSecrets(env)
+    return AppContext.fromConfig(cfg, secrets)
+  }
+
   static async fromConfig(
     cfg: ServerConfig,
     secrets: ServerSecrets,
     overrides?: Partial<AppContextOptions>,
   ): Promise<AppContext> {
+    // @TODO Implement using an AsyncDisposableStack
+
     const blobstore =
       cfg.blobstore.provider === 's3'
         ? S3BlobStore.creator({
@@ -141,6 +162,7 @@ export class AppContext {
             forcePathStyle: cfg.blobstore.forcePathStyle,
             credentials: cfg.blobstore.credentials,
             uploadTimeoutMs: cfg.blobstore.uploadTimeoutMs,
+            requestTimeoutMs: cfg.blobstore.requestTimeoutMs,
           })
         : DiskBlobStore.creator(
             cfg.blobstore.location,
@@ -233,14 +255,16 @@ export class AppContext {
     const entrywayAdminClient =
       cfg.entryway && secrets.entrywayAdminToken
         ? new Client(
-            { service: cfg.entryway.url },
             {
+              service: cfg.entryway.url,
               headers: {
                 authorization: basicAuthHeader(
                   'admin',
                   secrets.entrywayAdminToken,
                 ),
               },
+            },
+            {
               // Trust internal services to send us well-formed responses
               strictResponseProcessing: false,
               validateResponse: cfg.service.devMode,
@@ -395,6 +419,44 @@ export class AppContext {
               isTrusted: cfg.oauth.provider?.trustedClients?.includes(clientId),
             }
           },
+          onSignedUp({ account, data, clientId }) {
+            events.accountCreated({
+              source: 'oauth',
+              did: account.did,
+              clientId,
+              invited: data.inviteCode != null,
+              deactivated: false,
+            })
+          },
+          onSignedIn({ account, clientId }) {
+            events.signedIn({
+              did: account.did,
+              clientId,
+            })
+          },
+          onAuthorized({ account, client }) {
+            events.oauthAuthorized({
+              did: account.did,
+              clientId: client.id,
+              clientFirstParty: client.isFirstParty,
+              clientTrusted: client.isTrusted,
+              clientConfidential: client.isConfidential,
+            })
+          },
+          onTokenCreated({ account, client }) {
+            events.sessionCreated({
+              source: 'oauth',
+              did: account.did,
+              clientId: client.id,
+            })
+          },
+          onTokenRefreshed({ account, client }) {
+            events.sessionRefreshed({
+              source: 'oauth',
+              did: account.did,
+              clientId: client.id,
+            })
+          },
         })
       : undefined
 
@@ -509,6 +571,30 @@ export class AppContext {
       lxm,
       keypair,
     })
+  }
+
+  async destroy(): Promise<void> {
+    try {
+      await this.backgroundQueue.destroy()
+    } finally {
+      try {
+        await this.sequencer.destroy()
+      } finally {
+        try {
+          await this.accountManager.close()
+        } finally {
+          try {
+            await this.redisScratch?.quit()
+          } finally {
+            await this.proxyAgent.destroy()
+          }
+        }
+      }
+    }
+  }
+
+  async [Symbol.asyncDispose]() {
+    await this.destroy()
   }
 }
 

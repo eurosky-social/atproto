@@ -1,10 +1,10 @@
 import { Timestamp } from '@bufbuild/protobuf'
-import { ServiceImpl } from '@connectrpc/connect'
+import type { ServiceImpl } from '@connectrpc/connect'
 import { sql } from 'kysely'
 import { keyBy } from '@atproto/common'
 import { lexParse } from '@atproto/lex'
-import { app } from '../../../lexicons/index.js'
-import { Service } from '../../../proto/bsky_connect.js'
+import type { app } from '../../../lexicons/index.js'
+import type { Service } from '../../../proto/bsky_connect.js'
 import {
   FilterableNotificationPreference,
   NotificationInclude,
@@ -12,7 +12,7 @@ import {
   NotificationPreferences,
 } from '../../../proto/bsky_pb.js'
 import { Namespaces } from '../../../stash.js'
-import { Database } from '../db/index.js'
+import type { Database } from '../db/index.js'
 import { IsoSortAtKey } from '../db/pagination.js'
 import { countAll, notSoftDeletedClause } from '../db/util.js'
 
@@ -58,8 +58,8 @@ export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
       limit,
     })
 
-    const notifsRes = await builder.execute()
-    const notifications = notifsRes.map((notif) => ({
+    const page = key.page(await builder.execute(), limit)
+    const notifications = page.items.map((notif) => ({
       recipientDid: actorDid,
       uri: notif.uri,
       reason: notif.reason,
@@ -69,7 +69,7 @@ export default (db: Database): Partial<ServiceImpl<typeof Service>> => ({
     }))
     return {
       notifications,
-      cursor: key.packFromResult(notifsRes),
+      cursor: page.cursor,
     }
   },
 

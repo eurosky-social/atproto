@@ -2,19 +2,21 @@ import { msg } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useState } from 'react'
 import { useCustomizationData } from '#/contexts/customization.tsx'
-import { WizardCard } from './forms/wizard-card.tsx'
-import { LayoutTitle } from './layouts/layout-title.tsx'
+import { SignUpWizard } from './forms/sign-up-wizard.tsx'
+import { AuthShell } from './layouts/auth-shell.tsx'
 import {
-  SignUpCredentialsData,
+  type SignUpCredentialsData,
   SignUpCredentialsForm,
 } from './sign-up-credentials-form.tsx'
 import { SignUpDisclaimer } from './sign-up-disclaimer.tsx'
-import { SignUpHandleData, SignUpHandleForm } from './sign-up-handle-form.tsx'
 import {
-  SignUpHcaptchaData,
+  type SignUpHandleData,
+  SignUpHandleForm,
+} from './sign-up-handle-form.tsx'
+import {
+  type SignUpHcaptchaData,
   SignUpHcaptchaForm,
 } from './sign-up-hcaptcha-form.tsx'
-import { HelpCard } from './utils/help-card.tsx'
 
 export type SignUpViewProps = {
   onBack?: () => void
@@ -46,12 +48,17 @@ export function SignUpView({
     Partial<SignUpCredentialsData & SignUpHandleData & SignUpHcaptchaData>
   >({})
 
+  // @NOTE Only the last step creates the account, so only the last step states
+  // what creating one agrees to. Which step that is depends on whether hCaptcha
+  // is configured, so the wizard decides it (`atLast`) rather than this list.
+  const disclaimer = <SignUpDisclaimer links={links} />
+
   return (
-    <LayoutTitle
+    <AuthShell
       title={msg({ message: 'Sign up' })}
       subtitle={<Trans>We're so excited to have you join us!</Trans>}
     >
-      <WizardCard
+      <SignUpWizard
         onBack={onBack}
         doneLabel={<Trans>Sign up</Trans>}
         onDone={([handle, credentials, hcaptcha]: [
@@ -72,7 +79,7 @@ export function SignUpView({
           // issue with the email address (e.g. already in use).
           {
             titleRender: () => <Trans>Choose a username</Trans>,
-            contentRender: ({ prev, prevLabel, next, nextLabel }) => (
+            contentRender: ({ atLast, prev, prevLabel, next, nextLabel }) => (
               <SignUpHandleForm
                 className="grow"
                 domains={availableUserDomains}
@@ -86,13 +93,13 @@ export function SignUpView({
                   next(data)
                 }}
               >
-                <SignUpDisclaimer links={links} />
+                {atLast && disclaimer}
               </SignUpHandleForm>
             ),
           },
           {
             titleRender: () => <Trans>Your account</Trans>,
-            contentRender: ({ prev, prevLabel, next, nextLabel }) => (
+            contentRender: ({ atLast, prev, prevLabel, next, nextLabel }) => (
               <SignUpCredentialsForm
                 className="grow"
                 onBack={prev}
@@ -103,13 +110,13 @@ export function SignUpView({
                 handler={next}
                 inviteCodeRequired={inviteCodeRequired}
               >
-                <SignUpDisclaimer links={links} />
+                {atLast && disclaimer}
               </SignUpCredentialsForm>
             ),
           },
           hcaptchaSiteKey != null && {
             titleRender: () => <Trans>Verify you are human</Trans>,
-            contentRender: ({ prev, prevLabel, next, nextLabel }) => (
+            contentRender: ({ atLast, prev, prevLabel, next, nextLabel }) => (
               <SignUpHcaptchaForm
                 className="grow"
                 siteKey={hcaptchaSiteKey}
@@ -120,14 +127,12 @@ export function SignUpView({
                 onValues={(val) => setPending((old) => ({ ...old, ...val }))}
                 handler={next}
               >
-                <SignUpDisclaimer links={links} />
+                {atLast && disclaimer}
               </SignUpHcaptchaForm>
             ),
           },
         ]}
       />
-
-      <HelpCard className="mt-4" links={links} />
-    </LayoutTitle>
+    </AuthShell>
   )
 }
