@@ -38,6 +38,8 @@ jobs:
         env:
           PUPPETEER_SKIP_DOWNLOAD: true
       - run: pnpm changeset status --since=origin/${{ github.base_ref }}
+        # Eurosky fork: our PRs and upstream syncs carry no changesets.
+        if: github.repository == 'bluesky-social/atproto'
 
   build:
     name: Build
