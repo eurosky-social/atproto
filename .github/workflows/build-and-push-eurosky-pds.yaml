@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - eurosky
 
 env:
   REGISTRY: ghcr.io
@@ -55,9 +55,9 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,enable=true,priority=100,prefix=eurosky-pds-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }},suffix=,format=long
-            type=raw,value=eurosky-pds-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
-            type=raw,value=eurosky-pds-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}latest
+            type=sha,enable=true,priority=100,prefix=eurosky-pds-${{ github.ref_name != 'eurosky' && format('{0}-', github.ref_name) || '' }},suffix=,format=long
+            type=raw,value=eurosky-pds-${{ github.ref_name != 'eurosky' && format('{0}-', github.ref_name) || '' }}{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
+            type=raw,value=eurosky-pds-${{ github.ref_name != 'eurosky' && format('{0}-', github.ref_name) || '' }}latest
 
       - name: Build and push by digest
         id: build
@@ -123,9 +123,9 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,enable=true,priority=100,prefix=eurosky-pds-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }},suffix=,format=long
-            type=raw,value=eurosky-pds-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
-            type=raw,value=eurosky-pds-${{ github.ref_name != 'main' && format('{0}-', github.ref_name) || '' }}latest
+            type=sha,enable=true,priority=100,prefix=eurosky-pds-${{ github.ref_name != 'eurosky' && format('{0}-', github.ref_name) || '' }},suffix=,format=long
+            type=raw,value=eurosky-pds-${{ github.ref_name != 'eurosky' && format('{0}-', github.ref_name) || '' }}{{date 'YYYY-MM-DDTHH-mm-ssZ'}}
+            type=raw,value=eurosky-pds-${{ github.ref_name != 'eurosky' && format('{0}-', github.ref_name) || '' }}latest
 
       - name: Create manifest list and push
         id: merge
