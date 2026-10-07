@@ -8,6 +8,8 @@ type LiveNowConfig = {
   domains: string[]
 }[]
 
+export type NotificationsV2Algorithm = 'algoGravity' | 'algoLookback'
+
 export interface KwsConfig {
   apiKey: string
   apiOrigin: string
@@ -69,7 +71,13 @@ export interface ServerConfigValues {
   topicsUrl?: string
   topicsApiKey?: string
   irisUrl?: string
-  irisFeedUris?: Set<string> // `iris:feed:enable` gate to serve via iris instead of seeemore
+  irisServiceDid?: DidString
+  seemoreServiceDid?: DidString
+  irisStagingServiceDid?: DidString
+  trendingFeedDid?: DidString
+  bskyFeedgenDids: Set<string>
+  irisApiKey?: string
+  irisFeedUris?: Set<string> // allowlist iris may serve instead of seeemore; whats-hot is gated by `iris:feed:enable`, other feeds by their per-rkey `iris:feed:<rkey>:enable` gate
   irisStagingUrl?: string
   irisStagingFeedUris?: Set<string> // serve via iris staging instead of the registered feed generator
   feedGenSkeletonTimeout: number
@@ -102,6 +110,7 @@ export interface ServerConfigValues {
   visibilityTagRankPrefix: string
   // notifications
   notificationsDelayMs?: number
+  notificationsV2Algorithm?: NotificationsV2Algorithm
   // client config
   clientCheckEmailConfirmed?: boolean
   topicsEnabled?: boolean
@@ -178,6 +187,19 @@ export class ServerConfig {
     const topicsUrl = process.env.BSKY_TOPICS_URL || undefined
     const topicsApiKey = process.env.BSKY_TOPICS_API_KEY
     const irisUrl = process.env.BSKY_IRIS_URL || undefined
+    const irisServiceDid = process.env.BSKY_IRIS_SERVICE_DID || undefined
+    assert(irisServiceDid == null || isDidString(irisServiceDid))
+    const seemoreServiceDid = process.env.BSKY_SEEMORE_SERVICE_DID || undefined
+    assert(seemoreServiceDid == null || isDidString(seemoreServiceDid))
+    const irisStagingServiceDid =
+      process.env.BSKY_IRIS_STAGING_SERVICE_DID || undefined
+    assert(irisStagingServiceDid == null || isDidString(irisStagingServiceDid))
+    const trendingFeedDid = process.env.BSKY_TRENDING_FEED_DID || undefined
+    assert(trendingFeedDid == null || isDidString(trendingFeedDid))
+    const bskyFeedgenDids = new Set(
+      envList(process.env.BSKY_FEEDGEN_DIDS).filter(isDidString),
+    )
+    const irisApiKey = process.env.BSKY_IRIS_API_KEY || undefined
     const irisFeedUris = new Set(envList(process.env.BSKY_IRIS_FEED_URIS))
     const irisStagingUrl = process.env.BSKY_IRIS_STAGING_URL || undefined
     const irisStagingFeedUris = new Set(
@@ -277,6 +299,10 @@ export class ServerConfig {
     const notificationsDelayMs = process.env.BSKY_NOTIFICATIONS_DELAY_MS
       ? parseInt(process.env.BSKY_NOTIFICATIONS_DELAY_MS || '', 10)
       : 0
+    const notificationsV2Algorithm =
+      process.env.BSKY_NOTIFICATIONS_V2_ALGORITHM === 'algoLookback'
+        ? 'algoLookback'
+        : 'algoGravity'
 
     const disableSsrfProtection = process.env.BSKY_DISABLE_SSRF_PROTECTION
       ? process.env.BSKY_DISABLE_SSRF_PROTECTION === 'true'
@@ -381,6 +407,12 @@ export class ServerConfig {
       topicsUrl,
       topicsApiKey,
       irisUrl,
+      irisServiceDid,
+      seemoreServiceDid,
+      irisStagingServiceDid,
+      trendingFeedDid,
+      bskyFeedgenDids,
+      irisApiKey,
       irisFeedUris,
       irisStagingUrl,
       irisStagingFeedUris,
@@ -423,6 +455,7 @@ export class ServerConfig {
       visibilityTagHide,
       visibilityTagRankPrefix,
       notificationsDelayMs,
+      notificationsV2Algorithm,
       disableSsrfProtection,
       proxyAllowHTTP2,
       proxyConnectTimeout,
@@ -576,6 +609,30 @@ export class ServerConfig {
     return this.cfg.irisUrl
   }
 
+  get irisServiceDid() {
+    return this.cfg.irisServiceDid
+  }
+
+  get seemoreServiceDid() {
+    return this.cfg.seemoreServiceDid
+  }
+
+  get irisStagingServiceDid() {
+    return this.cfg.irisStagingServiceDid
+  }
+
+  get trendingFeedDid() {
+    return this.cfg.trendingFeedDid
+  }
+
+  get bskyFeedgenDids() {
+    return this.cfg.bskyFeedgenDids
+  }
+
+  get irisApiKey() {
+    return this.cfg.irisApiKey
+  }
+
   get irisFeedUris() {
     return this.cfg.irisFeedUris
   }
@@ -694,6 +751,10 @@ export class ServerConfig {
 
   get notificationsDelayMs() {
     return this.cfg.notificationsDelayMs ?? 0
+  }
+
+  get notificationsV2Algorithm(): NotificationsV2Algorithm {
+    return this.cfg.notificationsV2Algorithm ?? 'algoGravity'
   }
 
   get disableSsrfProtection(): boolean {

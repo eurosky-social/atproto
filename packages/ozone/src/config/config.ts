@@ -1,7 +1,17 @@
 import assert from 'node:assert'
 import { DAY, HOUR, MINUTE } from '@atproto/common'
-import type { DidString, UriString } from '@atproto/lex'
+import {
+  type DatetimeString,
+  type DidString,
+  type UriString,
+  isDatetimeString,
+  toDatetimeString,
+} from '@atproto/lex'
 import type { OzoneEnvironment } from './env.js'
+import {
+  type StrikeSuspensionConfig,
+  parseStrikeSuspensionConfig,
+} from './strike-suspension.js'
 
 // off-config but still from env:
 // logging: LOG_LEVEL, LOG_SYSTEMS, LOG_ENABLED, LOG_DESTINATION
@@ -103,6 +113,12 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     reportDurationMs: env.assignmentReportDurationMs ?? 5 * MINUTE,
   }
 
+  const inboxCfg: OzoneConfig['inbox'] = {
+    appealWindowMonths: env.inboxAppealWindowMonths ?? 6,
+    policyDefaultUrl: env.inboxPolicyDefaultUrl ?? DEFAULT_INBOX_POLICY_URL,
+    startAt: parseInboxStartAt(env.inboxStartAt),
+  }
+
   const statsCfg: OzoneConfig['stats'] = {
     computerIntervalMinutes: env.statsComputerIntervalMinutes ?? 15,
   }
@@ -119,6 +135,8 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     access: accessCfg,
     verifier: verifierCfg,
     assignments: assignmentsCfg,
+    inbox: inboxCfg,
+    strikeSuspension: parseStrikeSuspensionConfig(env.strikeSuspensionConfig),
     stats: statsCfg,
     jetstreamUrl: env.jetstreamUrl,
   }
@@ -135,6 +153,8 @@ export type OzoneConfig = {
   blobDivert: BlobDivertConfig | null
   access: AccessConfig
   assignments: AssignmentsConfig
+  strikeSuspension: StrikeSuspensionConfig
+  inbox: InboxConfig
   stats: StatsConfig
   jetstreamUrl?: string
   verifier: VerifierConfig | null
@@ -219,6 +239,40 @@ export type VerifierConfig = {
   password: string
   jetstreamUrl?: string
   issuersToIndex?: string[]
+}
+
+export type InboxConfig = {
+  /** Inclusive creation-time cutoff for inbox history; unset exposes all history. */
+  startAt?: DatetimeString
+  /**
+   * Calendar months a moderation action stays appealable, counted from the
+   * action. Defaults to 6.
+   *
+   * Configured rather than hardcoded so the window is a policy decision the
+   * deployment owns, and can be changed without shipping code.
+   */
+  appealWindowMonths: number
+  /** Fallback link for takedown policy keys missing from the policy list. */
+  policyDefaultUrl?: string
+}
+
+export const DEFAULT_INBOX_POLICY_URL =
+  'https://bsky.social/about/support/community-guidelines'
+
+function parseInboxStartAt(
+  value: string | undefined,
+): DatetimeString | undefined {
+  if (value === undefined) return undefined
+  assert(
+    isDatetimeString(value),
+    'OZONE_INBOX_START_AT must be an ISO 8601 timestamp with a timezone',
+  )
+  const normalized = toDatetimeString(new Date(value))
+  assert(
+    /^\d{4}-/.test(normalized),
+    'OZONE_INBOX_START_AT must use a four-digit UTC year',
+  )
+  return normalized
 }
 
 export type AssignmentsConfig = {
