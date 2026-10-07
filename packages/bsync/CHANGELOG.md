@@ -1,5 +1,38 @@
 # @atproto/bsync
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`a044af7`](https://github.com/bluesky-social/atproto/commit/a044af7bd7b522ca51229d7686f5b6413be6eee7)]:
+  - @atproto-labs/opentelemetry-node@0.3.1
+
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`0593d81`](https://github.com/bluesky-social/atproto/commit/0593d818bc2b7f8a40c9d0fe036bf39c7a4eecda)]:
+  - @atproto-labs/opentelemetry-node@0.3.0
+  - @atproto/common@0.8.5
+
+## 0.1.1
+
+### Patch Changes
+
+- [#5556](https://github.com/bluesky-social/atproto/pull/5556) [`5019f55`](https://github.com/bluesky-social/atproto/commit/5019f5537317ee75ad4527db212bc27c3085fe67) Thanks [@dependabot](https://github.com/apps/dependabot)! - build(deps-dev): bump the dev-dependencies group across 1 directory with 25 updates
+- Updated dependencies []:
+  - @atproto/common@0.8.4
+
+## 0.1.0
+
+### Minor Changes
+
+- [#5530](https://github.com/bluesky-social/atproto/pull/5530) [`f86aaa6`](https://github.com/bluesky-social/atproto/commit/f86aaa615b4372c1634011337e42247690d77c5a) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Remove the obsolete AddNotifOperation RPC.
+
+### Patch Changes
+
+- [#5524](https://github.com/bluesky-social/atproto/pull/5524) [`3e58d0b`](https://github.com/bluesky-social/atproto/commit/3e58d0bafdb873b86df25ebf2cf941e256dcf697) Thanks [@matthieusieben](https://github.com/matthieusieben)! - Cleanup signal event listeners when the request processing is complete.
+
 ## 0.0.44
 
 ### Patch Changes

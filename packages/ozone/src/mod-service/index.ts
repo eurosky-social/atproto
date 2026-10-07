@@ -24,6 +24,7 @@ import { LabelChannel } from '../db/schema/label.js'
 import type { ModerationEvent } from '../db/schema/moderation_event.js'
 import { jsonb } from '../db/types.js'
 import type { ImageInvalidator } from '../image-invalidator.js'
+import { InboxNotificationService } from '../inbox/producers.js'
 import { com, tools } from '../lexicons/index.js'
 import { httpLogger as log } from '../logger.js'
 import { LABELER_HEADER_NAME, type ParsedLabelers } from '../util.js'
@@ -489,6 +490,7 @@ export class ModerationService {
     createdAt?: Date
     modTool?: NonNullable<ModerationEvent['modTool']>
     externalId?: string
+    eventMeta?: Record<string, string | number | boolean>
   }): Promise<{
     event: ModerationEventRow
     subjectStatus: ModerationSubjectStatusRow | null
@@ -501,6 +503,7 @@ export class ModerationService {
       externalId,
       createdAt = new Date(),
       modTool,
+      eventMeta,
     } = info
 
     const createLabelVals =
@@ -514,7 +517,9 @@ export class ModerationService {
         ? event.negateLabelVals.join(' ')
         : undefined
 
-    const meta: Record<string, string | number | boolean> = {}
+    const meta: Record<string, string | number | boolean> = {
+      ...eventMeta,
+    }
 
     const addedTags = tools.ozone.moderation.defs.modEventTag.$isTypeOf(event)
       ? jsonb(event.add)
@@ -677,6 +682,16 @@ export class ModerationService {
       }
     }
 
+    const notifications = new InboxNotificationService(
+      this.db,
+      this.cfg.strikeSuspension,
+      this.cfg.inbox.startAt,
+    )
+    const previousStanding = await notifications.beforeModerationEvent(
+      subject,
+      event,
+    )
+
     const modEvent = await this.db.db
       .insertInto('moderation_event')
       .values({
@@ -767,6 +782,12 @@ export class ModerationService {
         )
       }
     }
+
+    await notifications.notifyModerationEvent(
+      subject,
+      modEvent,
+      previousStanding,
+    )
 
     return { event: modEvent, subjectStatus }
   }
@@ -1100,6 +1121,7 @@ export class ModerationService {
     reportedBy: DidString
     createdAt?: Date
     modTool?: NonNullable<ModerationEvent['modTool']>
+    eventMeta?: Record<string, string | number | boolean>
   }): Promise<{
     event: ModerationEventRow
     subjectStatus: ModerationSubjectStatusRow | null
@@ -1111,6 +1133,7 @@ export class ModerationService {
       createdAt = new Date(),
       subject,
       modTool,
+      eventMeta,
     } = info
 
     return await this.logEvent({
@@ -1122,6 +1145,7 @@ export class ModerationService {
       subject,
       createdAt,
       modTool,
+      eventMeta,
     })
   }
 
