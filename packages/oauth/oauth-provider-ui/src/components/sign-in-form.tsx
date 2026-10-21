@@ -1,7 +1,6 @@
 import { Trans, useLingui } from '@lingui/react/macro'
 import { AtSignIcon } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
-import { Notice } from '#/components/feedback/notice.tsx'
 import { CheckboxField } from '#/components/forms/fields/checkbox-field.tsx'
 import { PasswordField } from '#/components/forms/fields/password-field.tsx'
 import { TextField } from '#/components/forms/fields/text-field.tsx'
@@ -69,6 +68,7 @@ export function SignInForm({
   const formRef = useRef<HTMLFormElement>(null)
   const [otp, setOtp] = useState('')
 
+  const prevValuesRef = useRef<Partial<Values>>({})
   const clearSecondFactor = useCallback(() => {
     setOtp('')
     setSecondFactorError(null)
@@ -88,14 +88,31 @@ export function SignInForm({
       // The second factor is only required once the server has asked for it,
       // which is component state rather than something the schema can express.
       submittable={!secondFactorError || Boolean(otp)}
+      onValues={(next) => {
+        const prev = prevValuesRef.current
+        prevValuesRef.current = next
+        if (
+          next.password !== prev.password ||
+          next.username !== prev.username
+        ) {
+          clearSecondFactor()
+        }
+      }}
       onSubmit={async (values, signal) => {
         const data: SignInData = {
           username: values.username,
           password: values.password,
-          remember: !disableRemember && values.remember != null,
-          ...(secondFactorError && values.otp
-            ? { [secondFactorError.type]: values.otp }
-            : {}),
+        }
+
+        if (!disableRemember) {
+          data.remember = values.remember != null
+        } else {
+          // allow the server to determine the default remember behavior (based
+          // on the list of accounts signed into the device)
+        }
+
+        if (secondFactorError && !!values.otp) {
+          data[secondFactorError.type] = values.otp
         }
 
         // Wrap the handler to catch 2FA required errors and display the second
@@ -131,7 +148,12 @@ export function SignInForm({
         name="username"
         defaultValue={usernameDefault}
         pattern={SIGN_IN_IDENTIFIER_PATTERN}
-        label={<Trans>Identifier</Trans>}
+        label={<Trans>Username or Email</Trans>}
+        placeholder={
+          domains.length > 0
+            ? `${t`yourname`}${domains[0]}`
+            : t`Username or email address`
+        }
         icon={<AtSignIcon className="size-5" />}
         type="text"
         title={t`Username or email address`}
@@ -147,7 +169,6 @@ export function SignInForm({
         // form values entirely, which would submit without a username.
         autoFocus={!usernameReadonly}
         onBlur={(event) => {
-          clearSecondFactor()
           if (usernameReadonly) return
           let value = event.target.value.trim().toLowerCase()
           if (value.startsWith('@')) value = value.slice(1)
@@ -166,10 +187,10 @@ export function SignInForm({
       <PasswordField
         name="password"
         label={<Trans>Password</Trans>}
+        placeholder={t`Enter your password`}
         enterKeyHint={secondFactorError ? 'next' : 'done'}
         autoFocus={usernameReadonly}
         required
-        onBlur={() => clearSecondFactor()}
         labelAction={
           onForgotPassword && (
             <Button
@@ -190,12 +211,11 @@ export function SignInForm({
         }
       />
 
-      <Notice role="note" title={<Trans>Warning</Trans>}>
-        <Trans>
-          Verify the website address before entering your password. Only sign in
-          on sites you recognize and trust.
-        </Trans>
-      </Notice>
+      {/* @NOTE A quiet line rather than a boxed alert: the phishing reminder
+        should be read once, not compete with the fields. */}
+      <p role="note" className="text-muted-foreground text-sm leading-snug">
+        <Trans>Only enter your password on sites you trust.</Trans>
+      </p>
 
       {!disableRemember && (
         <CheckboxField
@@ -216,9 +236,11 @@ export function SignInForm({
             enterKeyHint="done"
             required
             autoFocus
+            // @TODO If we ever support "totp", adapt the check here:
+            data-1p-ignore={secondFactorError.type === 'emailOtp'}
           />
 
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground mt-3 text-sm leading-snug">
             <Trans>
               Check your {secondFactorError.hint} email for a login code and
               enter it here.

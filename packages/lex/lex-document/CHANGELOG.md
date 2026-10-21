@@ -1,5 +1,25 @@
 # @atproto/lex-document
 
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [[`f98b78a`](https://github.com/bluesky-social/atproto/commit/f98b78adbc8963e49823117b007422211f6d3ff2)]:
+  - @atproto/lex-schema@0.2.9
+
+## 0.1.13
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @atproto/lex-schema@0.2.8
+
+## 0.1.12
+
+### Patch Changes
+
+- [#5499](https://github.com/bluesky-social/atproto/pull/5499) [`210907c`](https://github.com/bluesky-social/atproto/commit/210907c801d281c6b83c92bf94c888b2dc3d531f) Thanks [@fatfingers23](https://github.com/fatfingers23)! - Allow `get()` to be called with strinfiable value
+
 ## 0.1.11
 
 ### Patch Changes
