@@ -1,5 +1,20 @@
 # @atproto/identity
 
+## 0.5.18
+
+### Patch Changes
+
+- Updated dependencies [[`fc60876`](https://github.com/bluesky-social/atproto/commit/fc60876949cca1ca28e98273ecfc97a151d3ebfc)]:
+  - @atproto-labs/fetch-node@0.4.2
+
+## 0.5.17
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @atproto-labs/fetch-node@0.4.1
+  - @atproto/common-web@0.5.15
+
 ## 0.5.16
 
 ### Patch Changes

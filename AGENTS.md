@@ -11,7 +11,7 @@ Workspace layout (see [pnpm-workspace.yaml](./pnpm-workspace.yaml) and [tsconfig
 - [packages/oauth/\*](packages/oauth/) — OAuth client/provider implementations and JWK helpers.
 - [packages/internal/\*](packages/internal/) — `@atproto-labs/*` internal shared utilities (fetch, handle/identity/DID resolvers, simple-store, pipe, xrpc-utils).
 - [services/{pds,bsky,bsync,ozone}](services/) — thin runtime wrappers; the actual implementation code lives in `packages/{pds,bsky,bsync,ozone}`.
-- [lexicons/](lexicons/) — canonical JSON Lexicon schemas for `com.atproto.*`, `app.bsky.*`, `chat.bsky.*`, `tools.ozone.*`. These are the source-of-truth that codegen consumes.
+- [lexicons/](lexicons/) — the canonical JSON Lexicon schemas for `com.atproto.*` and `tools.ozone.*` **only** (this repo is their source of truth). Other namespaces (`app.bsky.*`, `chat.bsky.*`, …) are vendored per-package from the `bsky` repo or the network — see [Codegen](#codegen). [lexicons-overrides/](lexicons-overrides/) holds local override documents shared across packages.
 - [interop-test-files/](interop-test-files/) — language-neutral protocol conformance fixtures, copied from [bluesky-social/atproto-interop-tests](https://github.com/bluesky-social/atproto-interop-tests/) (their canonical source, shared across SDKs). Don't edit unless changing protocol-level behavior; any edit must also be contributed upstream.
 
 ## Common commands
@@ -61,15 +61,16 @@ Before writing or extending any test, invoke the `testing` skill ([.agents/skill
 
 ## Codegen
 
-After editing anything under [lexicons/](lexicons/), or any `.proto` file, run `pnpm codegen` from the repo root.
+The repo-root [lexicons/](lexicons/) holds the canonical `com.atproto.*` / `tools.ozone.*` schemas **only** — this repo is their source of truth. Every other namespace (`app.bsky.*`, `chat.bsky.*`, `site.standard.*`, …) is vendored **per package**: each package lists the NSIDs it needs and where to resolve them (the root `lexicons` directory, the `bsky` GitHub repo, the network, or the shared [lexicons-overrides/](lexicons-overrides/)) in its own committed `lexicons.json`. A package's `prebuild` runs `lex install --ci` (resolving JSON into its gitignored `./lexicons`) then `lex build` (generating the gitignored `./src/lexicons` TypeScript tree that code imports). **Full how-to: the ["Working with lexicons"](CONTRIBUTING.md#working-with-lexicons) section of CONTRIBUTING.md and the `lex-setup` skill.**
 
-The lexicon JSON schemas are derived into TypeScript runtime schemas by `@atproto/lex` (`lex build`, wired through each package's `prebuild`).
+- **Add/refresh an external lexicon in a package:** `cd packages/<pkg> && pnpm lex:install <nsid>` (adds it plus transitive deps); `pnpm lex:update` refreshes installed ones.
+- **Edit a canonical lexicon:** change it under [lexicons/](lexicons/), then run `pnpm lex:update-local` from the repo root to propagate the new CID into every dependent package's `lexicons.json`. (After editing a `.proto` file instead, run `pnpm codegen` from the root.)
 
-For working with that SDK, invoke the focused skills under [.agents/skills/](.agents/skills/): `lex-setup` (install/build config), `lex-schema` and `lex-data` (schemas and values), `lex-client` (calls out), `xrpc-server` (defining server routes), and `lexification-client` / `lexification-server` (migrating off the legacy stack). To sync `chat.bsky.*` schemas from the chat repo, use `update-chat-lexicons`.
+For working with the generated SDK, invoke the focused skills under [.agents/skills/](.agents/skills/): `lex-setup` (lexicons.json / resolvers / codegen wiring), `lex-schema` and `lex-data` (schemas and values), `lex-client` (calls out), `xrpc-server` (defining server routes), and `lexification-client` / `lexification-server` (migrating off the legacy stack). To sync `chat.bsky.*` schemas from the chat repo, use `update-chat-lexicons`.
 
 ## Architecture notes
 
-- **Lexicons are the contract.** The JSON files in [lexicons/](lexicons/) drive both client types and server route validation. Service packages don't hand-write XRPC method signatures — they import the generated definitions from their `src/lexicons/` directory (gitignored / regenerated).
+- **Lexicons are the contract.** Lexicon schemas drive both client types and server route validation. Service packages don't hand-write XRPC method signatures — they import the generated definitions from their `src/lexicons/` directory (gitignored; regenerated from the package's `lexicons.json` — see [Codegen](#codegen)).
 - ([packages/pds](packages/pds)) — a single-tenant atproto server: account management, repo storage (kysely-over-sqlite), actor storage (kysely-over-postgres), email, OAuth provider, blob storage. Runtime entry point is [services/pds](services/pds); production code is in `packages/pds/src`.
   - Outbound requests to a URL resolved from a DID document are untrusted. Make them with `ctx.safeClient(url).xrpc(…)`, never a bare `xrpc(url, …)`, which uses the global fetch and bypasses the https-only/unicast-only checks. (`ctx.proxyAgent` is a separate thing — an undici `Dispatcher` used by pipethrough.)
 - ([packages/repo](packages/repo)) — **Every** MST traversal that can visit more than one child of a node (full-tree walks, diffs, block collection) MUST call `node.markVisited(seen)` on each node it enters, with a fresh `CidSet` per traversal. Never add one that skips it. Single-path lookups are exempt. See [packages/repo/AGENTS.md](packages/repo/AGENTS.md).
@@ -96,9 +97,7 @@ Agent files — this `AGENTS.md`, the skills under [.agents/skills/](.agents/ski
 
 - Keep working plans, handoffs, review reports, query-plan captures, and other session scratch files outside the repository, such as in the workspace directory containing the checkout. Do not add repository ignore rules for them. Never commit them. Before committing, inspect the staged file list for working documents; put only durable project guidance in tracked documentation.
 
-- **New pattern introduced** → document it in the relevant agent file (package-specific if scoped, global otherwise) so it can be re-applied.
-- **Existing important pattern found undocumented** → add it.
-- **Concept removed** → remove it from the agent files in the same change. Reviewers should check for this (see [.github/claude-review-prompt.md](.github/claude-review-prompt.md)).
+- These files capture **important architectural patterns and conventions** — the non-obvious rules, invariants, and cross-cutting decisions an expert needs that are _not_ evident from reading the code itself. They are not a changelog of behavior, and must not restate anything a reader can infer directly from the code (a route's signature, a function's arguments, what a module exports). Most changes need no update: don't document a new route, metric, migration, or test that simply re-applies an existing pattern. Reach for an edit only when a change establishes, meaningfully alters, or removes such an architectural pattern, and prefer doing it when wrapping up rather than mid-task. If you do, update the file that owns it (repo-wide → this file or [STYLE_GUIDE.md](./STYLE_GUIDE.md); scoped to one package → that package's nested `AGENTS.md`; a workflow an agent follows → the relevant skill), and delete guidance a change makes obsolete in the same pass — stale guidance is worse than none. Reviewers check for drift as a backstop (see [.github/claude-review-prompt.md](.github/claude-review-prompt.md)).
 - Keep them **as concise as possible**: only the minimal directives an expert needs. No tutorials, no restating what the code already says.
 
 ## Troubleshooting

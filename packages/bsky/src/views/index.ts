@@ -36,7 +36,7 @@ import type { HydrationState } from '../hydration/hydrator.js'
 import type { Label } from '../hydration/label.js'
 import {
   type RecordInfo,
-  getStarterPackUriFromFollow,
+  getStarterPackUriFromNotification,
   parseString,
 } from '../hydration/util.js'
 import type { ImageUriBuilder } from '../image/uri.js'
@@ -111,6 +111,7 @@ import {
   type PostView,
   type ProfileAssociatedActivitySubscription,
   type ProfileAssociatedChat,
+  type ProfileLinkRecord,
   type ProfileLinkView,
   type ProfileRecord,
   type ProfileView,
@@ -392,6 +393,14 @@ export class Views {
               getBlobCidString(link.record.icon),
             )
           : undefined,
+        labels: [
+          ...(state.labels?.getBySubject(ref.uri) ?? []),
+          ...this.selfLabels({
+            uri: ref.uri,
+            cid: link.cid,
+            record: link.record,
+          }),
+        ],
       })
     }
     return links.length ? links : undefined
@@ -910,6 +919,7 @@ export class Views {
       | ProfileRecord
       | LabelerRecord
       | VerificationRecord
+      | ProfileLinkRecord
       | NotificationRecordDeleted
   }): Label[] {
     if (!uri || !cid || !record) return []
@@ -918,7 +928,8 @@ export class Views {
     if (
       !isPostRecordType(record) &&
       !isProfileRecordType(record) &&
-      !isLabelerRecordType(record)
+      !isLabelerRecordType(record) &&
+      !app.bsky.actor.link.$isTypeOf(record)
     ) {
       return []
     }
@@ -2880,9 +2891,7 @@ export class Views {
       recordInfo = state.reposts?.get(notif.uri as AtUriString)
     } else if (uri.collection === app.bsky.graph.follow.$type) {
       recordInfo = state.follows?.get(notif.uri as AtUriString)
-      if (recordInfo) {
-        starterPackUri = getStarterPackUriFromFollow(recordInfo.record)
-      }
+      starterPackUri = getStarterPackUriFromNotification(notif.reasonSubject)
     } else if (uri.collection === app.bsky.graph.verification.$type) {
       // When a verification record is removed, the record won't be found,
       // both for the `verified` and `unverified` notifications.
@@ -2942,9 +2951,9 @@ export class Views {
     const defs = app.bsky.notification.getGroupedNotifications
     const followItem = (item: NotificationItem) => {
       const notif = item.raw
-      const followRecord = state.follows?.get(notif.uri)?.record
-      const starterPackUri =
-        followRecord && getStarterPackUriFromFollow(followRecord)
+      const starterPackUri = getStarterPackUriFromNotification(
+        notif.reasonSubject,
+      )
       return {
         actor: item.actorDid,
         starterPack:
@@ -3048,6 +3057,7 @@ export class Views {
           items: group.items.map((item) => ({
             actor: item.actorDid,
             post: item.raw.uri,
+            parent: state.posts?.get(item.raw.uri)?.record.reply?.parent.uri,
           })),
         })
         break
