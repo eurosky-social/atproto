@@ -1,6 +1,10 @@
 import { msg } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useState } from 'react'
+import {
+  RichLangString,
+  useLangText,
+} from '#/components/utils/rich-lang-string.tsx'
 import { useCustomizationData } from '#/contexts/customization.tsx'
 import { SignUpWizard } from './forms/sign-up-wizard.tsx'
 import { AuthShell } from './layouts/auth-shell.tsx'
@@ -17,6 +21,7 @@ import {
   type SignUpHcaptchaData,
   SignUpHcaptchaForm,
 } from './sign-up-hcaptcha-form.tsx'
+import { type SignUpTermsData, SignUpTermsForm } from './sign-up-terms-form.tsx'
 
 export type SignUpViewProps = {
   onBack?: () => void
@@ -39,29 +44,50 @@ export function SignUpView({
     hcaptchaSiteKey = undefined,
     inviteCodeRequired = true,
     links,
+    texts: { signUp: texts = {} } = {},
   } = useCustomizationData()
+
+  const title = useLangText(texts.title)
+  const submitLabel = useLangText(texts.submitLabel)
+  const subtitle = useLangText(texts.subtitle)
 
   // Keep a copy of all every step's form values in case the user changes a step
   // and goes back to the previous step, allowing to keep the un-submitted
   // values in the form inputs.
   const [pending, setPending] = useState<
-    Partial<SignUpCredentialsData & SignUpHandleData & SignUpHcaptchaData>
+    Partial<
+      SignUpTermsData &
+        SignUpCredentialsData &
+        SignUpHandleData &
+        SignUpHcaptchaData
+    >
   >({})
 
   // @NOTE Only the last step creates the account, so only the last step states
   // what creating one agrees to. Which step that is depends on whether hCaptcha
   // is configured, so the wizard decides it (`atLast`) rather than this list.
-  const disclaimer = <SignUpDisclaimer links={links} />
+  // When the deployment has a terms step, the user has already agreed there.
+  const disclaimer = texts.terms ? null : <SignUpDisclaimer links={links} />
 
   return (
     <AuthShell
-      title={msg({ message: 'Sign up' })}
-      subtitle={<Trans>We're so excited to have you join us!</Trans>}
+      title={title ?? msg({ message: 'Sign up' })}
+      subtitle={
+        texts.subtitle != null ? (
+          // An empty string removes the subtitle altogether.
+          subtitle ? (
+            <RichLangString value={texts.subtitle} />
+          ) : undefined
+        ) : (
+          <Trans>We're so excited to have you join us!</Trans>
+        )
+      }
     >
       <SignUpWizard
         onBack={onBack}
-        doneLabel={<Trans>Sign up</Trans>}
-        onDone={([handle, credentials, hcaptcha]: [
+        doneLabel={submitLabel ?? <Trans>Sign up</Trans>}
+        onDone={([, handle, credentials, hcaptcha]: [
+          SignUpTermsData | null,
           SignUpHandleData,
           SignUpCredentialsData,
           SignUpHcaptchaData | null,
@@ -73,6 +99,20 @@ export function SignUpView({
           })
         }}
         steps={[
+          texts.terms != null && {
+            contentRender: ({ prev, prevLabel, next, nextLabel }) => (
+              <SignUpTermsForm
+                className="grow"
+                texts={texts.terms!}
+                onBack={prev}
+                backLabel={prevLabel}
+                submitLabel={nextLabel}
+                values={pending}
+                onValues={(val) => setPending((old) => ({ ...old, ...val }))}
+                handler={next}
+              />
+            ),
+          },
           // We use the handle input first since the "onValidateNewHandle" check
           // will make it less likely that the actual signup call will fail, and
           // will result in a better user experience, especially if there is an
@@ -83,6 +123,7 @@ export function SignUpView({
               <SignUpHandleForm
                 className="grow"
                 domains={availableUserDomains}
+                hideChangeNote={texts.hideHandleChangeNote}
                 onBack={prev}
                 backLabel={prevLabel}
                 submitLabel={nextLabel}

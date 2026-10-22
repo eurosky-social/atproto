@@ -4,6 +4,11 @@ import { AccountPermission } from '@atproto/oauth-scopes'
 import type { OAuthClientMetadata } from '@atproto/oauth-types'
 import { ClientAvatar } from '#/components/identity/client-avatar.tsx'
 import { ClientName } from '#/components/identity/client-name.tsx'
+import {
+  RichLangString,
+  useLangText,
+} from '#/components/utils/rich-lang-string.tsx'
+import { useCustomizationData } from '#/contexts/customization.tsx'
 import { useAsyncAction } from '#/hooks/use-async-action.ts'
 import type { PermissionSets } from '#/hydration-data.d.ts'
 import { ActionButton, FormShell } from './forms/form-shell.tsx'
@@ -62,6 +67,10 @@ export function ConsentForm({
   const { t } = useLingui()
   const reject = useAsyncAction(onReject)
 
+  const { texts: { consent: texts = {} } = {} } = useCustomizationData()
+  const acceptLabel = useLangText(texts.acceptLabel)
+  const rejectLabel = useLangText(texts.rejectLabel)
+
   // Require the granular scope system to be able to unset the `account:email`
   // scope.
   const canUnsetEmail = !scope?.split(' ').some(isTransitionScope)
@@ -74,7 +83,9 @@ export function ConsentForm({
       // Clear a previous rejection error as soon as the user changes anything.
       onValues={() => reject.reset()}
       disabled={reject.loading}
-      submitLabel={<Trans context="OAuthConsent">Authorize</Trans>}
+      submitLabel={
+        acceptLabel ?? <Trans context="OAuthConsent">Authorize</Trans>
+      }
       onSubmit={() =>
         onConsent({
           scope:
@@ -93,7 +104,7 @@ export function ConsentForm({
             void reject.run()
           }}
         >
-          <Trans context="OAuthConsent">Deny access</Trans>
+          {rejectLabel ?? <Trans context="OAuthConsent">Deny access</Trans>}
         </ActionButton>
       }
     >
@@ -155,38 +166,52 @@ export function ConsentForm({
 
       {/* @NOTE Kept to one short line: the heading and the button already say
         what authorizing does, so this exists to carry the two links. Each
-        link is styled only when the client published a URL for it. */}
-      <p className="text-muted-foreground text-sm leading-snug">
-        <Trans>
-          Subject to the app's{' '}
-          <a
-            role="link"
-            href={clientMetadata.tos_uri}
-            rel="nofollow noopener"
-            target="_blank"
-            className={
-              clientMetadata.tos_uri ? 'text-foreground underline' : undefined
-            }
-          >
-            <Trans>terms of service</Trans>
-          </a>{' '}
-          and{' '}
-          <a
-            role="link"
-            href={clientMetadata.policy_uri}
-            rel="nofollow noopener"
-            target="_blank"
-            className={
-              clientMetadata.policy_uri
-                ? 'text-foreground underline'
-                : undefined
-            }
-          >
-            <Trans>privacy policy</Trans>
-          </a>
-          .
-        </Trans>
-      </p>
+        link is styled only when the client published a URL for it. A
+        deployment can replace it, linking to the client's documents through
+        the `client-tos` / `client-policy` targets. */}
+      {texts.notice != null ? (
+        <p className="text-muted-foreground text-sm leading-snug">
+          <RichLangString
+            value={texts.notice}
+            extraTargets={{
+              'client-tos': clientMetadata.tos_uri,
+              'client-policy': clientMetadata.policy_uri,
+            }}
+          />
+        </p>
+      ) : (
+        <p className="text-muted-foreground text-sm leading-snug">
+          <Trans>
+            Subject to the app's{' '}
+            <a
+              role="link"
+              href={clientMetadata.tos_uri}
+              rel="nofollow noopener"
+              target="_blank"
+              className={
+                clientMetadata.tos_uri ? 'text-foreground underline' : undefined
+              }
+            >
+              <Trans>terms of service</Trans>
+            </a>{' '}
+            and{' '}
+            <a
+              role="link"
+              href={clientMetadata.policy_uri}
+              rel="nofollow noopener"
+              target="_blank"
+              className={
+                clientMetadata.policy_uri
+                  ? 'text-foreground underline'
+                  : undefined
+              }
+            >
+              <Trans>privacy policy</Trans>
+            </a>
+            .
+          </Trans>
+        </p>
+      )}
     </FormShell>
   )
 }

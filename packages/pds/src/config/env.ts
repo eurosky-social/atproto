@@ -37,6 +37,10 @@ export function readEnv() {
     backgroundLightUrl: envStr('PDS_BACKGROUND_LIGHT_URL'),
     backgroundDarkUrl: envStr('PDS_BACKGROUND_DARK_URL'),
 
+    linksLocaleParam: envStr('PDS_LINKS_LOCALE_PARAM'),
+    // JSON file with the sign-up and consent copy (see `branding.texts`)
+    brandingTextsFile: envStr('PDS_BRANDING_TEXTS_FILE'),
+
     // database
     dataDirectory: envStr('PDS_DATA_DIRECTORY'),
     disableWalAutoCheckpoint: envBool('PDS_SQLITE_DISABLE_WAL_AUTO_CHECKPOINT'),

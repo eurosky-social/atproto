@@ -4,6 +4,11 @@ import type { Account } from '@atproto/oauth-provider-api'
 import type { OAuthClientMetadata } from '@atproto/oauth-types'
 import { AccountIdentifier } from '#/components/identity/account-identifier.tsx'
 import { AuthShell } from '#/components/layouts/auth-shell.tsx'
+import {
+  RichLangString,
+  useLangText,
+} from '#/components/utils/rich-lang-string.tsx'
+import { useCustomizationData } from '#/contexts/customization.tsx'
 import type { PermissionSets } from '#/hydration-data.d.ts'
 import { ConsentForm } from './consent-form.tsx'
 
@@ -34,12 +39,15 @@ export function ConsentView({
   onReject,
   onBack,
 }: ConsentViewProps) {
+  const { texts: { consent: texts = {} } = {} } = useCustomizationData()
+  const title = useLangText(texts.title)
+
   return (
     <AuthShell
       // @NOTE Two rem wider than the other auth cards: the scope rows carry a
       // description and a trailing control, and at 26rem the terms line wraps.
       className="max-w-[28rem]"
-      title={msg({ message: 'Authorize', context: 'OAuthConsent' })}
+      title={title ?? msg({ message: 'Authorize', context: 'OAuthConsent' })}
       subtitle={
         <>
           <Trans>Grant access to your account:</Trans>
@@ -50,6 +58,11 @@ export function ConsentView({
         </>
       }
     >
+      {texts.intro != null && (
+        <p className="mb-4">
+          <RichLangString value={texts.intro} />
+        </p>
+      )}
       <ConsentForm
         clientId={clientId}
         clientMetadata={clientMetadata}
