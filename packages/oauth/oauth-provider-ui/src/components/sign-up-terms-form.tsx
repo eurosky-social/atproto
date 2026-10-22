@@ -118,10 +118,7 @@ function TermsLink({ rel, children }: { rel: string; children: ReactNode }) {
   const link = links?.find((l) => l.rel === rel)
   if (!link) return <>{children}</>
   return (
-    <LinkAnchor
-      link={link}
-      className="text-foreground underline"
-    >
+    <LinkAnchor link={link} className="text-foreground underline">
       {children}
     </LinkAnchor>
   )
