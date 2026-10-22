@@ -3,7 +3,7 @@
 export const locales = {
   en: {
     name: 'English',
-    flag: '🇺🇸',
+    flag: '🇬🇧',
   },
   es: {
     name: 'Español',
