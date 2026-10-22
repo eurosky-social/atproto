@@ -4,7 +4,7 @@ import { formatter } from '@lingui/format-po'
 export default defineConfig({
   format: formatter({ lineNumbers: false }),
   sourceLocale: 'en',
-  locales: ['en', 'es', 'fr', 'ja', 'ko', 'ro', 'sv'],
+  locales: ['en', 'es', 'fr', 'ja', 'ko', 'nl', 'ro', 'sv'],
   fallbackLocales: {
     default: 'en',
   },

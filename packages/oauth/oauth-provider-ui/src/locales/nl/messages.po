@@ -1,0 +1,1602 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-21 17:39-0400\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: nl\n"
+
+#. placeholder {0}: bucket.count
+#: src/components/utils/date-ago.tsx
+msgid "{0, plural, one {# hour ago} other {# hours ago}}"
+msgstr "{0, plural, one {# uur geleden} other {# uur geleden}}"
+
+#. placeholder {0}: bucket.count
+#: src/components/utils/date-ago.tsx
+msgid "{0, plural, one {# minute ago} other {# minutes ago}}"
+msgstr "{0, plural, one {# minuut geleden} other {# minuten geleden}}"
+
+#. placeholder {0}: bucket.count
+#: src/components/utils/date-ago.tsx
+msgid "{0, plural, one {yesterday} other {# days ago}}"
+msgstr "{0, plural, one {gisteren} other {# dagen geleden}}"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>AT Protocol</0> — Technical documentation for developers"
+msgstr "<0>AT Protocol</0> — Technische documentatie voor ontwikkelaars"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>Bluesky Social</0> — General information about the network"
+msgstr "<0>Bluesky Social</0> — Algemene informatie over het netwerk"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>Learn more</0><1>Want to learn more about the technology and network behind your Atmosphere account?</1>"
+msgstr "<0>Meer informatie</0><1>Wil je meer weten over de technologie en het netwerk achter je Atmosphere-account?</1>"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>This website: your account control center</0><1>The website you're on right now is your <2>account management hub</2>. Here you can:</1><3><4>Update your email address and password</4><5>Manage your personal data and security settings</5><6>View and manage active sessions across devices (browsers where you're signed in)</6></3><7>This place is where you control the fundamental aspects of your Atmosphere identity, independently of any app-specific details like the profile you have on the <8>Bluesky social app</8>.</7><9>Your Atmosphere account is currently hosted by <10/>, one of many hosting providers in the Atmosphere network. You can switch to a different one at any time without losing your account, identity, or data.</9>"
+msgstr "<0>Deze website: het controlecentrum van je account</0><1>De website waarop je nu bent, is je <2>centrale plek voor accountbeheer</2>. Hier kun je:</1><3><4>Je e-mailadres en wachtwoord wijzigen</4><5>Je persoonlijke gegevens en beveiligingsinstellingen beheren</5><6>Actieve sessies op je apparaten bekijken en beheren (browsers waarin je bent ingelogd)</6></3><7>Hier beheer je de fundamentele aspecten van je Atmosphere-identiteit, los van app-specifieke details zoals je profiel in de <8>Bluesky-app</8>.</7><9>Je Atmosphere-account wordt momenteel gehost door <10/>, een van de vele hostingproviders in het Atmosphere-netwerk. Je kunt op elk moment overstappen naar een andere, zonder je account, identiteit of gegevens kwijt te raken.</9>"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>Use it across multiple apps</0><1>Your Atmosphere account works with the <2>Bluesky Social App</2> and any other social apps built on the same network.</1><3>Just like you can use the same email address to sign into different websites, your Atmosphere account lets you sign into different social apps while keeping the same identity, connections, and content.</3><4>When you see options to log in with an Atmosphere account or \"internet handle\" on other apps, you can use your existing account <5><6/></5> instead of creating a new one.</4>"
+msgstr "<0>Gebruik het in meerdere apps</0><1>Je Atmosphere-account werkt met de <2>Bluesky Social-app</2> en alle andere sociale apps die op hetzelfde netwerk zijn gebouwd.</1><3>Net zoals je met hetzelfde e-mailadres op verschillende websites kunt inloggen, kun je met je Atmosphere-account inloggen bij verschillende sociale apps, terwijl je dezelfde identiteit, connecties en content behoudt.</3><4>Zie je in andere apps de optie om in te loggen met een Atmosphere-account of \"internet handle\"? Dan kun je je bestaande account <5><6/></5> gebruiken in plaats van een nieuw account aan te maken.</4>"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>What is an Atmosphere account?</0><1>An <2>Atmosphere account</2> is your personal identity on the Atmosphere. Think of it as a digital passport that you truly own, not locked to any single app or company.</1>"
+msgstr "<0>Wat is een Atmosphere-account?</0><1>Een <2>Atmosphere-account</2> is je persoonlijke identiteit in de Atmosphere. Zie het als een digitaal paspoort dat echt van jou is en niet vastzit aan één app of bedrijf.</1>"
+
+#: src/routes/account/u/$accountId/-about/en.tsx
+msgid "<0>What makes it special</0><1>The key difference: your data isn't trapped in any one app. Unlike traditional social media accounts, where your data belongs to the platform, with an Atmosphere account you genuinely own your identity and data:</1><2><3><4>You own your identity</4>: Your username (handle) and permanent ID belong to you</3><5><6>Your data is portable</6>: Posts, follows, and content live in your personal data storage, not locked in an app's database</5><7><8>You can move freely</8>: Switch hosting providers without losing your followers, posts, or connections. This also lets you choose a provider in your country if it matters where your data is stored.</7><9><10>Multiple apps, one identity</10>: Use the same account across different apps built on the same network</9></2>"
+msgstr "<0>Wat het bijzonder maakt</0><1>Het belangrijkste verschil: je gegevens zitten niet vast in één app. Bij traditionele socialemedia-accounts zijn je gegevens van het platform, maar met een Atmosphere-account zijn je identiteit en gegevens echt van jou:</1><2><3><4>Je identiteit is van jou</4>: je gebruikersnaam (handle) en permanente ID zijn van jou</3><5><6>Je gegevens zijn overdraagbaar</6>: berichten, volgers en content staan in je persoonlijke gegevensopslag, niet opgesloten in de database van een app</5><7><8>Je kunt vrij verhuizen</8>: stap over naar een andere hostingprovider zonder je volgers, berichten of connecties kwijt te raken. Zo kun je ook een provider in je eigen land kiezen als het voor jou belangrijk is waar je gegevens worden opgeslagen.</7><9><10>Meerdere apps, één identiteit</10>: gebruik hetzelfde account in verschillende apps die op hetzelfde netwerk zijn gebouwd</9></2>"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "<your-domain>"
+msgstr "<jouw-domein>"
+
+#: src/components/sign-in-form.tsx
+msgid "2FA Confirmation"
+msgstr "2FA-bevestiging"
+
+#: src/hooks/use-oauth-client-name.ts
+msgid "A local app"
+msgstr "Een lokale app"
+
+#: src/lib/api.ts
+msgid "A second authentication factor is required ({hint})"
+msgstr "Een tweede authenticatiefactor is vereist ({hint})"
+
+#: src/components/utils/scope-description.tsx
+msgid "A service controlled by <0>{domain}</0>"
+msgstr "Een dienst beheerd door <0>{domain}</0>"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "About"
+msgstr "Over"
+
+#: src/components/utils/scope-description.tsx
+msgid "Access specific parts of your Bluesky account"
+msgstr "Toegang tot specifieke onderdelen van je Bluesky-account"
+
+#: src/components/utils/scope-description.tsx
+msgid "Access specific parts of your Bluesky account and read your private preferences"
+msgstr "Toegang tot specifieke onderdelen van je Bluesky-account en je privévoorkeuren lezen"
+
+#: src/components/utils/scope-description.tsx
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Account"
+msgstr "Account"
+
+#: src/components/identity/account-avatar.tsx
+msgid "Account avatar"
+msgstr "Accountavatar"
+
+#: src/data/account.ts
+msgid "Account deactivated"
+msgstr "Account gedeactiveerd"
+
+#: src/data/account.ts
+msgid "Account deleted"
+msgstr "Account verwijderd"
+
+#: src/components/identity/account-identifier.tsx
+msgid "Account identifier"
+msgstr "Account-ID"
+
+#: src/components/identity/account-name.tsx
+msgid "Account name"
+msgstr "Accountnaam"
+
+#: src/components/identity/account-menu.tsx
+msgid "Account overview"
+msgstr "Accountoverzicht"
+
+#: src/authorization-page.tsx
+#: src/data/account.ts
+msgid "Account reactivated"
+msgstr "Account opnieuw geactiveerd"
+
+#: src/components/identity/account-menu.tsx
+msgid "Account selector"
+msgstr "Accountkiezer"
+
+#: src/components/utils/handle.tsx
+msgid "Account username"
+msgstr "Gebruikersnaam van account"
+
+#: src/components/session-list.tsx
+msgid "Actions"
+msgstr "Acties"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Add the following record to your domain's DNS configuration."
+msgstr "Voeg het volgende record toe aan de DNS-configuratie van je domein."
+
+#: src/components/update-handle-custom-form.tsx
+msgid "alice.com"
+msgstr "alice.com"
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+#: src/components/reset-password-view.tsx
+#: src/components/update-password-dialog.tsx
+#: src/components/verify-email-dialog.tsx
+msgid "Already have a code?"
+msgstr "Heb je al een code?"
+
+#: src/components/identity/client-name.tsx
+msgid "An application on your device"
+msgstr "Een applicatie op je apparaat"
+
+#: src/lib/notification-message.ts
+msgid "An error occurred"
+msgstr "Er is een fout opgetreden"
+
+#: src/lib/api.ts
+msgid "An unexpected error occurred."
+msgstr "Er is een onverwachte fout opgetreden."
+
+#: src/components/error-view.tsx
+#: src/components/feedback/error-notice.tsx
+msgid "An unknown error occurred"
+msgstr "Er is een onbekende fout opgetreden"
+
+#: src/components/sign-in-picker.tsx
+msgid "Another account"
+msgstr "Ander account"
+
+#: src/components/utils/scope-description.tsx
+msgid "Any collection"
+msgstr "Elke collectie"
+
+#: src/components/utils/scope-description.tsx
+msgid "Any method"
+msgstr "Elke methode"
+
+#: src/components/utils/scope-description.tsx
+msgid "Any service"
+msgstr "Elke dienst"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgctxt "OAuthApp"
+msgid "App"
+msgstr "App"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Apps"
+msgstr "Apps"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "Apps may access your account in the background (to check notifications, sync data, etc.) even when you're not actively using them. This is normal behavior and will update the \"last accessed\" time."
+msgstr "Apps kunnen op de achtergrond toegang krijgen tot je account (om meldingen te controleren, gegevens te synchroniseren, enz.), ook als je ze niet actief gebruikt. Dit is normaal en werkt de tijd van \"laatste toegang\" bij."
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "Apps that can use your account. Revoke any you no longer use."
+msgstr "Apps die je account kunnen gebruiken. Trek de toegang in van apps die je niet meer gebruikt."
+
+#: src/components/delete-account-dialog.tsx
+msgid "Are you really, really sure?"
+msgstr "Weet je het echt, echt zeker?"
+
+#: src/components/authenticate-welcome-view.tsx
+msgctxt "AuthenticationPage"
+msgid "Authenticate"
+msgstr "Authenticeren"
+
+#: src/components/utils/scope-description.tsx
+msgctxt "OAuthScope"
+msgid "Authenticate"
+msgstr "Authenticeren"
+
+#: src/components/consent-form.tsx
+#: src/components/consent-view.tsx
+msgctxt "OAuthConsent"
+msgid "Authorize"
+msgstr "Autoriseren"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgctxt "OAuthApp"
+msgid "Authorized"
+msgstr "Geautoriseerd"
+
+#: src/components/forms/form-shell.tsx
+#: src/components/forms/sign-up-wizard.tsx
+#: src/components/layouts/account-shell.tsx
+#: src/components/sign-in-picker.tsx
+#: src/routes/__root.tsx
+msgid "Back"
+msgstr "Terug"
+
+#: src/components/utils/scope-description.tsx
+msgid "Blob storage"
+msgstr "Blob-opslag"
+
+#: src/components/utils/scope-description.tsx
+msgid "Bluesky App services"
+msgstr "Bluesky App-diensten"
+
+#: src/components/utils/scope-description.tsx
+msgid "Bluesky Chat services"
+msgstr "Bluesky Chat-diensten"
+
+#: src/components/sign-up-disclaimer.tsx
+msgid "By creating an account you agree to the <0>Terms of Service</0> and the <1>Privacy Policy</1> of this service."
+msgstr "Door een account aan te maken ga je akkoord met de <0>gebruiksvoorwaarden</0> en het <1>Privacybeleid</1> van deze dienst."
+
+#: src/components/utils/scope-description.tsx
+msgctxt "RPC lxm"
+msgid "Call"
+msgstr "Aanroep"
+
+#: src/components/authenticate-welcome-view.tsx
+#: src/components/delete-account-dialog.tsx
+#: src/components/forms/form-shell.tsx
+#: src/components/reactivate-account-view.tsx
+#: src/contexts/authentication.tsx
+msgid "Cancel"
+msgstr "Annuleren"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgid "Cannot remove current device"
+msgstr "Huidig apparaat kan niet worden verwijderd"
+
+#: src/components/utils/scope-description.tsx
+msgid "Change your <0>@handle</0>"
+msgstr "Je <0>@handle</0> wijzigen"
+
+#: src/components/update-password-dialog.tsx
+msgid "Change your password"
+msgstr "Wijzig je wachtwoord"
+
+#: src/components/utils/scope-description.tsx
+msgid "Chat"
+msgstr "Chat"
+
+#: src/components/delete-account-dialog.tsx
+msgid "Check <0>{email}</0> for an email with the confirmation code to enter below:"
+msgstr "Zoek in <0>{email}</0> naar een e-mail met de bevestigingscode en voer die hieronder in:"
+
+#. placeholder {0}: secondFactorError.hint
+#: src/components/sign-in-form.tsx
+msgid "Check your {0} email for a login code and enter it here."
+msgstr "Zoek in je {0}-mailbox naar een inlogcode en voer die hier in."
+
+#: src/components/delete-account-dialog.tsx
+msgid "Check your email for the confirmation code to enter below:"
+msgstr "Zoek in je e-mail naar de bevestigingscode en voer die hieronder in:"
+
+#: src/data/account.ts
+msgid "Check your inbox for the confirmation code."
+msgstr "Zoek in je inbox naar de bevestigingscode."
+
+#: src/data/email.ts
+msgid "Check your inbox for the verification code."
+msgstr "Zoek in je inbox naar de verificatiecode."
+
+#: src/data/email.ts
+#: src/data/password.ts
+msgid "Check your inbox."
+msgstr "Controleer je inbox."
+
+#: src/components/update-handle-dialog.tsx
+msgid "Choose a new default username."
+msgstr "Kies een nieuwe standaardgebruikersnaam."
+
+#: src/components/update-email-dialog.tsx
+msgid "Choose a new email address to associate with your account."
+msgstr "Kies een nieuw e-mailadres om aan je account te koppelen."
+
+#: src/components/sign-up-view.tsx
+msgid "Choose a username"
+msgstr "Kies een gebruikersnaam"
+
+#: src/components/redirecting-view.tsx
+msgid "Click here if nothing happens"
+msgstr "Klik hier als er niets gebeurt"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgctxt "OAuthApp"
+msgid "Client"
+msgstr "Client"
+
+#: src/components/oauth-session-details-dialog.tsx
+#: src/components/ui/dialog.tsx
+#: src/components/ui/toast.tsx
+msgid "Close"
+msgstr "Sluiten"
+
+#: src/components/error-view.tsx
+#: src/components/feedback/error-details.tsx
+msgctxt "Error"
+msgid "Code"
+msgstr "Code"
+
+#: src/components/sign-in-form.tsx
+msgctxt "verb"
+msgid "Confirm"
+msgstr "Bevestigen"
+
+#: src/components/sign-in-view.tsx
+msgid "Confirm your password to continue"
+msgstr "Bevestig je wachtwoord om door te gaan"
+
+#: src/components/delete-account-confirm-form.tsx
+#: src/components/sign-in-form.tsx
+msgid "Confirmation code"
+msgstr "Bevestigingscode"
+
+#: src/data/account.ts
+msgid "Confirmation email sent"
+msgstr "Bevestigingsmail verzonden"
+
+#: src/components/sign-in-view.tsx
+msgctxt "AuthenticationPage"
+msgid "Continue with\n"
+"an existing account"
+msgstr "Doorgaan met\n"
+"een bestaand account"
+
+#: src/cookie-error-page.tsx
+msgid "Cookies are blocked"
+msgstr "Cookies zijn geblokkeerd"
+
+#: src/components/forms/copy-button.tsx
+msgid "Copied"
+msgstr "Gekopieerd"
+
+#: src/components/forms/copy-button.tsx
+msgid "Copy to clipboard"
+msgstr "Kopiëren naar klembord"
+
+#: src/components/utils/scope-description.tsx
+msgid "Create"
+msgstr "Aanmaken"
+
+#: src/components/authenticate-welcome-view.tsx
+msgid "Create a new account"
+msgstr "Nieuw account aanmaken"
+
+#: src/components/utils/scope-description.tsx
+msgid "Create, update, and delete any public data linked to your account"
+msgstr "Alle openbare gegevens die aan je account zijn gekoppeld aanmaken, bijwerken en verwijderen"
+
+#: src/lib/api.ts
+msgid "Custom domains are not supported"
+msgstr "Eigen domeinen worden niet ondersteund"
+
+#: src/components/utils/scope-description.tsx
+msgid "Data"
+msgstr "Gegevens"
+
+#: src/components/deactivate-account-dialog.tsx
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Deactivate account"
+msgstr "Account deactiveren"
+
+#: src/components/identity/account-avatar.tsx
+msgid "Deactivated account"
+msgstr "Gedeactiveerd account"
+
+#: src/components/utils/scope-description.tsx
+msgid "Delete"
+msgstr "Verwijderen"
+
+#: src/components/delete-account-dialog.tsx
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Delete account"
+msgstr "Account verwijderen"
+
+#: src/components/delete-account-dialog.tsx
+msgid "Delete account <0/>"
+msgstr "Account <0/> verwijderen"
+
+#: src/components/delete-account-confirm-form.tsx
+msgid "Delete my account"
+msgstr "Mijn account verwijderen"
+
+#: src/components/consent-form.tsx
+msgctxt "OAuthConsent"
+msgid "Deny access"
+msgstr "Toegang weigeren"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "Details"
+msgstr "Details"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgctxt "device list"
+msgid "Device"
+msgstr "Apparaat"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Devices"
+msgstr "Apparaten"
+
+#: src/components/forms/fields/token-field.tsx
+msgid "Didn't receive a code? <0>Click here to resend.</0>"
+msgstr "Geen code ontvangen? <0>Klik hier om opnieuw te verzenden.</0>"
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+msgid "Disable 2FA"
+msgstr "2FA uitschakelen"
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+msgid "Disable two-factor authentication"
+msgstr "Tweestapsverificatie uitschakelen"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgctxt "2FA"
+msgid "Disabled"
+msgstr "Uitgeschakeld"
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+msgid "Disabling two-factor authentication makes your account less secure."
+msgstr "Als je tweestapsverificatie uitschakelt, wordt je account minder veilig."
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "DNS"
+msgstr "DNS"
+
+#: src/components/update-handle-dialog.tsx
+msgid "e.g. <0>alice.com</0>"
+msgstr "bijv. <0>alice.com</0>"
+
+#. placeholder {0}: domains[0]
+#: src/components/update-handle-dialog.tsx
+msgid "e.g. <0>alice{0}</0>"
+msgstr "bijv. <0>alice{0}</0>"
+
+#: src/components/sign-up-credentials-form.tsx
+#: src/components/utils/scope-description.tsx
+msgid "Email"
+msgstr "E-mail"
+
+#: src/components/forms/fields/email-field.tsx
+#: src/components/reset-password-request-form.tsx
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Email address"
+msgstr "E-mailadres"
+
+#: src/components/update-email-dialog.tsx
+msgid "Email address successfully updated"
+msgstr "E-mailadres bijgewerkt"
+
+#: src/data/email.ts
+msgid "Email change request sent"
+msgstr "Verzoek om e-mailwijziging verzonden"
+
+#: src/data/email.ts
+msgid "Email change successful"
+msgstr "E-mailadres gewijzigd"
+
+#: src/data/email.ts
+msgid "Email login verification disabled"
+msgstr "Inlogverificatie via e-mail uitgeschakeld"
+
+#: src/data/email.ts
+msgid "Email login verification enabled"
+msgstr "Inlogverificatie via e-mail ingeschakeld"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Email not verified"
+msgstr "E-mailadres niet geverifieerd"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Email these instructions"
+msgstr "Deze instructies e-mailen"
+
+#: src/data/email.ts
+msgid "Email verified"
+msgstr "E-mailadres geverifieerd"
+
+#: src/components/enable-email-auth-factor-dialog.tsx
+msgid "Enable"
+msgstr "Inschakelen"
+
+#: src/components/enable-email-auth-factor-dialog.tsx
+msgid "Enable two-factor authentication"
+msgstr "Tweestapsverificatie inschakelen"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgctxt "2FA"
+msgid "Enabled"
+msgstr "Ingeschakeld"
+
+#: src/components/forms/fields/new-password-field.tsx
+msgid "Enter a password"
+msgstr "Voer een wachtwoord in"
+
+#: src/components/reset-password-view.tsx
+msgid "Enter the code you received by email to reset your password."
+msgstr "Voer de code in die je per e-mail hebt ontvangen om je wachtwoord opnieuw in te stellen."
+
+#: src/components/update-handle-custom-form.tsx
+msgid "Enter the domain you want to use"
+msgstr "Voer het domein in dat je wilt gebruiken"
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+msgid "Enter the security code we sent to <0>{email}</0> to disable email two-factor authentication."
+msgstr "Voer de beveiligingscode in die we naar <0>{email}</0> hebben gestuurd om tweestapsverificatie via e-mail uit te schakelen."
+
+#: src/components/reset-password-view.tsx
+msgid "Enter your account's email and we'll send you a reset code."
+msgstr "Voer het e-mailadres van je account in, dan sturen we je een herstelcode."
+
+#: src/components/reset-password-request-form.tsx
+msgid "Enter your email address"
+msgstr "Voer je e-mailadres in"
+
+#: src/components/forms/fields/new-password-field.tsx
+msgid "Enter your new password"
+msgstr "Voer je nieuwe wachtwoord in"
+
+#: src/components/sign-in-form.tsx
+#: src/components/sign-in-view.tsx
+msgid "Enter your password"
+msgstr "Voer je wachtwoord in"
+
+#: src/components/deactivate-account-dialog.tsx
+msgid "Every app currently connected to your account, as well as any \"app passwords\" you've created, will be revoked. You'll need to sign back in when you reactivate."
+msgstr "Alle apps die momenteel met je account zijn verbonden, evenals alle \"app-wachtwoorden\" die je hebt aangemaakt, worden ingetrokken. Je moet opnieuw inloggen wanneer je je account heractiveert."
+
+#: src/components/sign-up-credentials-form.tsx
+msgid "example-com-xxxxx-xxxxx"
+msgstr "voorbeeld-com-xxxxx-xxxxx"
+
+#: src/components/utils/description-card.tsx
+msgid "Expand details"
+msgstr "Details uitvouwen"
+
+#: src/components/feedback/password-strength.tsx
+#: src/components/utils/password-strength-label.tsx
+msgid "Extra"
+msgstr "Extra"
+
+#: src/data/email.ts
+msgid "Failed to change email"
+msgstr "Wijzigen van e-mailadres mislukt"
+
+#: src/data/account.ts
+msgid "Failed to deactivate account"
+msgstr "Deactiveren van account mislukt"
+
+#: src/data/account.ts
+msgid "Failed to delete account"
+msgstr "Verwijderen van account mislukt"
+
+#: src/data/email.ts
+msgid "Failed to disable email login verification"
+msgstr "Uitschakelen van verificatie via e-mail bij inloggen mislukt"
+
+#: src/data/email.ts
+msgid "Failed to enable email login verification"
+msgstr "Inschakelen van verificatie via e-mail bij inloggen mislukt"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "Failed to load connected apps"
+msgstr "Laden van verbonden apps mislukt"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgid "Failed to load your devices"
+msgstr "Laden van je apparaten mislukt"
+
+#: src/data/account.ts
+msgid "Failed to reactivate account"
+msgstr "Heractiveren van account mislukt"
+
+#: src/data/account-sessions.ts
+msgid "Failed to remove device"
+msgstr "Verwijderen van apparaat mislukt"
+
+#: src/data/email.ts
+msgid "Failed to request email change"
+msgstr "Aanvragen van e-mailwijziging mislukt"
+
+#: src/data/password.ts
+msgid "Failed to request password reset"
+msgstr "Aanvragen van wachtwoordherstel mislukt"
+
+#: src/data/password.ts
+msgid "Failed to reset password"
+msgstr "Herstellen van wachtwoord mislukt"
+
+#: src/data/oauth-sessions.ts
+msgid "Failed to revoke access"
+msgstr "Intrekken van toegang mislukt"
+
+#: src/data/account.ts
+msgid "Failed to send confirmation email"
+msgstr "Versturen van bevestigingsmail mislukt"
+
+#: src/data/email.ts
+msgid "Failed to send security code"
+msgstr "Versturen van beveiligingscode mislukt"
+
+#: src/data/email.ts
+msgid "Failed to send verification email"
+msgstr "Versturen van verificatiemail mislukt"
+
+#: src/data/handle.ts
+msgid "Failed to update username"
+msgstr "Bijwerken van gebruikersnaam mislukt"
+
+#: src/data/email.ts
+msgid "Failed to verify email"
+msgstr "Verifiëren van e-mailadres mislukt"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "File contents"
+msgstr "Bestandsinhoud"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "Filter apps"
+msgstr "Apps filteren"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgid "Filter devices"
+msgstr "Apparaten filteren"
+
+#: src/components/delete-account-dialog.tsx
+msgid "For security reasons, we'll need to send a confirmation code to your email address <0>{email}</0>."
+msgstr "Om veiligheidsredenen moeten we een bevestigingscode naar je e-mailadres <0>{email}</0> sturen."
+
+#: src/components/delete-account-dialog.tsx
+msgid "For security reasons, we'll need to send a confirmation code to your email address."
+msgstr "Om veiligheidsredenen moeten we een bevestigingscode naar je e-mailadres sturen."
+
+#: src/components/reset-password-view.tsx
+msgid "Forgot Password"
+msgstr "Wachtwoord vergeten"
+
+#: src/components/sign-in-form.tsx
+msgid "Forgot?"
+msgstr "Vergeten?"
+
+#: src/components/error-view.tsx
+msgid "Go back"
+msgstr "Ga terug"
+
+#: src/components/consent-view.tsx
+msgid "Grant access to your account:"
+msgstr "Toegang verlenen tot je account:"
+
+#. placeholder {0}: instructionsMethods .map(({ label, message, values }) => { return `${label}: ${message}\n${values.map(({ label, value }) => `${label}: ${value}`).join('\n')}` }) .join(`\n\n`)
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Hello,\n"
+"\n"
+"To associate the domain \"{handle}\" with my AT Protocol identity ({did}), one of the following configuration changes is required. Either method is sufficient, only one needs to be applied.\n"
+"\n"
+"{0}\n"
+"\n"
+"The change can be verified by visiting the following URL: {troubleshootHref}\n"
+"A detailed tutorial can be found here: {tutorialHref}\n"
+"\n"
+"Thank you."
+msgstr "Hallo,\n"
+"\n"
+"Om het domein \"{handle}\" te koppelen aan mijn AT Protocol-identiteit ({did}), is een van de volgende configuratiewijzigingen nodig. Elke methode volstaat; er hoeft er maar één te worden toegepast.\n"
+"\n"
+"{0}\n"
+"\n"
+"De wijziging kan worden gecontroleerd via de volgende URL: {troubleshootHref}\n"
+"Een uitgebreide handleiding (in het Engels) vind je hier: {tutorialHref}\n"
+"\n"
+"Bedankt."
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Help"
+msgstr "Help"
+
+#: src/components/forms/fields/password-field.tsx
+msgid "Hide"
+msgstr "Verbergen"
+
+#: src/components/utils/link-title.tsx
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Home"
+msgstr "Home"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Host"
+msgstr "Host"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "HTTP"
+msgstr "HTTP"
+
+#: src/components/utils/scope-description.tsx
+msgid "Identity"
+msgstr "Identiteit"
+
+#: src/cookie-error-page.tsx
+msgid "If this keeps happening, allow cookies for {hostname} in your browser's privacy settings."
+msgstr "Blijft dit gebeuren? Sta cookies toe voor {hostname} in de privacyinstellingen van je browser."
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "If you have access to your domain's DNS configuration panel (e.g. via your domain registrar)"
+msgstr "Als je toegang hebt tot het DNS-configuratiepaneel van je domein (bijv. via je domeinregistrar)"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "If you have access to your domain's web hosting configuration (e.g. via FTP)"
+msgstr "Als je toegang hebt tot de webhostingconfiguratie van je domein (bijv. via FTP)"
+
+#: src/components/update-handle-dialog.tsx
+msgid "If you have your own domain, you can use that as your handle. This lets you self-verify your identity. <0>Learn more here</0>."
+msgstr "Als je een eigen domein hebt, kun je dat als handle gebruiken. Zo kun je je identiteit zelf verifiëren. <0>Lees hier meer</0>."
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "If you update your email address, email 2FA (if enabled) will be disabled."
+msgstr "Als je je e-mailadres wijzigt, wordt tweestapsverificatie via e-mail (indien ingeschakeld) uitgeschakeld."
+
+#: src/components/deactivate-account-dialog.tsx
+msgid "If you're trying to change your handle or email, do so before you deactivate."
+msgstr "Wil je je handle of e-mailadres wijzigen? Doe dat dan voordat je je account deactiveert."
+
+#: src/components/utils/handle.tsx
+msgid "Invalid Handle"
+msgstr "Ongeldige handle"
+
+#: src/components/sign-up-credentials-form.tsx
+msgid "Invite code"
+msgstr "Activatiecode"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgctxt "device list"
+msgid "IP address"
+msgstr "IP-adres"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "It appears that you haven’t used this account to sign in to any apps yet."
+msgstr "Het lijkt erop dat je met dit account nog bij geen enkele app bent ingelogd."
+
+#: src/components/utils/date-ago.tsx
+msgid "just now"
+msgstr "zojuist"
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgctxt "OAuthApp"
+msgid "Last accessed"
+msgstr "Laatst gebruikt"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgctxt "device list"
+msgid "Last seen"
+msgstr "Laatst gezien"
+
+#: src/components/update-email-dialog.tsx
+msgctxt "verify email"
+msgid "Later"
+msgstr "Later"
+
+#: src/components/layouts/account-shell.tsx
+#: src/components/layouts/auth-shell.tsx
+msgid "Logo"
+msgstr "Logo"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgid "Looks like you aren't logged in on any other devices."
+msgstr "Het lijkt erop dat je op geen andere apparaten bent ingelogd."
+
+#: src/hooks/use-oauth-client-identifier.ts
+msgid "loopback"
+msgstr "loopback"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Make a text file with the contents below available at the following URL."
+msgstr "Maak een tekstbestand met de onderstaande inhoud beschikbaar op de volgende URL."
+
+#: src/components/forms/fields/password-field.tsx
+msgid "Make visible"
+msgstr "Zichtbaar maken"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Manage applications that have access to your account"
+msgstr "Beheer apps die toegang hebben tot je account"
+
+#: src/components/utils/scope-description.tsx
+msgid "Manage your <0>full identity</0> including your <1>@handle</1>"
+msgstr "Je <0>volledige identiteit</0> beheren, inclusief je <1>@handle</1>"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Manage your account"
+msgstr "Beheer je account"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "Manage your active sessions"
+msgstr "Beheer je actieve sessies"
+
+#: src/components/utils/scope-description.tsx
+msgid "Manage your profile, posts, likes and follows"
+msgstr "Je profiel, posts, likes en follows beheren"
+
+#: src/components/utils/scope-description.tsx
+msgid "Manage your profile, posts, likes and follows as well as read your private preferences"
+msgstr "Je profiel, posts, likes en follows beheren en je privévoorkeuren lezen"
+
+#: src/components/feedback/error-details.tsx
+msgctxt "Error"
+msgid "Message"
+msgstr "Foutmelding"
+
+#: src/components/feedback/password-strength.tsx
+#: src/components/utils/password-strength-label.tsx
+msgid "Missing"
+msgstr "Ontbreekt"
+
+#: src/components/feedback/password-strength.tsx
+#: src/components/utils/password-strength-label.tsx
+msgid "Moderate"
+msgstr "Matig"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "My Atmosphere Account"
+msgstr "Mijn Atmosphere-account"
+
+#: src/components/feedback/error-details.tsx
+msgctxt "Error"
+msgid "Name"
+msgstr "Naam"
+
+#: src/components/layouts/account-shell.tsx
+msgid "Navigation"
+msgstr "Navigatie"
+
+#: src/components/sign-in-picker.tsx
+msgid "Need an account?"
+msgstr "Nog geen account?"
+
+#: src/components/update-email-dialog.tsx
+#: src/components/update-email-form.tsx
+msgid "New email address"
+msgstr "Nieuw e-mailadres"
+
+#: src/components/reset-password-confirm-form.tsx
+msgid "New password"
+msgstr "Nieuw wachtwoord"
+
+#: src/components/forms/sign-up-wizard.tsx
+#: src/components/reset-password-view.tsx
+msgid "Next"
+msgstr "Volgende"
+
+#: src/components/session-list.tsx
+msgid "No matches"
+msgstr "Geen resultaten"
+
+#: src/components/reset-password-view.tsx
+msgid "Okay"
+msgstr "Oké"
+
+#: src/components/sign-in-form.tsx
+msgid "Only enter your password on sites you trust."
+msgstr "Voer je wachtwoord alleen in op sites die je vertrouwt."
+
+#: src/routes/__root.tsx
+msgid "Page not found"
+msgstr "Pagina niet gevonden"
+
+#: src/components/delete-account-confirm-form.tsx
+#: src/components/forms/fields/password-field.tsx
+#: src/components/sign-in-form.tsx
+#: src/components/sign-up-credentials-form.tsx
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Password"
+msgstr "Wachtwoord"
+
+#: src/data/password.ts
+msgid "Password reset email sent"
+msgstr "E-mail voor wachtwoordherstel verstuurd"
+
+#: src/data/password.ts
+msgid "Password reset successful"
+msgstr "Wachtwoord succesvol hersteld"
+
+#: src/components/feedback/password-strength.tsx
+#: src/components/utils/password-strength-label.tsx
+msgid "Password strength"
+msgstr "Wachtwoordsterkte"
+
+#: src/components/feedback/password-strength.tsx
+msgid "Password strength indicator"
+msgstr "Indicator voor wachtwoordsterkte"
+
+#: src/components/reset-password-view.tsx
+msgid "Password Updated"
+msgstr "Wachtwoord bijgewerkt"
+
+#: src/components/forms/fields/new-password-field.tsx
+msgid "Password with at least {MIN_PASSWORD_LENGTH, plural, other {# characters}}"
+msgstr "Wachtwoord van minstens {MIN_PASSWORD_LENGTH, plural, other {# tekens}}"
+
+#: src/components/feedback/error-details.tsx
+msgctxt "Error"
+msgid "Payload"
+msgstr "Details"
+
+#: src/components/utils/scope-description.tsx
+msgid "Perform actions on your behalf"
+msgstr "Acties namens jou uitvoeren"
+
+#: src/components/utils/scope-description.tsx
+msgid "Perform authenticated actions towards <0>any service</0> on your behalf"
+msgstr "Geauthenticeerde acties namens jou uitvoeren bij <0>elke dienst</0>"
+
+#: src/components/authenticate-welcome-view.tsx
+msgid "Please authenticate to continue"
+msgstr "Log in om door te gaan"
+
+#: src/data/email.ts
+#: src/data/password.ts
+msgid "Please check the email address and try again."
+msgstr "Controleer het e-mailadres en probeer het opnieuw."
+
+#: src/data/handle.ts
+msgid "Please check the username and try again."
+msgstr "Controleer de gebruikersnaam en probeer het opnieuw."
+
+#: src/data/account.ts
+msgid "Please check your code and password, then try again."
+msgstr "Controleer je code en wachtwoord en probeer het opnieuw."
+
+#: src/data/email.ts
+#: src/data/password.ts
+msgid "Please check your reset code and try again."
+msgstr "Controleer je herstelcode en probeer het opnieuw."
+
+#: src/data/email.ts
+msgid "Please check your verification code and try again."
+msgstr "Controleer je verificatiecode en probeer het opnieuw."
+
+#: src/components/update-email-form.tsx
+msgid "Please enter the security code that was sent to your email address."
+msgstr "Voer de beveiligingscode in die naar je e-mailadres is gestuurd."
+
+#: src/data/account.ts
+#: src/data/email.ts
+msgid "Please try again in a moment."
+msgstr "Probeer het zo meteen opnieuw."
+
+#: src/components/forms/request-code-button.tsx
+msgid "Please wait {remainingSeconds, plural, one {# second} other {# seconds}} before trying again."
+msgstr "Wacht {remainingSeconds, plural, one {# seconde} other {# seconden}} voordat je het opnieuw probeert."
+
+#: src/components/utils/link-title.tsx
+msgid "Privacy"
+msgstr "Privacybeleid"
+
+#: src/components/utils/link-title.tsx
+msgid "Privacy Policy"
+msgstr "Privacybeleid"
+
+#: src/components/utils/scope-description.tsx
+msgid "Publish changes"
+msgstr "Wijzigingen publiceren"
+
+#: src/components/reactivate-account-dialog.tsx
+msgid "Reactivate"
+msgstr "Heractiveren"
+
+#: src/components/reactivate-account-dialog.tsx
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Reactivate account"
+msgstr "Account heractiveren"
+
+#: src/components/reactivate-account-view.tsx
+msgid "Reactivating makes your profile and content visible again."
+msgstr "Door te heractiveren worden je profiel en content weer zichtbaar."
+
+#: src/components/utils/scope-description.tsx
+msgid "Read and send messages"
+msgstr "Berichten lezen en versturen"
+
+#: src/components/utils/scope-description.tsx
+msgid "Read and update your account's email address"
+msgstr "Het e-mailadres van je account lezen en bijwerken"
+
+#: src/components/utils/scope-description.tsx
+msgid "Read your account's email address"
+msgstr "Het e-mailadres van je account lezen"
+
+#: src/components/utils/scope-description.tsx
+msgid "Read your private preferences"
+msgstr "Je privévoorkeuren lezen"
+
+#: src/components/sign-in-form.tsx
+msgid "Remember this account on this device"
+msgstr "Dit account op dit apparaat onthouden"
+
+#: src/components/utils/scope-description.tsx
+msgid "Repository"
+msgstr "Repository"
+
+#: src/components/enable-email-auth-factor-dialog.tsx
+msgid "Require an email code to sign in to your account."
+msgstr "Vereis een code via e-mail om in te loggen op je account."
+
+#: src/components/reset-password-confirm-form.tsx
+msgid "Reset code"
+msgstr "Herstelcode"
+
+#: src/components/reset-password-view.tsx
+msgid "Reset Password"
+msgstr "Wachtwoord herstellen"
+
+#: src/components/sign-in-form.tsx
+msgid "Reset your password"
+msgstr "Herstel je wachtwoord"
+
+#: src/components/feedback/error-notice.tsx
+#: src/routes/account/u/$accountId/apps.tsx
+#: src/routes/account/u/$accountId/devices.tsx
+msgid "Retry"
+msgstr "Opnieuw proberen"
+
+#: src/components/forms/request-code-button.tsx
+msgid "Retry in {remainingSeconds}s"
+msgstr "Opnieuw proberen over {remainingSeconds}s"
+
+#: src/components/oauth-session-details-dialog.tsx
+msgctxt "OAuthApp"
+msgid "Revoke access"
+msgstr "Toegang intrekken"
+
+#: src/components/update-email-form.tsx
+msgid "Security code"
+msgstr "Beveiligingscode"
+
+#: src/components/update-email-form.tsx
+msgid "Security step required"
+msgstr "Beveiligingsstap vereist"
+
+#: src/components/identity/account-menu.tsx
+msgid "Select another account"
+msgstr "Ander account selecteren"
+
+#: src/components/forms/fields/handle-field.tsx
+msgid "Select domain"
+msgstr "Domein selecteren"
+
+#: src/components/delete-account-dialog.tsx
+msgid "Send email"
+msgstr "E-mail versturen"
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+msgid "Send email to verify"
+msgstr "Verificatiemail versturen"
+
+#: src/components/forms/request-code-button.tsx
+msgid "Send verification code"
+msgstr "Verificatiecode versturen"
+
+#: src/components/sign-in-view.tsx
+msgctxt "AuthenticationPage"
+msgid "Sign in"
+msgstr "Inloggen"
+
+#: src/components/authenticate-welcome-view.tsx
+#: src/components/sign-in-form.tsx
+msgctxt "verb"
+msgid "Sign in"
+msgstr "Inloggen"
+
+#. placeholder {0}: session.account.name ?? stringifyHandle(session.account.handle) ?? session.account.did
+#: src/components/sign-in-picker.tsx
+msgid "Sign in as {0}"
+msgstr "Inloggen als {0}"
+
+#: src/components/sign-in-picker.tsx
+msgid "Sign in to an account that is not listed"
+msgstr "Inloggen met een account dat niet in de lijst staat"
+
+#: src/components/identity/account-menu.tsx
+msgid "Sign out"
+msgstr "Uitloggen"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgctxt "device list"
+msgid "Sign out"
+msgstr "Uitloggen"
+
+#: src/components/sign-in-picker.tsx
+#: src/components/sign-up-view.tsx
+msgid "Sign up"
+msgstr "Account aanmaken"
+
+#: src/authorization-page.tsx
+msgid "Sign-in canceled"
+msgstr "Inloggen geannuleerd"
+
+#: src/authorization-page.tsx
+msgid "Sign-in complete"
+msgstr "Inloggen voltooid"
+
+#: src/cookie-error-page.tsx
+msgid "Sign-in needs cookies, and your browser isn't accepting them."
+msgstr "Voor inloggen zijn cookies nodig, maar je browser accepteert ze niet."
+
+#: src/components/error-view.tsx
+msgid "Something went wrong"
+msgstr "Er is iets misgegaan"
+
+#: src/components/feedback/error-details.tsx
+msgctxt "Error"
+msgid "Stack"
+msgstr "Stack"
+
+#: src/components/forms/sign-up-wizard.tsx
+msgid "Step {currentPosition} of {count}"
+msgstr "Stap {currentPosition} van {count}"
+
+#: src/components/feedback/password-strength.tsx
+#: src/components/utils/password-strength-label.tsx
+msgid "Strong"
+msgstr "Sterk"
+
+#: src/components/consent-form.tsx
+msgid "Subject to the app's <0>terms of service</0> and <1>privacy policy</1>."
+msgstr "Onder voorbehoud van de <0>gebruiksvoorwaarden</0> en het <1>privacybeleid</1> van de app."
+
+#: src/components/forms/form-shell.tsx
+msgid "Submit"
+msgstr "Versturen"
+
+#: src/data/account-sessions.ts
+msgid "Successfully removed device"
+msgstr "Apparaat verwijderd"
+
+#: src/data/oauth-sessions.ts
+msgid "Successfully revoked access"
+msgstr "Toegang ingetrokken"
+
+#: src/components/utils/link-title.tsx
+msgid "Support"
+msgstr "Support"
+
+#: src/components/consent-form.tsx
+msgid "Technical details"
+msgstr "Technische details"
+
+#: src/components/utils/scope-description.tsx
+msgid "Temporarily activate or deactivate your account"
+msgstr "Je account tijdelijk activeren of deactiveren"
+
+#: src/components/utils/link-title.tsx
+msgid "Terms"
+msgstr "Gebruiksvoorwaarden"
+
+#: src/components/utils/link-title.tsx
+msgid "Terms of Service"
+msgstr "Gebruiksvoorwaarden"
+
+#: src/components/utils/scope-description.tsx
+msgid "The application is asking for full control over your network identity, meaning that it could <0>permanently break</0>, or even <1>steal</1>, your account. Only grant this permission to applications you really trust."
+msgstr "De applicatie vraagt volledige controle over je netwerkidentiteit. Dat betekent dat ze je account <0>permanent onbruikbaar kan maken</0> of zelfs kan <1>stelen</1>. Verleen deze machtiging alleen aan applicaties die je echt vertrouwt."
+
+#: src/components/utils/scope-description.tsx
+msgid "The application requests the permissions necessary to perform the following actions on your behalf:"
+msgstr "De applicatie vraagt de machtigingen die nodig zijn om namens jou de volgende acties uit te voeren:"
+
+#: src/components/utils/scope-description.tsx
+msgid "The application requests the permissions necessary to perform the following actions on your Bluesky account:"
+msgstr "De applicatie vraagt de machtigingen die nodig zijn om de volgende acties uit te voeren op je Bluesky-account:"
+
+#: src/components/utils/scope-description.tsx
+msgid "The AT Protocol network uses an authentication mechanism that allows to uniquely identify users when communicating with external services. This is typically used to retrieve or update data linked to your account, such as chat messages, feeds or moderation content. The application requests the permissions necessary to perform the following authenticated actions on your behalf:"
+msgstr "Het AT Protocol-netwerk gebruikt een authenticatiemechanisme waarmee gebruikers uniek kunnen worden geïdentificeerd bij communicatie met externe diensten. Dit wordt meestal gebruikt om gegevens op te halen of bij te werken die aan je account gekoppeld zijn, zoals chatberichten, feeds of moderatie-inhoud. De applicatie vraagt de machtigingen die nodig zijn om namens jou de volgende geauthenticeerde acties uit te voeren:"
+
+#: src/lib/api.ts
+msgid "The data you submitted is invalid. Please check the form and try again."
+msgstr "De ingediende gegevens zijn ongeldig. Controleer het formulier en probeer het opnieuw."
+
+#: src/lib/api.ts
+msgid "The domain name is not allowed"
+msgstr "Deze domeinnaam is niet toegestaan"
+
+#: src/lib/api.ts
+msgid "The invite code is not valid"
+msgstr "De activatiecode is ongeldig"
+
+#: src/lib/api.ts
+msgid "The server encountered an unexpected error. Please try again."
+msgstr "Er is een onverwachte serverfout opgetreden. Probeer het opnieuw."
+
+#: src/lib/api.ts
+msgid "The username contains inappropriate language"
+msgstr "De gebruikersnaam bevat ongepast taalgebruik"
+
+#: src/lib/api.ts
+msgid "The username could not be resolved"
+msgstr "De gebruikersnaam kon niet worden gevonden"
+
+#: src/lib/api.ts
+msgid "The username is already in use"
+msgstr "De gebruikersnaam is al in gebruik"
+
+#: src/lib/api.ts
+msgid "The username is invalid"
+msgstr "De gebruikersnaam is ongeldig"
+
+#: src/components/deactivate-account-dialog.tsx
+msgid "There is no time limit for account deactivation, come back any time."
+msgstr "Er is geen tijdslimiet voor het deactiveren van je account; je kunt altijd terugkomen."
+
+#: src/components/oauth-session-details-dialog.tsx
+msgid "This app can uniquely identify you through your account."
+msgstr "Deze app kan je uniek identificeren via je account."
+
+#: src/components/oauth-session-details-dialog.tsx
+msgid "This app has access to your account with the following permissions:"
+msgstr "Deze app heeft toegang tot je account met de volgende machtigingen:"
+
+#: src/components/consent-form.tsx
+msgid "This application identifies itself as:"
+msgstr "Deze applicatie identificeert zich als:"
+
+#: src/components/consent-form.tsx
+msgid "This application is requesting the following permissions (scopes) to access your account:"
+msgstr "Deze applicatie vraagt de volgende machtigingen (scopes) voor toegang tot je account:"
+
+#: src/lib/api.ts
+msgid "This authorization request has been denied. Please try again."
+msgstr "Dit autorisatieverzoek is geweigerd. Probeer het opnieuw."
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgctxt "device list"
+msgid "This device"
+msgstr "Dit apparaat"
+
+#: src/lib/api.ts
+msgid "This email is already used"
+msgstr "Dit e-mailadres is al in gebruik"
+
+#: src/lib/api.ts
+msgid "This sign-in session has expired"
+msgstr "Deze inlogsessie is verlopen"
+
+#: src/lib/api.ts
+msgid "This username is reserved"
+msgstr "Deze gebruikersnaam is gereserveerd"
+
+#: src/components/delete-account-dialog.tsx
+msgid "This will irreversibly delete your Bluesky account <0/> and all associated data. Note that this will affect any other Atmosphere services you use with this account."
+msgstr "Hiermee worden je Bluesky-account <0/> en alle bijbehorende gegevens onherroepelijk verwijderd. Let op: dit heeft ook gevolgen voor andere Atmosphere-diensten die je met dit account gebruikt."
+
+#: src/components/delete-account-dialog.tsx
+msgid "This will irreversibly delete your Bluesky account and all associated data. Note that this will affect any other Atmosphere services you use with this account."
+msgstr "Hiermee worden je Bluesky-account en alle bijbehorende gegevens onherroepelijk verwijderd. Let op: dit heeft ook gevolgen voor andere Atmosphere-diensten die je met dit account gebruikt."
+
+#: src/components/update-password-dialog.tsx
+msgid "To change your password, you'll need to enter a security code sent to your email."
+msgstr "Om je wachtwoord te wijzigen, moet je een beveiligingscode invoeren die naar je e-mailadres is gestuurd."
+
+#: src/components/disable-email-auth-factor-dialog.tsx
+msgid "To disable your email two-factor authentication, please verify your access to <0>{email}</0>"
+msgstr "Bevestig je toegang tot <0>{email}</0> om tweestapsverificatie via e-mail uit te schakelen"
+
+#: src/components/verify-email-dialog.tsx
+msgid "To verify your email, you'll need to enter a security code sent to <0>{email}</0>."
+msgstr "Om je e-mailadres te verifiëren, moet je een beveiligingscode invoeren die naar <0>{email}</0> is gestuurd."
+
+#: src/components/utils/scope-description.tsx
+msgctxt "RPC aud"
+msgid "Towards"
+msgstr "Naar"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Troubleshoot"
+msgstr "Problemen oplossen"
+
+#: src/components/error-view.tsx
+#: src/cookie-error-page.tsx
+msgid "Try again"
+msgstr "Opnieuw proberen"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Two-factor authentication (2FA)"
+msgstr "Tweestapsverificatie (2FA)"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Type"
+msgstr "Type"
+
+#: src/components/update-handle-custom-form.tsx
+msgid "Type your domain"
+msgstr "Voer je domein in"
+
+#: src/components/forms/fields/handle-field.tsx
+msgid "Type your username"
+msgstr "Voer je gebruikersnaam in"
+
+#: src/contexts/session.tsx
+msgid "Unauthorized"
+msgstr "Niet geautoriseerd"
+
+#: src/lib/json-client.ts
+msgid "Unexpected server response"
+msgstr "Onverwacht antwoord van de server"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgctxt "device list"
+msgid "Unknown user agent"
+msgstr "Onbekende user-agent"
+
+#: src/components/utils/scope-description.tsx
+msgid "Update"
+msgstr "Bijwerken"
+
+#: src/components/update-email-dialog.tsx
+msgid "Update your email"
+msgstr "Je e-mailadres wijzigen"
+
+#: src/components/update-handle-dialog.tsx
+msgid "Update your username"
+msgstr "Je gebruikersnaam wijzigen"
+
+#: src/components/update-handle-dialog.tsx
+msgid "Update your username to a domain name you own to self-verify your identity."
+msgstr "Wijzig je gebruikersnaam in een domeinnaam die je bezit om je identiteit zelf te verifiëren."
+
+#: src/components/utils/scope-description.tsx
+msgid "Upload files"
+msgstr "Bestanden uploaden"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "URL"
+msgstr "URL"
+
+#: src/components/forms/fields/handle-field.tsx
+msgid "Use {minLength}–{maxLength, plural, one {# letter, number or hyphen} other {# letters, numbers or hyphens}}"
+msgstr "Gebruik {minLength}–{maxLength, plural, one {# letter, cijfer of koppelteken} other {# letters, cijfers of koppeltekens}}"
+
+#: src/components/update-handle-dialog.tsx
+msgid "Use a default username"
+msgstr "Een standaardgebruikersnaam gebruiken"
+
+#: src/components/update-handle-dialog.tsx
+msgid "Use a domain name I own"
+msgstr "Een domeinnaam gebruiken die ik bezit"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Username"
+msgstr "Gebruikersnaam"
+
+#: src/components/sign-in-form.tsx
+msgid "Username or Email"
+msgstr "Gebruikersnaam of e-mail"
+
+#: src/components/sign-in-form.tsx
+msgid "Username or email address"
+msgstr "Gebruikersnaam of e-mailadres"
+
+#: src/data/handle.ts
+msgid "Username updated"
+msgstr "Gebruikersnaam bijgewerkt"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Value"
+msgstr "Waarde"
+
+#: src/components/disable-email-auth-factor-confirm-form.tsx
+#: src/components/update-email-dialog.tsx
+#: src/components/verify-email-confirm-form.tsx
+msgid "Verification code"
+msgstr "Verificatiecode"
+
+#: src/data/email.ts
+msgid "Verification email sent"
+msgstr "Verificatie-e-mail verstuurd"
+
+#: src/components/forms/input-handle-custom-instructions.tsx
+msgid "Verification method"
+msgstr "Verificatiemethode"
+
+#: src/components/sign-up-hcaptcha-form.tsx
+msgid "Verification successful!"
+msgstr "Verificatie geslaagd!"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgctxt "verify email"
+msgid "Verify"
+msgstr "Verifiëren"
+
+#: src/components/update-handle-dialog.tsx
+msgid "Verify and Save"
+msgstr "Verifiëren en opslaan"
+
+#: src/routes/account/u/$accountId/manage.tsx
+msgid "Verify email to enable"
+msgstr "Verifieer je e-mailadres om dit in te schakelen"
+
+#: src/components/update-email-dialog.tsx
+msgctxt "verify email"
+msgid "Verify now"
+msgstr "Nu verifiëren"
+
+#: src/components/sign-up-view.tsx
+msgid "Verify you are human"
+msgstr "Bevestig dat je een mens bent"
+
+#: src/components/verify-email-dialog.tsx
+msgid "Verify your email"
+msgstr "Verifieer je e-mailadres"
+
+#: src/components/consent-form.tsx
+msgid "wants to access your account"
+msgstr "wil toegang tot je account"
+
+#: src/components/consent-form.tsx
+msgid "wants to uniquely identify you through your account"
+msgstr "wil je uniek identificeren via je account"
+
+#: src/components/sign-up-view.tsx
+msgid "We're so excited to have you join us!"
+msgstr "We zijn zo blij dat je erbij komt!"
+
+#: src/components/feedback/password-strength.tsx
+#: src/components/utils/password-strength-label.tsx
+msgid "Weak"
+msgstr "Zwak"
+
+#: src/components/authenticate-welcome-view.tsx
+msgid "Welcome"
+msgstr "Welkom"
+
+#: src/components/reactivate-account-view.tsx
+msgid "Welcome back!"
+msgstr "Welkom terug!"
+
+#: src/routes/account/u/$accountId/index.tsx
+msgid "What does this mean?"
+msgstr "Wat betekent dit?"
+
+#: src/routes/account/u/$accountId/route.tsx
+msgid "What is an Atmosphere Account?"
+msgstr "Wat is een Atmosphere-account?"
+
+#: src/routes/account/u/$accountId/devices.tsx
+msgid "Where your account is signed in. Sign out of anything you don't recognize."
+msgstr "Waar je account is ingelogd. Log uit bij alles wat je niet herkent."
+
+#: src/routes/account/u/$accountId/apps.tsx
+msgid "Why is this time so recent?"
+msgstr "Waarom is dit tijdstip zo recent?"
+
+#: src/lib/api.ts
+msgid "Wrong identifier or password"
+msgstr "Onjuiste gebruikersnaam of onjuist wachtwoord"
+
+#: src/components/deactivate-account-dialog.tsx
+msgid "Yes, Deactivate"
+msgstr "Ja, deactiveren"
+
+#: src/components/delete-account-dialog.tsx
+msgid "Yes, delete my account"
+msgstr "Ja, verwijder mijn account"
+
+#: src/components/reactivate-account-view.tsx
+msgid "Yes, reactivate my account"
+msgstr "Ja, heractiveer mijn account"
+
+#: src/components/redirecting-view.tsx
+msgid "You are being redirected..."
+msgstr "Je wordt doorgestuurd..."
+
+#: src/components/delete-account-dialog.tsx
+msgid "You can also temporarily deactivate your account instead. Your profile, posts, feeds, and lists will no longer be visible to other Bluesky users. You can reactivate your account at any time by logging in."
+msgstr "Je kunt je account ook tijdelijk deactiveren. Je profiel, posts, feeds en lijsten zijn dan niet meer zichtbaar voor andere Bluesky-gebruikers. Je kunt je account op elk moment heractiveren door in te loggen."
+
+#: src/components/sign-up-handle-form.tsx
+msgid "You can change this username to any domain name you control after your account is set up."
+msgstr "Nadat je account is aangemaakt, kun je deze gebruikersnaam wijzigen in elke domeinnaam die je beheert."
+
+#: src/components/reactivate-account-dialog.tsx
+msgid "You can deactivate your account again at any time from this page."
+msgstr "Je kunt je account op elk moment opnieuw deactiveren via deze pagina."
+
+#: src/data/email.ts
+msgid "You can now sign in with your new email."
+msgstr "Je kunt nu inloggen met je nieuwe e-mailadres."
+
+#: src/components/reset-password-view.tsx
+#: src/data/password.ts
+msgid "You can now sign in with your new password."
+msgstr "Je kunt nu inloggen met je nieuwe wachtwoord."
+
+#: src/data/email.ts
+msgid "You will no longer be prompted for a code to sign in."
+msgstr "Je wordt niet langer om een code gevraagd bij het inloggen."
+
+#: src/components/sign-up-view.tsx
+msgid "Your account"
+msgstr "Jouw account"
+
+#: src/data/account.ts
+msgid "Your account and all associated data have been deleted."
+msgstr "Je account en alle bijbehorende gegevens zijn verwijderd."
+
+#: src/components/update-email-dialog.tsx
+msgid "Your account currently uses <0>{emailCurrent}</0>. Choose a new email address to associate with it."
+msgstr "Je account gebruikt momenteel <0>{emailCurrent}</0>. Kies een nieuw e-mailadres om eraan te koppelen."
+
+#: src/authorization-page.tsx
+msgid "Your account has been successfully reactivated."
+msgstr "Je account is opnieuw geactiveerd."
+
+#: src/components/reactivate-account-view.tsx
+msgid "Your account is currently deactivated."
+msgstr "Je account is momenteel gedeactiveerd."
+
+#: src/data/account.ts
+msgid "Your account is now deactivated."
+msgstr "Je account is nu gedeactiveerd."
+
+#: src/data/account.ts
+msgid "Your account is visible again."
+msgstr "Je account is weer zichtbaar."
+
+#: src/routes/account/u/$accountId/index.tsx
+msgid "Your Atmosphere account\n"
+"is hosted by <0/>."
+msgstr "Je Atmosphere-account\n"
+"wordt gehost door <0/>."
+
+#: src/components/deactivate-account-dialog.tsx
+msgid "Your content (profile, posts, feeds, lists, etc.) will be hidden from the Bluesky app and across the Atmosphere network."
+msgstr "Je content (profiel, posts, feeds, lijsten, enz.) wordt verborgen in de Bluesky-app en in het hele Atmosphere-netwerk."
+
+#: src/components/update-email-dialog.tsx
+msgid "Your email address has been successfully updated and needs to be verified. Please enter the verification code that was sent to <0>{email}</0>."
+msgstr "Je e-mailadres is bijgewerkt en moet worden geverifieerd. Voer de verificatiecode in die naar <0>{email}</0> is gestuurd."
+
+#: src/data/email.ts
+msgid "Your email address has been verified."
+msgstr "Je e-mailadres is geverifieerd."
+
+#. placeholder {0}: segment ? ( <span className="text-foreground block font-medium break-all"> @{segment} {domain} </span> ) : ( <span className="block break-all"> @{exampleSegment} {domain} </span> )
+#: src/components/forms/fields/handle-field.tsx
+msgid "Your full username will be: {0}"
+msgstr "Jouw gebruikersnaam wordt: {0}"
+
+#: src/data/email.ts
+msgid "Your next login will require a code that is sent to your email address."
+msgstr "Bij je volgende login heb je een code nodig die naar je e-mailadres wordt gestuurd."
+
+#: src/components/reactivate-account-dialog.tsx
+msgid "Your profile, posts, feeds, and lists will become visible again across the Atmosphere network — that includes the Bluesky app and any other Atmosphere app you use with this account."
+msgstr "Je profiel, posts, feeds en lijsten worden weer zichtbaar in het hele Atmosphere-netwerk, inclusief de Bluesky-app en alle andere Atmosphere-apps die je met dit account gebruikt."
+
+#: src/components/utils/scope-description.tsx
+msgid "Your repository contains all the data publicly available on the AT Protocol network, such as Bluesky posts, likes, and follows. It also contains data created through other apps you've signed into using this account. The application requests the permissions necessary to publish the following changes to your repository:"
+msgstr "Je repository bevat alle gegevens die openbaar beschikbaar zijn op het AT Protocol-netwerk, zoals Bluesky-posts, likes en follows. Ook bevat het gegevens die zijn aangemaakt via andere apps waarbij je met dit account bent ingelogd. De applicatie vraagt de machtigingen die nodig zijn om de volgende wijzigingen in je repository te publiceren:"
+
+#: src/contexts/session.tsx
+msgid "Your session has expired. Please sign in again."
+msgstr "Je sessie is verlopen. Log opnieuw in."
+
+#: src/data/handle.ts
+msgid "Your username has been updated."
+msgstr "Je gebruikersnaam is bijgewerkt."
+
+#: src/components/forms/fields/handle-field.tsx
+#: src/components/sign-in-form.tsx
+msgid "yourname"
+msgstr "jouwnaam"
