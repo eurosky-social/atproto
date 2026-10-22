@@ -20,6 +20,8 @@ export type SignUpHandleFormProps = Omit<
   'onSubmit' | 'onValues'
 > & {
   domains: string[]
+  /** Hides the note that the username can later be changed to a domain. */
+  hideChangeNote?: boolean
   values?: Partial<SignUpHandleData>
   onValues?: (values: Partial<SignUpHandleData>) => void
   handler: (
@@ -30,6 +32,7 @@ export type SignUpHandleFormProps = Omit<
 
 export function SignUpHandleForm({
   domains,
+  hideChangeNote = false,
   values,
   onValues,
   handler,
@@ -60,12 +63,14 @@ export function SignUpHandleForm({
       {/* @NOTE Plain copy rather than a `Notice`: this is background about a
         later step, not something to act on now, and an alert surface next to
         the field it follows read as a warning about what was just typed. */}
-      <p className="text-muted-foreground text-sm">
-        <Trans>
-          You can change this username to any domain name you control after your
-          account is set up.
-        </Trans>
-      </p>
+      {!hideChangeNote && (
+        <p className="text-muted-foreground text-sm">
+          <Trans>
+            You can change this username to any domain name you control after
+            your account is set up.
+          </Trans>
+        </p>
+      )}
 
       {children}
     </FormShell>

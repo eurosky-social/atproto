@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { DAY, HOUR, SECOND } from '@atproto/common'
 import type {
@@ -290,6 +291,10 @@ export const envToCfg = (env: ServerEnvironment): ServerConfig => {
       light: env.backgroundLightUrl,
       dark: env.backgroundDarkUrl,
     },
+    linksLocaleParam: env.linksLocaleParam,
+    texts: env.brandingTextsFile
+      ? readBrandingTexts(env.brandingTextsFile)
+      : undefined,
     links: [
       {
         title: { en: 'Home', fr: 'Accueil' },
@@ -553,4 +558,13 @@ export type ModServiceConfig = {
 export type ReportServiceConfig = {
   url: string
   did: string
+}
+
+// Validated against the branding schema by the OAuth provider, at startup.
+function readBrandingTexts(file: string): BrandingConfig['texts'] {
+  try {
+    return JSON.parse(readFileSync(file, 'utf8'))
+  } catch (err) {
+    throw new Error(`Invalid PDS_BRANDING_TEXTS_FILE (${file})`, { cause: err })
+  }
 }

@@ -253,6 +253,15 @@ copy stays legible over any background.
 The mock pages inject the same variables a branded deployment would, so
 `pnpm dev:ui` demonstrates branding without a PDS.
 
+Operator copy comes from `CustomizationData.texts` (`branding.texts` on the
+provider): each value is a `LangString`. Render it with `RichLangString` (or
+`useLangText` for labels), never by hand — it resolves the locale and the
+`[label](target)` link syntax, where a target is a branding link `rel` or a
+caller-supplied extra target. Copy that is not configured falls back to a
+Lingui string, so every override must keep a translated default.
+`linksLocaleParam` is applied in `LinkAnchor`, so branding links get it for
+free.
+
 ## Utility types
 
 `Override<A, B>` (from `#/lib/util.ts`) is the standard prop-extension pattern:

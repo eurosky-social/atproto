@@ -21,6 +21,10 @@ export const locales = {
     name: '한국어',
     flag: '🇰🇷',
   },
+  nl: {
+    name: 'Nederlands',
+    flag: '🇳🇱',
+  },
   ro: {
     name: 'Română',
     flag: '🇷🇴',

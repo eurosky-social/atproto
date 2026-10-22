@@ -15,7 +15,11 @@ function SignUpPage() {
       onValidateNewHandle={async (data) => {
         await api.validateHandleAvailability(data)
       }}
-      onBack={() => navigate({ to: '/account/sign-in' })}
+      // @NOTE Back to the entry point, not to sign-in: with no account on the
+      // device, sign-in shows only the form, which has no way back to sign-up.
+      // The index route picks the welcome screen or the account picker, both of
+      // which offer sign-up again.
+      onBack={() => navigate({ to: '/account' })}
       onDone={async (data) => {
         const { account } = await api.signUp(data)
         // Sign-up establishes a session; go straight into its manager.

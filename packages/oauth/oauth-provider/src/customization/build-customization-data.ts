@@ -20,5 +20,7 @@ export function buildCustomizationData({
     name: branding?.name,
     logo: branding?.logo,
     links: branding?.links,
+    linksLocaleParam: branding?.linksLocaleParam,
+    texts: branding?.texts,
   }
 }
