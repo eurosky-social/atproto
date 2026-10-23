@@ -979,7 +979,12 @@ export function createApiMiddleware<
         res.setHeader('Cache-Control', 'no-store')
         res.setHeader('Pragma', 'no-cache')
 
-        // Prevent CORS requests
+        // Prevent CORS requests. Unlike the authorization page (which allows
+        // "same-site" to support hosting the PDS and the app on different
+        // subdomains of the same site), these endpoints perform authenticated,
+        // state-changing actions, so we require "same-origin": subdomains of
+        // the issuer are a different origin and must not be able to reach
+        // these routes using the ambient session cookie.
         validateFetchMode(req, ['same-origin'])
         validateFetchSite(req, ['same-origin'])
         validateOrigin(req, issuerOrigin)
