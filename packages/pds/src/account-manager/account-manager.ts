@@ -24,6 +24,7 @@ import { assertValidDidDocumentForService } from '../api/com/atproto/server/util
 import { AuthScope } from '../auth-scope.js'
 import type { ServerConfig } from '../config/config.js'
 import { softDeleted } from '../db/index.js'
+import { compileHandleBlocklist } from '../handle/blocklist.js'
 import { hasExplicitSlur } from '../handle/explicit-slurs.js'
 import {
   baseNormalizeAndValidate,
@@ -112,6 +113,7 @@ export type AccountManagerDbConfig = {
 
 export class AccountManager {
   readonly db: AccountDb
+  readonly isBlockedHandleLabel: (label: string) => boolean
 
   constructor(
     readonly cfg: ServerConfig,
@@ -124,6 +126,9 @@ export class AccountManager {
     readonly plcRotationKey: Keypair,
   ) {
     this.db = getDb(cfg.db.accountDbLoc, cfg.db.disableWalAutoCheckpoint)
+    this.isBlockedHandleLabel = compileHandleBlocklist(
+      cfg.identity.handleBlocklist,
+    )
   }
 
   get serviceDid(): DidString {
@@ -230,6 +235,13 @@ export class AccountManager {
         this.serviceHandleDomains,
         allowAnyValid,
       )
+      // service constraints guarantee the first label is the whole name part
+      if (
+        !allowAnyValid &&
+        this.isBlockedHandleLabel(normalized.split('.')[0])
+      ) {
+        throw new InvalidRequestError('Reserved handle', 'HandleNotAvailable')
+      }
     } else {
       // When creating an account (no did yet), we require the handle to be a
       // local service domain. Updating to a custom handle will be possible once

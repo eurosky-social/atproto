@@ -74,6 +74,8 @@ export function readEnv() {
     recoveryDidKey: envStr('PDS_RECOVERY_DID_KEY'),
     serviceHandleDomains: envList('PDS_SERVICE_HANDLE_DOMAINS'), // public hostname by default
     handleBackupNameservers: envList('PDS_HANDLE_BACKUP_NAMESERVERS'),
+    // names refused for handles on the service domains (see `handle/blocklist.ts`)
+    handleBlocklistFile: envStr('PDS_HANDLE_BLOCKLIST_FILE'),
     enableDidDocWithSession: envBool('PDS_ENABLE_DID_DOC_WITH_SESSION'),
 
     // entryway

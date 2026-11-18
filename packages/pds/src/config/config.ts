@@ -8,6 +8,7 @@ import type {
 } from '@atproto/oauth-provider/provider'
 import { type DidString, ensureValidDid, isValidDid } from '@atproto/syntax'
 import pkg from '../../package.json' with { type: 'json' }
+import { parseHandleBlocklist } from '../handle/blocklist.js'
 import type { ServerEnvironment } from './env.js'
 
 export type { BrandingConfig }
@@ -123,6 +124,9 @@ export const envToCfg = (env: ServerEnvironment): ServerConfig => {
     recoveryDidKey: env.recoveryDidKey ?? null,
     serviceHandleDomains,
     handleBackupNameservers: env.handleBackupNameservers,
+    handleBlocklist: env.handleBlocklistFile
+      ? readHandleBlocklist(env.handleBlocklistFile)
+      : [],
     enableDidDocWithSession: !!env.enableDidDocWithSession,
   }
 
@@ -462,6 +466,8 @@ export type IdentityConfig = {
   recoveryDidKey: string | null
   serviceHandleDomains: string[]
   handleBackupNameservers?: string[]
+  /** Normalized patterns from `PDS_HANDLE_BLOCKLIST_FILE` */
+  handleBlocklist: string[]
   enableDidDocWithSession: boolean
 }
 
@@ -566,5 +572,15 @@ function readBrandingTexts(file: string): BrandingConfig['texts'] {
     return JSON.parse(readFileSync(file, 'utf8'))
   } catch (err) {
     throw new Error(`Invalid PDS_BRANDING_TEXTS_FILE (${file})`, { cause: err })
+  }
+}
+
+function readHandleBlocklist(file: string): string[] {
+  try {
+    return parseHandleBlocklist(readFileSync(file, 'utf8'))
+  } catch (err) {
+    throw new Error(`Invalid PDS_HANDLE_BLOCKLIST_FILE (${file})`, {
+      cause: err,
+    })
   }
 }
