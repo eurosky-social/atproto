@@ -33,7 +33,7 @@ export default function (server: Server, ctx: AppContext) {
       }
     }
 
-    const resolveDirectly = (): Promise<DidString> =>
+    const resolveDirectly = () =>
       ctx.idResolver.handle
         .resolve(handle)
         .then(
@@ -41,9 +41,8 @@ export default function (server: Server, ctx: AppContext) {
           throwInvalidRequestError,
         )
 
-    // Ask the service this request is proxied to, and resolve the handle
-    // directly if that fails, so that an appview outage does not break
-    // handle resolution.
+    // @NOTE resolving directly when the proxied service fails keeps handle
+    // resolution working through an appview outage
     const did: DidString = ctx.bskyAppView
       ? await proxyTarget(ctx, req, com.atproto.identity.resolveHandle.$lxm)
           .then(({ client }) =>

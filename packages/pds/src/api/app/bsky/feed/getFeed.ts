@@ -26,7 +26,6 @@ export default function (server: Server, ctx: AppContext) {
 
       const feedUrl = new AtUri(params.feed)
 
-      // The feed record is looked up on the service this request is proxied to
       const { client } = await proxyTarget(ctx, req, app.bsky.feed.getFeed.$lxm)
 
       const data = await client.call(com.atproto.repo.getRecord, {

@@ -14,6 +14,7 @@ import {
 } from '@atproto/dev-env'
 import type { DidString } from '@atproto/syntax'
 import { verifyJwt } from '@atproto/xrpc-server'
+import { app, com } from '../../src/lexicons/index.js'
 import { parseProxyHeader } from '../../src/pipethrough.js'
 
 const FEEDGEN_DID = 'did:web:feedgen.test'
@@ -178,8 +179,8 @@ describe('proxy header', () => {
   it('looks up the getFeed record on the service from the header', async () => {
     // The configured appview is unreachable in this network, so this only
     // succeeds if the feed record lookup follows the proxy header too.
-    const feed = `at://${alice}/app.bsky.feed.generator/test`
-    const path = `/xrpc/app.bsky.feed.getFeed?feed=${encodeURIComponent(feed)}`
+    const feed = `at://${alice}/${app.bsky.feed.generator.$type}/test`
+    const path = `/xrpc/${app.bsky.feed.getFeed.$lxm}?feed=${encodeURIComponent(feed)}`
     const res = await fetch(`${network.pds.url}${path}`, {
       headers: {
         ...sc.getHeaders(alice),
@@ -193,10 +194,10 @@ describe('proxy header', () => {
     assert(lookup && proxied)
 
     const lookupUrl = new URL(lookup.url, proxyServer.url)
-    expect(lookupUrl.pathname).toBe('/xrpc/com.atproto.repo.getRecord')
+    expect(lookupUrl.pathname).toBe(`/xrpc/${com.atproto.repo.getRecord.$lxm}`)
     expect(Object.fromEntries(lookupUrl.searchParams)).toEqual({
       repo: alice,
-      collection: 'app.bsky.feed.generator',
+      collection: app.bsky.feed.generator.$type,
       rkey: 'test',
     })
 
@@ -205,7 +206,7 @@ describe('proxy header', () => {
     const verified = await verifyJwt(
       proxied.auth.replace('Bearer ', ''),
       FEEDGEN_DID,
-      'app.bsky.feed.getFeedSkeleton',
+      app.bsky.feed.getFeedSkeleton.$lxm,
       (iss) => network.pds.ctx.idResolver.did.resolveAtprotoKey(iss, true),
     )
     expect(verified.aud).toBe(FEEDGEN_DID)
@@ -218,13 +219,13 @@ describe('proxy header', () => {
     const post = await createPost({
       text: 'quote',
       embed: {
-        $type: 'app.bsky.embed.record',
+        $type: app.bsky.embed.record.$type,
         record: { uri: quoted.uri, cid: quoted.cid },
       },
     })
 
     const res = await fetch(
-      `${network.pds.url}/xrpc/app.bsky.feed.getTimeline`,
+      `${network.pds.url}/xrpc/${app.bsky.feed.getTimeline.$lxm}`,
       {
         headers: {
           ...sc.getHeaders(alice),
@@ -238,9 +239,9 @@ describe('proxy header', () => {
     const hydration = proxyServer.requests.at(-1)
     assert(hydration)
     const hydrationUrl = new URL(hydration.url, proxyServer.url)
-    expect(hydrationUrl.pathname).toBe('/xrpc/app.bsky.feed.getPosts')
+    expect(hydrationUrl.pathname).toBe(`/xrpc/${app.bsky.feed.getPosts.$lxm}`)
     expect(hydrationUrl.searchParams.getAll('uris')).toEqual([quoted.uri])
-    await expectServiceAuth(hydration, 'app.bsky.feed.getPosts')
+    await expectServiceAuth(hydration, app.bsky.feed.getPosts.$lxm)
   })
 
   it('fetches read-after-write thread parents on the service from the header', async () => {
@@ -252,7 +253,7 @@ describe('proxy header', () => {
       reply: { root: ref, parent: ref },
     })
 
-    const path = `/xrpc/app.bsky.feed.getPostThread?uri=${encodeURIComponent(reply.uri)}`
+    const path = `/xrpc/${app.bsky.feed.getPostThread.$lxm}?uri=${encodeURIComponent(reply.uri)}`
     const res = await fetch(`${network.pds.url}${path}`, {
       headers: {
         ...sc.getHeaders(alice),
@@ -268,13 +269,15 @@ describe('proxy header', () => {
     expect(proxied.url).toEqual(path)
 
     const parentsUrl = new URL(parents.url, proxyServer.url)
-    expect(parentsUrl.pathname).toBe('/xrpc/app.bsky.feed.getPostThread')
+    expect(parentsUrl.pathname).toBe(
+      `/xrpc/${app.bsky.feed.getPostThread.$lxm}`,
+    )
     expect(parentsUrl.searchParams.get('uri')).toBe(parent.uri)
-    await expectServiceAuth(parents, 'app.bsky.feed.getPostThread')
+    await expectServiceAuth(parents, app.bsky.feed.getPostThread.$lxm)
   })
 
   it('resolves handles on the service from the header', async () => {
-    const path = `/xrpc/com.atproto.identity.resolveHandle?handle=${EXTERNAL_HANDLE}`
+    const path = `/xrpc/${com.atproto.identity.resolveHandle.$lxm}?handle=${EXTERNAL_HANDLE}`
     const res = await fetch(`${network.pds.url}${path}`, {
       headers: { 'atproto-proxy': `${proxyServer.did}#atproto_test` },
     })
@@ -287,7 +290,7 @@ describe('proxy header', () => {
       .spyOn(network.pds.ctx.idResolver.handle, 'resolve')
       .mockResolvedValue(EXTERNAL_DID)
 
-    const path = `/xrpc/com.atproto.identity.resolveHandle?handle=${EXTERNAL_HANDLE}`
+    const path = `/xrpc/${com.atproto.identity.resolveHandle.$lxm}?handle=${EXTERNAL_HANDLE}`
     const res = await fetch(`${network.pds.url}${path}`)
     await expect(res.json()).resolves.toEqual({ did: EXTERNAL_DID })
     expect(resolve).toHaveBeenCalledWith(EXTERNAL_HANDLE)
@@ -295,7 +298,7 @@ describe('proxy header', () => {
 
   async function createPost(record: Record<string, unknown>) {
     const res = await fetch(
-      `${network.pds.url}/xrpc/com.atproto.repo.createRecord`,
+      `${network.pds.url}/xrpc/${com.atproto.repo.createRecord.$lxm}`,
       {
         method: 'POST',
         headers: {
@@ -304,9 +307,9 @@ describe('proxy header', () => {
         },
         body: JSON.stringify({
           repo: alice,
-          collection: 'app.bsky.feed.post',
+          collection: app.bsky.feed.post.$type,
           record: {
-            $type: 'app.bsky.feed.post',
+            $type: app.bsky.feed.post.$type,
             createdAt: new Date().toISOString(),
             ...record,
           },
@@ -366,20 +369,20 @@ class ProxyServer {
     const record = (req: express.Request) => {
       requests.push({ url: req.url, auth: req.header('authorization') })
     }
-    const app = express()
+    const expressApp = express()
 
     // This is a PDS endpoint which uses a manual pipethrough() in its handler
-    app.get('/xrpc/app.bsky.actor.getPreferences', (req, res) => {
+    expressApp.get('/xrpc/app.bsky.actor.getPreferences', (req, res) => {
       res.sendStatus(501)
     })
 
-    app.get('/xrpc/com.atproto.repo.getRecord', (req, res) => {
+    expressApp.get(`/xrpc/${com.atproto.repo.getRecord.$lxm}`, (req, res) => {
       record(req)
       const { repo, collection, rkey } = req.query
       res.json({
         uri: `at://${repo}/${collection}/${rkey}`,
         value: {
-          $type: 'app.bsky.feed.generator',
+          $type: app.bsky.feed.generator.$type,
           did: FEEDGEN_DID,
           displayName: 'Test feed',
           createdAt: new Date().toISOString(),
@@ -387,34 +390,37 @@ class ProxyServer {
       })
     })
 
-    app.get('/xrpc/com.atproto.identity.resolveHandle', (req, res) => {
-      record(req)
-      res.json({ did: EXTERNAL_DID })
-    })
+    expressApp.get(
+      `/xrpc/${com.atproto.identity.resolveHandle.$lxm}`,
+      (req, res) => {
+        record(req)
+        res.json({ did: EXTERNAL_DID })
+      },
+    )
 
-    app.get('/xrpc/app.bsky.feed.getTimeline', (req, res) => {
+    expressApp.get(`/xrpc/${app.bsky.feed.getTimeline.$lxm}`, (req, res) => {
       record(req)
       res.setHeader('atproto-repo-rev', state.repoRev)
       res.json({ feed: [] })
     })
 
-    app.get('/xrpc/app.bsky.feed.getPosts', (req, res) => {
+    expressApp.get(`/xrpc/${app.bsky.feed.getPosts.$lxm}`, (req, res) => {
       record(req)
       res.json({ posts: [] })
     })
 
-    app.get('/xrpc/app.bsky.feed.getPostThread', (req, res) => {
+    expressApp.get(`/xrpc/${app.bsky.feed.getPostThread.$lxm}`, (req, res) => {
       record(req)
       res.setHeader('atproto-repo-rev', state.repoRev)
       res.status(400).json({ error: 'NotFound', message: 'Post not found' })
     })
 
-    app.get('*', (req, res) => {
+    expressApp.get('*', (req, res) => {
       record(req)
       res.sendStatus(200)
     })
 
-    const server = app.listen(0)
+    const server = expressApp.listen(0)
     await once(server, 'listening')
 
     const { port } = server.address() as AddressInfo
