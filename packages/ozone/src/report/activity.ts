@@ -1,10 +1,10 @@
+import type { LexMap } from '@atproto/lex-data'
 import type {
   DatetimeString,
   DidString,
-  LexMap,
   Unknown$Type,
-} from '@atproto/lex'
-import { currentDatetimeString } from '@atproto/lex'
+} from '@atproto/lex-schema'
+import { currentDatetimeString } from '@atproto/lex-schema'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import type { Database } from '../db/index.js'
 import { TimeIdKeyset, paginate } from '../db/pagination.js'
@@ -14,6 +14,7 @@ import {
   InvalidStateTransition,
   handleReportUpdate,
 } from './handle-report-update.js'
+import { getActivityMetadata } from './metadata.js'
 import { notifyReportActivities } from './notifications.js'
 
 const VALID_ACTIVITY_TYPES = new Set([
@@ -45,6 +46,7 @@ export type CreateActivityParams = {
   isAutomated?: boolean
   createdBy: DidString
   inboxStartAt?: DatetimeString
+  inboxPushEnabled?: boolean
 }
 
 export async function createReportActivity(
@@ -57,10 +59,11 @@ export async function createReportActivity(
     activityType,
     internalNote,
     publicNote,
-    meta,
     isAutomated = false,
     createdBy,
   } = params
+
+  const metadata = getActivityMetadata(params.meta)
 
   if ((reportId === undefined) === (eventId === undefined)) {
     throw new InvalidRequestError(
@@ -137,10 +140,20 @@ export async function createReportActivity(
         internalNote: internalNote ?? null,
         publicNote: publicNote ?? null,
         meta:
-          activityType === 'closeActivity' &&
-          report.reportType === tools.ozone.report.defs.ReasonAppeal
-            ? { ...meta, appealOutcome: 'denied' }
-            : (meta ?? null),
+          metadata || activityType === 'closeActivity'
+            ? {
+                ...metadata,
+                ...(activityType === 'closeActivity'
+                  ? {
+                      resolution: 'noAction',
+                      ...(report.reportType ===
+                      tools.ozone.report.defs.ReasonAppeal
+                        ? { appealOutcome: 'denied' }
+                        : {}),
+                    }
+                  : {}),
+              }
+            : null,
         isAutomated,
         createdBy,
         createdAt: now,
@@ -159,6 +172,7 @@ export async function createReportActivity(
         },
       ],
       params.inboxStartAt,
+      params.inboxPushEnabled,
     )
 
     return activity

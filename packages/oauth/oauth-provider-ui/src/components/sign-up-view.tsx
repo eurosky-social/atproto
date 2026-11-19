@@ -1,11 +1,13 @@
 import { msg } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useState } from 'react'
+import type { SignUpInput } from '@atproto/oauth-provider-api'
 import {
   RichLangString,
   useLangText,
 } from '#/components/utils/rich-lang-string.tsx'
 import { useCustomizationData } from '#/contexts/customization.tsx'
+import type { WithOptionalLocale } from '#/lib/api.ts'
 import { SignUpWizard } from './forms/sign-up-wizard.tsx'
 import { AuthShell } from './layouts/auth-shell.tsx'
 import {
@@ -23,16 +25,13 @@ import {
 } from './sign-up-hcaptcha-form.tsx'
 import { type SignUpTermsData, SignUpTermsForm } from './sign-up-terms-form.tsx'
 
+export type SignUpViewData = WithOptionalLocale<SignUpInput>
+
 export type SignUpViewProps = {
   rememberDefault?: boolean
   onBack?: () => void
   onValidateNewHandle: (data: SignUpHandleData) => void | PromiseLike<void>
-  onDone: (
-    data: SignUpCredentialsData & {
-      handle: string
-      hcaptchaToken?: string
-    },
-  ) => void | PromiseLike<void>
+  onDone: (data: SignUpViewData) => void | PromiseLike<void>
 }
 
 export function SignUpView({
@@ -56,7 +55,7 @@ export function SignUpView({
   // Keep a copy of all every step's form values in case the user changes a step
   // and goes back to the previous step, allowing to keep the un-submitted
   // values in the form inputs.
-  const [pending, setPending] = useState<
+  const [defaultValues, setDefaultValues] = useState<
     Partial<
       SignUpTermsData &
         SignUpCredentialsData &
@@ -64,6 +63,15 @@ export function SignUpView({
         SignUpHcaptchaData
     >
   >({})
+
+  const updateDefaultValues = (
+    val: Partial<
+      SignUpTermsData &
+        SignUpCredentialsData &
+        SignUpHandleData &
+        SignUpHcaptchaData
+    >,
+  ) => setDefaultValues((old) => ({ ...old, ...val }))
 
   // @NOTE Only the last step creates the account, so only the last step states
   // what creating one agrees to. Which step that is depends on whether hCaptcha
@@ -109,9 +117,12 @@ export function SignUpView({
                 onBack={prev}
                 backLabel={prevLabel}
                 submitLabel={nextLabel}
-                values={pending}
-                onValues={(val) => setPending((old) => ({ ...old, ...val }))}
-                handler={next}
+                defaultValues={defaultValues}
+                onValues={updateDefaultValues}
+                handler={(val) => {
+                  updateDefaultValues(val)
+                  return next(val)
+                }}
               />
             ),
           },
@@ -129,11 +140,12 @@ export function SignUpView({
                 onBack={prev}
                 backLabel={prevLabel}
                 submitLabel={nextLabel}
-                values={pending}
-                onValues={(val) => setPending((old) => ({ ...old, ...val }))}
-                handler={async (data) => {
-                  await onValidateNewHandle(data)
-                  next(data)
+                defaultValues={defaultValues}
+                onValues={updateDefaultValues}
+                handler={async (val) => {
+                  updateDefaultValues(val)
+                  await onValidateNewHandle(val)
+                  return next(val)
                 }}
               >
                 {atLast && disclaimer}
@@ -148,9 +160,12 @@ export function SignUpView({
                 onBack={prev}
                 backLabel={prevLabel}
                 submitLabel={nextLabel}
-                values={pending}
-                onValues={(val) => setPending((old) => ({ ...old, ...val }))}
-                handler={next}
+                defaultValues={defaultValues}
+                onValues={updateDefaultValues}
+                handler={(val) => {
+                  updateDefaultValues(val)
+                  return next(val)
+                }}
                 inviteCodeRequired={inviteCodeRequired}
                 rememberDefault={rememberDefault}
               >
@@ -158,6 +173,9 @@ export function SignUpView({
               </SignUpCredentialsForm>
             ),
           },
+          // @NOTE We could try without the hCaptcha step and use the
+          // server-side rate limits to enforce captcha when necessary. For now,
+          // we keep the legacy implementation with the hCaptcha step.
           hcaptchaSiteKey != null && {
             titleRender: () => <Trans>Verify you are human</Trans>,
             contentRender: ({ atLast, prev, prevLabel, next, nextLabel }) => (
@@ -167,9 +185,12 @@ export function SignUpView({
                 onBack={prev}
                 backLabel={prevLabel}
                 submitLabel={nextLabel}
-                values={pending}
-                onValues={(val) => setPending((old) => ({ ...old, ...val }))}
-                handler={next}
+                defaultValues={defaultValues}
+                onValues={updateDefaultValues}
+                handler={(val) => {
+                  updateDefaultValues(val)
+                  return next(val)
+                }}
               >
                 {atLast && disclaimer}
               </SignUpHcaptchaForm>

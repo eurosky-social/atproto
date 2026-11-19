@@ -1,5 +1,51 @@
 # @atproto/oauth-client
 
+## 0.9.4
+
+### Patch Changes
+
+- [#5917](https://github.com/bluesky-social/atproto/pull/5917) [`b5dfe0b`](https://github.com/bluesky-social/atproto/commit/b5dfe0b80ac4f14f56b3c9b797e0e50d2e194a3b) Thanks [@matthieusieben](https://github.com/matthieusieben)! - Properly propagate request cancellation errors
+
+## 0.9.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @atproto/xrpc@0.8.18
+
+## 0.9.2
+
+### Patch Changes
+
+- [#5805](https://github.com/bluesky-social/atproto/pull/5805) [`a93db66`](https://github.com/bluesky-social/atproto/commit/a93db663f51405031b9fc12b6f57968a435fddec) Thanks [@mozzius](https://github.com/mozzius)! - Fix the DPoP nonce retry for authorization server requests on React Native, where the first sign-in (or a token refresh with no cached nonce) failed with `use_dpop_nonce`. Unexpected errors while checking for a `use_dpop_nonce` response are no longer treated as "not a nonce error".
+- Updated dependencies [[`a93db66`](https://github.com/bluesky-social/atproto/commit/a93db663f51405031b9fc12b6f57968a435fddec)]:
+  - @atproto-labs/fetch@0.4.2
+  - @atproto-labs/did-resolver@0.3.13
+  - @atproto/oauth-resolver@0.0.3
+  - @atproto-labs/identity-resolver@0.4.13
+
+## 0.9.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @atproto-labs/did-resolver@0.3.12
+  - @atproto-labs/fetch@0.4.1
+  - @atproto-labs/identity-resolver@0.4.12
+  - @atproto/oauth-resolver@0.0.2
+  - @atproto/xrpc@0.8.17
+
+## 0.9.0
+
+### Minor Changes
+
+- [#5687](https://github.com/bluesky-social/atproto/pull/5687) [`943170b`](https://github.com/bluesky-social/atproto/commit/943170bd390705fbb16920688f8f09ec7078a59b) Thanks [@matthieusieben](https://github.com/matthieusieben)! - Factorize `OAuthResolver` logic in separate `@atproto/oauth-resolver` package (out of `@atproto/oauth-client`)
+
+### Patch Changes
+
+- Updated dependencies [[`943170b`](https://github.com/bluesky-social/atproto/commit/943170bd390705fbb16920688f8f09ec7078a59b)]:
+  - @atproto/oauth-resolver@0.0.1
+
 ## 0.8.10
 
 ### Patch Changes

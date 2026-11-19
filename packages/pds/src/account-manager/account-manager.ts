@@ -6,13 +6,13 @@ import { isDisposableEmail } from 'disposable-email-domains-js'
 import { HOUR, obfuscateEmail, wait } from '@atproto/common'
 import type { Keypair } from '@atproto/crypto'
 import type { IdResolver } from '@atproto/identity'
+import type { Cid } from '@atproto/lex-data'
 import {
   type AtIdentifierString,
   type DidString,
   type HandleString,
   isAtIdentifierString,
-} from '@atproto/lex'
-import type { Cid } from '@atproto/lex-data'
+} from '@atproto/lex-schema'
 import {
   INVALID_HANDLE,
   currentDatetimeString,
@@ -23,7 +23,7 @@ import type { ActorStore } from '../actor-store/actor-store.js'
 import { assertValidDidDocumentForService } from '../api/com/atproto/server/util.js'
 import { AuthScope } from '../auth-scope.js'
 import type { ServerConfig } from '../config/config.js'
-import { softDeleted } from '../db/index.js'
+import { retrySqlite, softDeleted } from '../db/index.js'
 import { compileHandleBlocklist } from '../handle/blocklist.js'
 import { hasExplicitSlur } from '../handle/explicit-slurs.js'
 import {
@@ -141,6 +141,9 @@ export class AccountManager {
 
   async migrateOrThrow() {
     await this.db.ensureWal()
+    if (this.cfg.db.synchronousFull) {
+      await retrySqlite(() => this.db.ensureSynchronousFull())
+    }
     await getMigrator(this.db).migrateToLatestOrThrow()
   }
 
@@ -1133,12 +1136,11 @@ export class AccountManager {
   async updateAccountPassword(opts: { did: DidString; password: string }) {
     const { did } = opts
     const passwordScrypt = await scrypt.genSaltAndHash(opts.password)
-    await this.db.transaction(async (dbTxn) =>
-      Promise.all([
-        password.updateUserPassword(dbTxn, { did, passwordScrypt }),
-        emailToken.deleteEmailToken(dbTxn, did, 'reset_password'),
-        auth.revokeRefreshTokensByDid(dbTxn, did),
-      ]),
-    )
+    await this.db.transaction(async (dbTxn) => {
+      await password.updateUserPassword(dbTxn, { did, passwordScrypt })
+      await emailToken.deleteEmailToken(dbTxn, did, 'reset_password')
+      await auth.revokeRefreshTokensByDid(dbTxn, did)
+      // @NOTE Should we also clear oauth sessions here ?
+    })
   }
 }

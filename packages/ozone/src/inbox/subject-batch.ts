@@ -3,7 +3,7 @@ import {
   type DatetimeString,
   type DidString,
   currentDatetimeString,
-} from '@atproto/lex'
+} from '@atproto/lex-schema'
 import type { InboxConfig } from '../config/config.js'
 import type { Database } from '../db/index.js'
 import { com } from '../lexicons/index.js'
@@ -14,10 +14,13 @@ import {
   appealResolutionFilter,
 } from './appeal-outcome.js'
 import {
-  APPEAL_REASON_TYPE,
   PUBLIC_EVENT_ACTIONS,
+  appealReportTypeFilter,
+  eligibilityFromCandidates,
+  hasKnownLatestAppealable,
   subjectLabelUri,
 } from './appeal.js'
+import { findLatestAppealableByUri } from './appealable-events.js'
 import { loadPolicyList } from './policies.js'
 import type { ActionedSubjectRow } from './subjects.js'
 import { publicEventSelection, toSubjectView } from './views.js'
@@ -82,7 +85,7 @@ export async function hydrateSubjectViews(
           SELECT DISTINCT unnest(${paths}::text[]) AS "recordPath"
         )`.as('subjects'),
       )
-      .innerJoinLateral(
+      .leftJoinLateral(
         (eb) =>
           eb
             .selectFrom('report')
@@ -90,10 +93,42 @@ export async function hydrateSubjectViews(
             .whereRef('recordPath', '=', 'subjects.recordPath')
             .where('subjectMessageId', 'is', null)
             .where('subjectConvoId', 'is', null)
-            .where('reportType', '=', APPEAL_REASON_TYPE)
+            .where(appealReportTypeFilter)
+            .where(sql<boolean>`status <> 'closed'`)
             .orderBy('id', 'desc')
             .limit(1)
-            .select(appealReportSelection)
+            .select('report.id')
+            .as('active'),
+        (join) => join.onTrue(),
+      )
+      .leftJoinLateral(
+        (eb) =>
+          eb
+            .selectFrom('report')
+            .where('did', '=', did)
+            .whereRef('recordPath', '=', 'subjects.recordPath')
+            .where('subjectMessageId', 'is', null)
+            .where('subjectConvoId', 'is', null)
+            .where(appealReportTypeFilter)
+            .where(sql<boolean>`status = 'closed'`)
+            .orderBy(sql`"closedAt" DESC NULLS FIRST`)
+            .orderBy('id', 'desc')
+            .limit(1)
+            .select(['report.id', 'report.closedAt'])
+            .as('closed'),
+        (join) => join.onTrue(),
+      )
+      .innerJoinLateral(
+        (eb) =>
+          eb
+            .selectFrom('report')
+            .where('id', '=', sql<number>`coalesce(active.id, closed.id)`)
+            .select(
+              appealReportSelection.map(
+                (column) => `report.${column}` as const,
+              ),
+            )
+            .limit(1)
             .as('report'),
         (join) => join.onTrue(),
       )
@@ -121,12 +156,27 @@ export async function hydrateSubjectViews(
         'report.createdAt',
         'report.updatedAt',
         'report.closedAt',
+        'active.id as activeId',
+        'closed.id as closedId',
+        'closed.closedAt as lastClosedAt',
       ])
       .select(appealActivityOutcome('report', 'closure').as('outcome'))
       .orderBy('report.recordPath')
       .execute(),
     loadPolicyList(db, serviceDid),
   ])
+  const fallbackUris = rows.flatMap((row, i) => {
+    const subjectEvents = events.filter(
+      (event) => (event.subjectUri ?? did) === uris[i],
+    )
+    return (cfg.startAt && !row.latestAppealableAt) ||
+      !hasKnownLatestAppealable(row.latestAppealableAt, subjectEvents)
+      ? [uris[i]]
+      : []
+  })
+  const latestByUri = fallbackUris.length
+    ? await findLatestAppealableByUri(db, did, fallbackUris)
+    : new Map()
   return rows.flatMap((row, i) => {
     const subject = subjects[i]
     const appealReport =
@@ -146,8 +196,17 @@ export async function hydrateSubjectViews(
         actionCount: row.actionCount,
         firstActionAt: row.firstActionAt,
         lastActionAt: row.lastActionAt,
-        latestAppealableAt: row.latestAppealableAt,
+        latestAppealableAt: fallbackUris.includes(uris[i])
+          ? (latestByUri.get(uris[i]) ?? null)
+          : row.latestAppealableAt,
         appealReport,
+        eligibility: appealReport
+          ? eligibilityFromCandidates({
+              activeId: appealReport.activeId,
+              closedId: appealReport.closedId,
+              closedAt: appealReport.lastClosedAt,
+            })
+          : undefined,
       },
     })
     return view ? [view] : []

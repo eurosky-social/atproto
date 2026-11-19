@@ -65,7 +65,7 @@ export function ConsentForm({
   onBack,
 }: ConsentFormProps) {
   const { t } = useLingui()
-  const reject = useAsyncAction(onReject)
+  const action = useAsyncAction(onReject)
 
   const { texts: { consent: texts = {} } = {} } = useCustomizationData()
   const acceptLabel = useLangText(texts.acceptLabel)
@@ -78,30 +78,30 @@ export function ConsentForm({
   const [allowEmail, setAllowEmail] = useState(true)
 
   return (
-    <FormShell<{ allowEmail: string }>
+    <FormShell
       onBack={onBack}
       // Clear a previous rejection error as soon as the user changes anything.
-      onValues={() => reject.reset()}
-      disabled={reject.loading}
+      onValues={() => action.reset()}
+      loading={action.loading}
       submitLabel={
         acceptLabel ?? <Trans context="OAuthConsent">Authorize</Trans>
       }
-      onSubmit={() =>
-        onConsent({
+      handler={() => {
+        return onConsent({
           scope:
             canUnsetEmail && !allowEmail
               ? stripAccountEmailScope(scope)
               : scope,
         })
-      }
+      }}
       actions={
         <ActionButton
           type="button"
           variant="secondary"
-          disabled={reject.loading}
+          disabled={action.loading}
           onClick={(event) => {
             event.preventDefault()
-            void reject.run()
+            void action.run()
           }}
         >
           {rejectLabel ?? <Trans context="OAuthConsent">Deny access</Trans>}

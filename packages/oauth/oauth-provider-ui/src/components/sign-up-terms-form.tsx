@@ -9,6 +9,7 @@ import {
 import { LinkAnchor } from '#/components/utils/link-anchor.tsx'
 import { RichLangString } from '#/components/utils/rich-lang-string.tsx'
 import { useCustomizationData } from '#/contexts/customization.tsx'
+import type { Override } from '#/lib/util'
 
 type Values = { acceptTerms?: string }
 
@@ -18,18 +19,13 @@ export type SignUpTermsTexts = NonNullable<
   NonNullable<CustomizationTexts['signUp']>['terms']
 >
 
-export type SignUpTermsFormProps = Omit<
-  FormShellProps<Values>,
-  'onSubmit' | 'onValues' | 'submittable'
-> & {
-  texts: SignUpTermsTexts
-  values?: Partial<SignUpTermsData>
-  onValues?: (values: Partial<SignUpTermsData>) => void
-  handler: (
-    data: SignUpTermsData,
-    signal: AbortSignal,
-  ) => void | PromiseLike<void>
-}
+export type SignUpTermsFormProps = Override<
+  Omit<FormShellProps<SignUpTermsData>, 'submittable'>,
+  {
+    texts: SignUpTermsTexts
+    defaultValues?: Partial<SignUpTermsData>
+  }
+>
 
 /**
  * The optional first sign-up step: a summary of the deployment's terms, and a
@@ -38,13 +34,15 @@ export type SignUpTermsFormProps = Omit<
  */
 export function SignUpTermsForm({
   texts,
-  values,
+  defaultValues,
+
+  // FormShellProps
   onValues,
   handler,
   children,
   ...props
 }: SignUpTermsFormProps) {
-  const [accepted, setAccepted] = useState(values?.acceptTerms === true)
+  const [accepted, setAccepted] = useState(defaultValues?.acceptTerms === true)
 
   return (
     <FormShell<Values>
@@ -57,7 +55,7 @@ export function SignUpTermsForm({
         setAccepted(acceptTerms)
         onValues?.({ acceptTerms })
       }}
-      onSubmit={(_next, signal) => handler({ acceptTerms: true }, signal)}
+      handler={(_values, signal) => handler({ acceptTerms: true }, signal)}
     >
       <p>
         {texts.intro != null ? (

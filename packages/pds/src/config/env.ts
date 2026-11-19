@@ -18,6 +18,9 @@ export function readEnv() {
     maxImportSize: envInt('PDS_MAX_REPO_IMPORT_SIZE'),
     blobUploadLimit: envInt('PDS_BLOB_UPLOAD_LIMIT'),
     devMode: envBool('PDS_DEV_MODE'),
+    trustedProxies: envStr('PDS_TRUSTED_PROXIES')
+      ?.split(',')
+      .map((addr) => addr.trim()),
 
     // hCaptcha
     hcaptchaSiteKey: envStr('PDS_HCAPTCHA_SITE_KEY'),
@@ -44,6 +47,7 @@ export function readEnv() {
     // database
     dataDirectory: envStr('PDS_DATA_DIRECTORY'),
     disableWalAutoCheckpoint: envBool('PDS_SQLITE_DISABLE_WAL_AUTO_CHECKPOINT'),
+    synchronousFull: envBool('PDS_SQLITE_SYNCHRONOUS_FULL'),
     accountDbLocation: envStr('PDS_ACCOUNT_DB_LOCATION'),
     sequencerDbLocation: envStr('PDS_SEQUENCER_DB_LOCATION'),
     didCacheDbLocation: envStr('PDS_DID_CACHE_DB_LOCATION'),
@@ -80,11 +84,13 @@ export function readEnv() {
 
     // entryway
     entrywayUrl: envStr('PDS_ENTRYWAY_URL'),
+    entrywayApiUrl: envStr('PDS_ENTRYWAY_API_URL'),
     entrywayDid: envStr('PDS_ENTRYWAY_DID'),
     entrywayJwtVerifyKeyK256PublicKeyHex: envStr(
       'PDS_ENTRYWAY_JWT_VERIFY_KEY_K256_PUBLIC_KEY_HEX',
     ),
     entrywayPlcRotationKey: envStr('PDS_ENTRYWAY_PLC_ROTATION_KEY'),
+    entrywayRequireServiceAuth: envBool('PDS_ENTRYWAY_REQUIRE_SERVICE_AUTH'),
 
     // invites
     inviteRequired: envBool('PDS_INVITE_REQUIRED'),
@@ -127,6 +133,7 @@ export function readEnv() {
     rateLimitRepoUploadBlobPoints: envInt(
       'PDS_RATE_LIMIT_REPO_UPLOAD_BLOB_POINTS',
     ),
+    disableIpRateLimits: envBool('PDS_DISABLE_IP_RATE_LIMITS'),
 
     // redis
     redisScratchAddress: envStr('PDS_REDIS_SCRATCH_ADDRESS'),

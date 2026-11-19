@@ -18,6 +18,7 @@ export default function (server: Server, ctx: AppContext) {
       },
     }),
     rateLimit: {
+      calcKey: ({ auth }) => auth.credentials.did,
       durationMs: rateLimits.enabled
         ? rateLimits.repoUploadBlobRateLimitDuration
         : DAY,

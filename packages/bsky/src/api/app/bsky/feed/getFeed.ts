@@ -1,12 +1,13 @@
 import { mapDefined, noUndefinedVals } from '@atproto/common'
 import {
-  type DidString,
   XrpcInvalidResponseError,
   XrpcResponseError,
   xrpcSafe,
-} from '@atproto/lex'
+} from '@atproto/lex-client'
+import type { DidString } from '@atproto/lex-schema'
 import { AtUri } from '@atproto/syntax'
 import {
+  AuthRequiredError,
   type Headers as HeadersMap,
   InvalidRequestError,
   type Server,
@@ -47,8 +48,16 @@ export default function (server: Server, ctx: AppContext) {
     presentation,
   )
   server.add(app.bsky.feed.getFeed, {
-    auth: ctx.authVerifier.standardOptionalParameterized({
+    auth: ctx.authVerifier.standardReadOptional({
       lxmCheck: (method) => {
+        // lxm check only runs for service JWTs sent directly by the PDS, not for
+        // BSG's token.
+        //
+        // Cases:
+        // 1. PDS with custom getFeed handler (like ours): `lxm` is getFeedSkeleton
+        //    and `aud` is the feed generator's DID (hence `skipAudCheck`).
+        // 2. PDS without custom getFeed handler: `lxm` is getFeed. The feed generator
+        //    gets the same token and may reject it.
         return (
           method === app.bsky.feed.getFeedSkeleton.$lxm ||
           method === app.bsky.feed.getFeed.$lxm
@@ -61,15 +70,25 @@ export default function (server: Server, ctx: AppContext) {
       const stableDeviceId = req.header(ANALYTICS_HEADER_DEVICE_ID) ?? null
       const labelers = ctx.reqLabelers(req)
       const hydrateCtx = await ctx.hydrator.createContext({
+        xrpcEndpoint: app.bsky.feed.getFeed.$lxm,
         labelers,
         viewer,
         features: ctx.featureGatesClient.scope(
           ctx.featureGatesClient.parseUserContextFromHandler({ viewer, req }),
         ),
       })
+      const serviceJwt =
+        auth.credentials.type === 'standard'
+          ? auth.credentials.serviceJwt
+          : undefined
+      if (!serviceJwt && viewer) {
+        // @TODO With OAuth, BSG's token has no service JWT. AppView will get
+        // one from BSG here.
+        throw new AuthRequiredError('Malformed token', 'InvalidToken')
+      }
       const headers = noUndefinedVals({
         'user-agent': BSKY_USER_AGENT,
-        authorization: req.headers['authorization'],
+        authorization: serviceJwt ? `Bearer ${serviceJwt}` : undefined,
         'accept-language': req.headers['accept-language'],
       })
       const passthroughHeaders = getAtprotoPassthroughHeaders(req)
@@ -291,11 +310,15 @@ export function irisUrlForTrendingFeed(
 const resolveSkeletonEndpoint = async (
   ctx: Context,
   params: Params,
-): Promise<{ endpoint: string; feedDid?: DidString }> => {
+): Promise<{ endpoint: string; feedDid?: DidString; trusted?: boolean }> => {
   const { feed } = params
   const irisUrl = irisUrlForFeed(ctx.cfg, params)
   if (irisUrl) {
-    return { endpoint: irisUrl, feedDid: await getFeedGenDid(ctx, feed) }
+    return {
+      endpoint: irisUrl,
+      feedDid: await getFeedGenDid(ctx, feed),
+      trusted: true,
+    }
   }
 
   const irisStagingUrl = irisStagingUrlForFeed(ctx.cfg, params)
@@ -303,6 +326,7 @@ const resolveSkeletonEndpoint = async (
     return {
       endpoint: irisStagingUrl,
       feedDid: await getFeedGenDid(ctx, feed),
+      trusted: true,
     }
   }
 
@@ -312,7 +336,9 @@ const resolveSkeletonEndpoint = async (
   }
 
   const trendingIrisUrl = irisUrlForTrendingFeed(ctx.cfg, { feed, feedDid })
-  if (trendingIrisUrl) return { endpoint: trendingIrisUrl, feedDid }
+  if (trendingIrisUrl) {
+    return { endpoint: trendingIrisUrl, feedDid, trusted: true }
+  }
 
   let identity: GetIdentityByDidResponse
   try {
@@ -335,7 +361,7 @@ const resolveSkeletonEndpoint = async (
     )
   }
 
-  return { endpoint: fgEndpoint, feedDid }
+  return { endpoint: fgEndpoint, feedDid, trusted: false }
 }
 
 async function getFeedGenDid(
@@ -351,7 +377,10 @@ const skeletonFromFeedGen = async (
   params: Params,
 ): Promise<AlgoResponse> => {
   const { headers, passthroughHeaders } = params
-  const { endpoint, feedDid } = await resolveSkeletonEndpoint(ctx, params)
+  const { endpoint, feedDid, trusted } = await resolveSkeletonEndpoint(
+    ctx,
+    params,
+  )
   const requestHeaders = noUndefinedVals({
     ...headers,
     ...(feedDid && ctx.cfg.bskyFeedgenDids.has(feedDid)
@@ -360,20 +389,26 @@ const skeletonFromFeedGen = async (
   })
 
   // @TODO currently passthrough auth headers from pds
-  const result = await xrpcSafe(endpoint, app.bsky.feed.getFeedSkeleton, {
-    strictResponseProcessing: false,
-    signal: AbortSignal.any([
-      params.signal,
-      AbortSignal.timeout(ctx.cfg.feedGenSkeletonTimeout),
-    ]),
-    headers: requestHeaders,
-    params: {
-      feed: params.feed,
-      // The feedgen is not guaranteed to honor the limit, but we try it.
-      limit: params.limit,
-      cursor: params.cursor,
+  // Configured endpoints (iris) are ours. The DID-document path is resolved from
+  // another account's record, so only that one goes through the guarded fetch.
+  const result = await xrpcSafe(
+    trusted ? endpoint : { service: endpoint, fetch: ctx.federatedFetch },
+    app.bsky.feed.getFeedSkeleton,
+    {
+      strictResponseProcessing: false,
+      signal: AbortSignal.any([
+        params.signal,
+        AbortSignal.timeout(ctx.cfg.feedGenSkeletonTimeout),
+      ]),
+      headers: requestHeaders,
+      params: {
+        feed: params.feed,
+        // The feedgen is not guaranteed to honor the limit, but we try it.
+        limit: params.limit,
+        cursor: params.cursor,
+      },
     },
-  })
+  )
 
   if (!result.success) {
     const cause = result.reason

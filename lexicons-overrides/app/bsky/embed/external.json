@@ -6,12 +6,7 @@
       "type": "object",
       "description": "A representation of some externally linked content (eg, a URL and 'card'), embedded in a Bluesky record (eg, a post).",
       "required": ["external"],
-      "properties": {
-        "external": {
-          "type": "ref",
-          "ref": "#external"
-        }
-      }
+      "properties": { "external": { "type": "ref", "ref": "#external" } }
     },
     "external": {
       "type": "object",
@@ -20,17 +15,10 @@
         "uri": { "type": "string", "format": "uri" },
         "title": { "type": "string" },
         "description": { "type": "string" },
-        "thumb": {
-          "type": "blob",
-          "accept": ["image/*"],
-          "maxSize": 1000000
-        },
+        "thumb": { "type": "blob", "accept": ["image/*"], "maxSize": 1000000 },
         "associatedRefs": {
           "type": "array",
-          "items": {
-            "type": "ref",
-            "ref": "com.atproto.repo.strongRef"
-          },
+          "items": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
           "description": "StrongRefs (uri+cid) of the Atmosphere records that backed this view."
         }
       }
@@ -38,12 +26,7 @@
     "view": {
       "type": "object",
       "required": ["external"],
-      "properties": {
-        "external": {
-          "type": "ref",
-          "ref": "#viewExternal"
-        }
-      }
+      "properties": { "external": { "type": "ref", "ref": "#viewExternal" } }
     },
     "viewExternal": {
       "type": "object",
@@ -74,10 +57,7 @@
         "source": { "type": "ref", "ref": "#viewExternalSource" },
         "associatedRefs": {
           "type": "array",
-          "items": {
-            "type": "ref",
-            "ref": "com.atproto.repo.strongRef"
-          },
+          "items": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
           "description": "StrongRefs (uri+cid) of the Atmosphere records that backed this view."
         },
         "associatedProfiles": {
@@ -107,32 +87,17 @@
         },
         "title": { "type": "string" },
         "description": { "type": "string" },
-        "theme": {
-          "type": "ref",
-          "ref": "#viewExternalSourceTheme"
-        }
+        "theme": { "type": "ref", "ref": "#viewExternalSourceTheme" }
       }
     },
     "viewExternalSourceTheme": {
       "type": "object",
-      "description": "The theme colors of an external source, such as a site.standard.publication. These colors may be used when rendering an embed from that source.",
+      "description": "The theme colors of an external source, such as a standard.site publication. These colors may be used when rendering an embed from that source.",
       "properties": {
-        "backgroundRGB": {
-          "type": "ref",
-          "ref": "#colorRGB"
-        },
-        "foregroundRGB": {
-          "type": "ref",
-          "ref": "#colorRGB"
-        },
-        "accentRGB": {
-          "type": "ref",
-          "ref": "#colorRGB"
-        },
-        "accentForegroundRGB": {
-          "type": "ref",
-          "ref": "#colorRGB"
-        }
+        "backgroundRGB": { "type": "ref", "ref": "#colorRGB" },
+        "foregroundRGB": { "type": "ref", "ref": "#colorRGB" },
+        "accentRGB": { "type": "ref", "ref": "#colorRGB" },
+        "accentForegroundRGB": { "type": "ref", "ref": "#colorRGB" }
       }
     },
     "colorRGB": {
@@ -172,10 +137,7 @@
         "image": { "type": "string", "format": "uri" },
         "publisher": { "type": "ref", "ref": "#viewArticlePublication" },
         "readingTime": { "type": "integer", "minimum": 1 },
-        "likeCount": {
-          "type": "integer",
-          "minimum": 0
-        },
+        "likeCount": { "type": "integer", "minimum": 0 },
         "likers": {
           "type": "array",
           "maxLength": 3,
@@ -214,10 +176,7 @@
         "logo": { "type": "string", "format": "uri" },
         "image": { "type": "string", "format": "uri" },
         "theme": { "type": "ref", "ref": "#viewArticlePublicationTheme" },
-        "subscriptionCount": {
-          "type": "integer",
-          "minimum": 0
-        },
+        "subscriptionCount": { "type": "integer", "minimum": 0 },
         "subscribers": {
           "type": "array",
           "maxLength": 3,
@@ -226,6 +185,21 @@
             "type": "ref",
             "ref": "app.bsky.actor.defs#profileViewBasic"
           }
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#viewArticlePublicationViewerState"
+        }
+      }
+    },
+    "viewArticlePublicationViewerState": {
+      "type": "object",
+      "description": "Metadata about the requesting account's relationship with the subject publication. Only has meaningful content for authed requests.",
+      "properties": {
+        "subscription": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "The requesting account's site.standard.graph.subscription record for this publication, if subscribed."
         }
       }
     },
@@ -276,16 +250,15 @@
         },
         "items": {
           "type": "array",
-          "items": {
-            "type": "union",
-            "refs": ["#viewGalleryImage"]
-          },
+          "items": { "type": "union", "refs": ["#viewGalleryImage"] },
           "description": "The media items in the gallery. Each item may be of a different type, but all types must be supported by the client."
         },
-        "likeCount": {
+        "photoCount": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Total number of gallery item backlinks, independent of the items included in this view."
         },
+        "likeCount": { "type": "integer", "minimum": 0 },
         "likers": {
           "type": "array",
           "maxLength": 3,
@@ -351,7 +324,12 @@
           "description": "True if the livestream is currently active at the time this view is served, false if it has ended."
         },
         "startedAt": { "type": "string", "format": "datetime" },
-        "endedAt": { "type": "string", "format": "datetime" }
+        "endedAt": { "type": "string", "format": "datetime" },
+        "lastSeenAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "When the livestream last reported that it was live. A livestream without endedAt is considered active until two minutes after its last heartbeat; clients can apply the same window to tell whether a cached view is still live."
+        }
       }
     }
   }

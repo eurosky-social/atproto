@@ -42,6 +42,7 @@ export const envToCfg = (env: ServerEnvironment): ServerConfig => {
     maxImportSize: env.maxImportSize,
     blobUploadLimit: env.blobUploadLimit ?? 5 * 1024 * 1024, // 5mb
     devMode: env.devMode ?? false,
+    trustedProxies: env.trustedProxies,
   }
 
   const dbLoc = (name: string) => {
@@ -49,18 +50,21 @@ export const envToCfg = (env: ServerEnvironment): ServerConfig => {
   }
 
   const disableWalAutoCheckpoint = env.disableWalAutoCheckpoint ?? false
+  const synchronousFull = env.synchronousFull ?? false
 
   const dbCfg: ServerConfig['db'] = {
     accountDbLoc: env.accountDbLocation ?? dbLoc('account.sqlite'),
     sequencerDbLoc: env.sequencerDbLocation ?? dbLoc('sequencer.sqlite'),
     didCacheDbLoc: env.didCacheDbLocation ?? dbLoc('did_cache.sqlite'),
     disableWalAutoCheckpoint,
+    synchronousFull,
   }
 
   const actorStoreCfg: ServerConfig['actorStore'] = {
     directory: env.actorStoreDirectory ?? dbLoc('actors'),
     cacheSize: env.actorStoreCacheSize ?? 100,
     disableWalAutoCheckpoint,
+    synchronousFull,
   }
 
   let blobstoreCfg: ServerConfig['blobstore']
@@ -140,9 +144,11 @@ export const envToCfg = (env: ServerEnvironment): ServerConfig => {
     )
     entrywayCfg = {
       url: env.entrywayUrl,
+      apiUrl: env.entrywayApiUrl ?? env.entrywayUrl,
       did: env.entrywayDid,
       jwtPublicKeyHex: env.entrywayJwtVerifyKeyK256PublicKeyHex,
       plcRotationKey: env.entrywayPlcRotationKey,
+      requireServiceAuth: env.entrywayRequireServiceAuth ?? false,
     }
   }
 
@@ -257,6 +263,7 @@ export const envToCfg = (env: ServerEnvironment): ServerConfig => {
         repoUploadBlobRateLimitPoints: env.rateLimitRepoUploadBlobPoints
           ? env.rateLimitRepoUploadBlobPoints
           : 1000,
+        disableIpLimits: env.disableIpRateLimits,
       }
     : { enabled: false }
 
@@ -418,6 +425,13 @@ export type ServiceConfig = {
   blobUploadLimit: number
   contactEmailAddress?: string
   devMode: boolean
+  /**
+   * The proxies trusted to report the client IP through `X-Forwarded-For`, as
+   * IP addresses, CIDR ranges, or the `loopback`, `linklocal` and
+   * `uniquelocal` presets (see Express's "trust proxy" setting). Defaults to
+   * those three presets, plus the rate limit bypass IPs.
+   */
+  trustedProxies?: string[]
 }
 
 export type DatabaseConfig = {
@@ -425,12 +439,14 @@ export type DatabaseConfig = {
   sequencerDbLoc: string
   didCacheDbLoc: string
   disableWalAutoCheckpoint: boolean
+  synchronousFull: boolean
 }
 
 export type ActorStoreConfig = {
   directory: string
   cacheSize: number
   disableWalAutoCheckpoint: boolean
+  synchronousFull: boolean
 }
 
 export type S3BlobstoreConfig = {
@@ -472,10 +488,21 @@ export type IdentityConfig = {
 }
 
 export type EntrywayConfig = {
+  /**
+   * The entryway's public URL, which is also the OAuth issuer and the
+   * authorization server this PDS advertises.
+   */
   url: string
+  /**
+   * Where this PDS sends its own requests to the entryway. Defaults to
+   * {@link url}; differs when those requests go through a local proxy, e.g.
+   * one that adds mTLS.
+   */
+  apiUrl: string
   did: string
   jwtPublicKeyHex: string
   plcRotationKey: string
+  requireServiceAuth: boolean
 }
 
 export type FetchConfig = {
@@ -547,6 +574,11 @@ export type RateLimitsConfig =
       bypassIps?: string[]
       repoUploadBlobRateLimitDuration: number
       repoUploadBlobRateLimitPoints: number
+      /**
+       * Drop the PDS's own per-IP rate limits, for when an upstream proxy
+       * enforces them. Per-account rate limits still apply.
+       */
+      disableIpLimits?: boolean
     }
   | { enabled: false }
 

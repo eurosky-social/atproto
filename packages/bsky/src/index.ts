@@ -9,17 +9,19 @@ import { type HttpTerminator, createHttpTerminator } from 'http-terminator'
 import { DAY, SECOND } from '@atproto/common'
 import type { Keypair } from '@atproto/crypto'
 import { IdResolver } from '@atproto/identity'
-import { Client } from '@atproto/lex'
+import { Client } from '@atproto/lex-client'
 import { createServer } from '@atproto/xrpc-server'
+import { safeFetchWrap } from '@atproto-labs/fetch-node'
 import { createBlobDispatcher } from './api/blob-dispatcher.js'
 import API, {
   blobResolver,
+  blobSource,
   external,
   health,
   sitemap,
   wellKnown,
 } from './api/index.js'
-import { AuthVerifier, createPublicKeyObject } from './auth-verifier.js'
+import { AuthVerifier, createPublicKeyObject } from './auth/verifier.js'
 import { authWithApiKey as bsyncAuth, createBsyncClient } from './bsync.js'
 import type { ServerConfig } from './config.js'
 import { AppContext } from './context.js'
@@ -39,6 +41,7 @@ import * as imageServer from './image/server.js'
 import { ImageUriBuilder } from './image/uri.js'
 import { createKwsClient } from './kws.js'
 import { loggerMiddleware } from './logger.js'
+import { ProhibitedTerms } from './prohibited-terms.js'
 import {
   authWithApiKey as rolodexAuth,
   createRolodexClient,
@@ -140,29 +143,11 @@ export class BskyAppView {
         )
       : undefined
 
-    // @NOTE These bound the connection phase (TCP + TLS) only; once connected,
-    // the request is not bounded here. They are kept for the lifetime of the
+    // @NOTE This bounds the connection phase (TCP + TLS) only; once connected,
+    // the request is not bounded here. It is kept for the lifetime of the
     // service (pooling connections), and closed on `destroy()`.
-    // An unused agent holds no socket, so they can be built unconditionally.
-    const topicsDispatcher = createUndiciAgent({ connectTimeout: SECOND })
+    // An unused agent holds no socket, so it can be built unconditionally.
     const irisDispatcher = createUndiciAgent({ connectTimeout: SECOND })
-
-    const topicsClient = config.topicsUrl
-      ? new Client(
-          {
-            service: config.topicsUrl,
-            headers: config.topicsApiKey
-              ? { authorization: `Bearer ${config.topicsApiKey}` }
-              : undefined,
-            fetch: dispatcherFetch(topicsDispatcher),
-          },
-          {
-            // Trust internal services to send us well-formed responses
-            strictResponseProcessing: false,
-            validateResponse: config.debugMode,
-          },
-        )
-      : undefined
 
     const irisClient = config.irisUrl
       ? new Client(
@@ -204,9 +189,21 @@ export class BskyAppView {
       httpVersion: config.dataplaneHttpVersion,
       rejectUnauthorized: !config.dataplaneIgnoreBadTls,
     })
+    const typeaheadClient = config.typeaheadUrls.length
+      ? createDataPlaneClient(new BasicHostList(config.typeaheadUrls), {
+          httpVersion: config.dataplaneHttpVersion,
+          rejectUnauthorized: !config.dataplaneIgnoreBadTls,
+        })
+      : undefined
+    const typeaheadProhibitedTerms =
+      typeaheadClient && config.typeaheadProhibitedTermsFile
+        ? ProhibitedTerms.load(config.typeaheadProhibitedTermsFile)
+        : undefined
     const hydrator = new Hydrator(dataplane, config.labelsFromIssuerDids, {
+      postViewCountsStartAt: config.postViewCountsStartAt,
       debugFieldAllowedDids: config.debugFieldAllowedDids,
       featureGatesClient,
+      needsReviewTagSources: [config.modServiceDid],
     })
     const views = new Views({
       imgUriBuilder: imgUriBuilder,
@@ -254,28 +251,48 @@ export class BskyAppView {
     const entrywayJwtPublicKey = config.entrywayJwtPublicKeyHex
       ? createPublicKeyObject(config.entrywayJwtPublicKeyHex)
       : undefined
-    const bffJwtSecret = config.bffJwtSecret
-      ? Buffer.from(config.bffJwtSecret, 'utf8')
+    const bsgJwtSecret = config.bsgJwtSecret
+      ? Buffer.from(config.bsgJwtSecret, 'utf8')
       : undefined
+    const internalServiceSecrets = Object.fromEntries(
+      Object.entries(config.internalServiceSecrets ?? {}).map(
+        ([name, secret]) => [name, Buffer.from(secret, 'utf8')],
+      ),
+    )
     const authVerifier = new AuthVerifier(dataplane, {
       ownDid: config.serverDid,
       alternateAudienceDids: config.alternateAudienceDids,
       modServiceDid: config.modServiceDid,
       adminPasses: config.adminPasswords,
       entrywayJwtPublicKey,
-      bffJwtSecret,
+      bsgJwtSecret,
+      internalServiceSecrets,
     })
 
     const blobDispatcher = createBlobDispatcher(config)
+    // Egress to hosts named in DID documents, where the destination is chosen by
+    // the account being resolved. Same policy as blobDispatcher: https only,
+    // unicast addresses only, re-checked per hop by the dispatcher. Redirects
+    // stay enabled because xrpcRequestInit sets `redirect: 'follow'`.
+    const federatedFetch = (
+      config.disableSsrfProtection
+        ? globalThis.fetch
+        : safeFetchWrap({
+            allowIpHost: false,
+            allowImplicitRedirect: true,
+            responseMaxSize: 5 * 1024 * 1024,
+          })
+    ) as typeof globalThis.fetch
 
     const ctx = new AppContext({
       cfg: config,
       etcd,
       dataplane,
       dataplaneHostList,
+      typeaheadClient,
+      typeaheadProhibitedTerms,
       searchClient,
       suggestionsClient,
-      topicsClient,
       irisClient,
       hydrator,
       views,
@@ -288,6 +305,7 @@ export class BskyAppView {
       authVerifier,
       featureGatesClient,
       blobDispatcher,
+      federatedFetch,
       kwsClient,
     })
 
@@ -304,6 +322,7 @@ export class BskyAppView {
 
     app.use(health.createRouter(ctx))
     app.use(wellKnown.createRouter(ctx))
+    app.use(blobSource.createRouter(ctx))
     app.use(blobResolver.createMiddleware(ctx))
     app.use(imageServer.createMiddleware(ctx, { prefix: '/img/' }))
 
@@ -318,7 +337,7 @@ export class BskyAppView {
     return new BskyAppView({
       ctx,
       app,
-      dispatchers: [topicsDispatcher, irisDispatcher],
+      dispatchers: [irisDispatcher],
     })
   }
 
@@ -327,6 +346,7 @@ export class BskyAppView {
       await this.ctx.dataplaneHostList.connect()
     }
     this.ctx.featureGatesClient.start() // lazy, no await
+    this.ctx.typeaheadProhibitedTerms?.start()
     const server = this.app.listen(this.ctx.cfg.port)
     this.server = server
     server.keepAliveTimeout = 90000
@@ -338,6 +358,7 @@ export class BskyAppView {
   }
 
   async destroy(): Promise<void> {
+    this.ctx.typeaheadProhibitedTerms?.destroy()
     try {
       await this.ctx.featureGatesClient.destroy()
     } finally {

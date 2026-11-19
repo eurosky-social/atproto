@@ -71,6 +71,10 @@ const otpEnabledAccounts = new Set([
   'did:plc:alice',
 ])
 
+// Simulates the sign-in rate limits: a captcha is required after 3 failed
+// attempts, and the client is blocked (once) after 6.
+let failedSignIns = 0
+
 export const customizationData: CustomizationData = {
   availableUserDomains: ['.bsky.social', '.bsky.team'],
   inviteCodeRequired: false,
@@ -314,9 +318,32 @@ export function buildMockFetch(origFetch = window.fetch): typeof window.fetch {
         return Response.json({ account })
       }
       case `POST ${API_ENDPOINT_PREFIX}/sign-in`: {
-        const { username, remember, emailOtp } = await request.json()
+        const { identifier, remember, emailOtp, hcaptchaToken } =
+          await request.json()
+
+        if (failedSignIns >= 6) {
+          failedSignIns = 0
+          return Response.json(
+            {
+              error: 'rate_limit_exceeded',
+              error_description: 'Too many requests, please try again later',
+            },
+            { status: 429, headers: { 'Retry-After': '30' } },
+          )
+        }
+
+        if (failedSignIns >= 3 && !hcaptchaToken) {
+          return Response.json(
+            {
+              error: 'captcha_required',
+              error_description: 'Captcha verification required',
+            },
+            { status: 400 },
+          )
+        }
+
         for (const [did, account] of accounts) {
-          if (account.email === username || account.handle === username) {
+          if (account.email === identifier || account.handle === identifier) {
             if (
               otpEnabledAccounts.has(account.did) &&
               emailOtp !== 'AAAAA-AAAAA'
@@ -346,6 +373,7 @@ export function buildMockFetch(origFetch = window.fetch): typeof window.fetch {
             return Response.json({ account })
           }
         }
+        failedSignIns++
         return Response.json(
           {
             error: 'invalid_request',
@@ -425,10 +453,40 @@ export function buildMockFetch(origFetch = window.fetch): typeof window.fetch {
         return Response.json({
           url: 'https://example.com/callback?error=access_denied&state=mock-state',
         })
-      case `POST ${API_ENDPOINT_PREFIX}/verify-handle-availability`:
+      case `POST ${API_ENDPOINT_PREFIX}/verify-handle-availability`: {
         return Response.json({ available: true })
-      case `POST ${API_ENDPOINT_PREFIX}/reset-password-request`:
-        return Response.json({ success: true })
+      }
+      case `POST ${API_ENDPOINT_PREFIX}/reset-password-request`: {
+        const { identifier } = await request.json()
+        if (identifier.includes('@', 1)) {
+          // Email based reset always succeed
+          return Response.json({ success: true })
+        }
+
+        // Simulate UnknownAtprotoAccountError
+        if (identifier.includes('jane')) {
+          // Faking identity resolution by backend:
+          return Response.json(
+            {
+              error: 'unknown_atproto_account_error',
+              error_description: `Atmosphere account ${identifier} is hosted elsewhere`,
+              issuer: 'https://example.com',
+              identifier,
+            },
+            { status: 404 },
+          )
+        }
+
+        return Response.json(
+          {
+            error: 'unknown_atproto_account_error',
+            error_description:
+              'An email address is required for password reset',
+            identifier,
+          },
+          { status: 404 },
+        )
+      }
       case `POST ${API_ENDPOINT_PREFIX}/reset-password-confirm`:
         return Response.json({ success: true })
       case `POST ${API_ENDPOINT_PREFIX}/update-email-request`: {

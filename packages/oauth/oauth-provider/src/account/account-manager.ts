@@ -1,14 +1,22 @@
 import type { Did } from '@atproto/did'
+import type {
+  ConfirmResetPasswordInput,
+  InitiatePasswordResetInput,
+  SignInInput,
+  SignUpInput,
+} from '@atproto/oauth-provider-api'
+import type { OAuthResolver } from '@atproto/oauth-resolver'
 import {
   type OAuthIssuerIdentifier,
   isOAuthClientIdLoopback,
 } from '@atproto/oauth-types'
+import { isAtIdentifierString } from '@atproto/syntax'
 import type { ClientId } from '../client/client-id.js'
 import type { Client } from '../client/client.js'
 import type { DeviceId } from '../device/device-id.js'
 import { InvalidCredentialsError } from '../errors/invalid-credentials-error.js'
 import { InvalidRequestError } from '../errors/invalid-request-error.js'
-import { HCaptchaClient, type HcaptchaVerifyResult } from '../lib/hcaptcha.js'
+import { UnknownAtprotoAccountError } from '../errors/unknown-atproto-account-error.js'
 import { callAsync } from '../lib/util/function.js'
 import { constantTime } from '../lib/util/time.js'
 import type { OAuthHooks, RequestMetadata } from '../oauth-hooks.js'
@@ -16,116 +24,36 @@ import type { Customization } from '../oauth-provider.js'
 import type {
   Account,
   AccountStore,
+  AtIdentifierString,
   AuthorizedClientData,
+  AuthorizedClients,
   DeleteAccountConfirmInput,
   DeleteAccountRequestInput,
   DeviceAccount,
   DisableEmailAuthFactorInput,
   EnableEmailAuthFactorInput,
   HandleString,
-  ResetPasswordConfirmInput,
-  ResetPasswordRequestInput,
-  SignUpData,
   UpdateEmailConfirmInput,
   UpdateEmailRequestInput,
   UpdateHandleData,
   VerifyEmailConfirmInput,
   VerifyEmailRequestInput,
 } from './account-store.js'
-import type { SignInData } from './sign-in-data.js'
-import type { SignUpInput } from './sign-up-input.js'
 
 const TIMING_ATTACK_MITIGATION_DELAY = 400
 const BRUTE_FORCE_MITIGATION_DELAY = 300
 
-// @TODO Add rate limit to all the OAuth routes.
-
 export class AccountManager {
   protected readonly inviteCodeRequired: boolean
-  protected readonly hcaptchaClient?: HCaptchaClient
 
   constructor(
-    issuer: OAuthIssuerIdentifier,
+    protected readonly issuer: OAuthIssuerIdentifier,
     protected readonly store: AccountStore,
     protected readonly hooks: OAuthHooks,
+    protected readonly oauthResolver: OAuthResolver,
     customization: Customization,
   ) {
     this.inviteCodeRequired = customization.inviteCodeRequired !== false
-    this.hcaptchaClient = customization.hcaptcha
-      ? new HCaptchaClient(new URL(issuer).hostname, customization.hcaptcha)
-      : undefined
-  }
-
-  protected async processHcaptchaToken(
-    input: SignUpInput,
-    deviceId: DeviceId,
-    deviceMetadata: RequestMetadata,
-  ): Promise<HcaptchaVerifyResult | undefined> {
-    if (!this.hcaptchaClient) {
-      return undefined
-    }
-
-    if (!input.hcaptchaToken) {
-      throw new InvalidRequestError('hCaptcha token is required')
-    }
-
-    try {
-      const tokens = await this.hcaptchaClient.buildClientTokens(
-        deviceMetadata.ipAddress,
-        input.handle,
-        deviceMetadata.userAgent,
-      )
-
-      const result = await this.hcaptchaClient.verify(
-        'signup',
-        input.hcaptchaToken,
-        deviceMetadata.ipAddress,
-        tokens,
-      )
-
-      await this.hooks.onHcaptchaResult?.call(null, {
-        input,
-        deviceId,
-        deviceMetadata,
-        tokens,
-        result,
-      })
-
-      this.hcaptchaClient.checkVerifyResult(result, tokens)
-
-      return result
-    } catch (err) {
-      throw InvalidRequestError.from(err, 'hCaptcha verification failed')
-    }
-  }
-
-  protected async enforceInviteCode(
-    input: SignUpInput,
-    _deviceId: DeviceId,
-    _deviceMetadata: RequestMetadata,
-  ): Promise<string | undefined> {
-    if (!this.inviteCodeRequired) {
-      return undefined
-    }
-
-    if (!input.inviteCode) {
-      throw new InvalidRequestError('Invite code is required')
-    }
-
-    return input.inviteCode
-  }
-
-  protected async buildSignupData(
-    input: SignUpInput,
-    deviceId: DeviceId,
-    deviceMetadata: RequestMetadata,
-  ): Promise<SignUpData> {
-    const [hcaptchaResult, inviteCode] = await Promise.all([
-      this.processHcaptchaToken(input, deviceId, deviceMetadata),
-      this.enforceInviteCode(input, deviceId, deviceMetadata),
-    ])
-
-    return { ...input, hcaptchaResult, inviteCode }
   }
 
   public async createAccount(
@@ -134,18 +62,21 @@ export class AccountManager {
     input: SignUpInput,
     clientId?: ClientId,
   ): Promise<{ account: Account; remembered: boolean }> {
+    // @NOTE The front-end will not provide an invite code when not required.
+    if (this.inviteCodeRequired && !input.inviteCode) {
+      throw new InvalidRequestError('Invite code is required')
+    }
+
     return constantTime(BRUTE_FORCE_MITIGATION_DELAY, async () => {
-      await callAsync(this.hooks.onSignUpAttempt, {
+      await this.hooks.onSignUpAttempt?.call(null, {
         input,
         deviceId,
         deviceMetadata,
         clientId,
       })
 
-      const data = await this.buildSignupData(input, deviceId, deviceMetadata)
-
       const account = await callAsync(async () => {
-        return this.store.createAccount(data)
+        return this.store.createAccount(input)
       }).catch((err) => {
         throw InvalidRequestError.from(err, 'Account creation failed')
       })
@@ -168,8 +99,8 @@ export class AccountManager {
       }
 
       try {
-        await callAsync(this.hooks.onSignedUp, {
-          data,
+        await this.hooks.onSignedUp?.call(null, {
+          input,
           account,
           deviceId,
           deviceMetadata,
@@ -194,7 +125,7 @@ export class AccountManager {
   public async authenticateAccount(
     deviceId: DeviceId,
     deviceMetadata: RequestMetadata,
-    data: SignInData,
+    input: SignInInput,
     clientId?: ClientId,
   ): Promise<{ account: Account; remembered: boolean }> {
     return constantTime(TIMING_ATTACK_MITIGATION_DELAY, async () => {
@@ -204,7 +135,7 @@ export class AccountManager {
       const deviceAccounts = await this.listDeviceAccounts(deviceId)
 
       await this.hooks.onSignInAttempt?.call(null, {
-        data,
+        input,
         deviceId,
         deviceMetadata,
         deviceAccounts,
@@ -213,10 +144,10 @@ export class AccountManager {
 
       const account = await callAsync(async () => {
         return this.store.authenticateAccount({
-          locale: data.locale,
-          password: data.password,
-          username: data.username,
-          emailOtp: data.emailOtp,
+          identifier: input.identifier,
+          password: input.password,
+          locale: input.locale,
+          emailOtp: input.emailOtp,
           deviceAccounts,
         })
       }).catch(async (error) => {
@@ -230,7 +161,7 @@ export class AccountManager {
         // "identifier known, password wrong" from "identifier unknown".
         if (error instanceof InvalidRequestError) {
           await this.hooks.onSignInFailed?.call(null, {
-            data,
+            input,
             error,
             did: error instanceof InvalidCredentialsError ? error.did : null,
             deviceId,
@@ -244,7 +175,7 @@ export class AccountManager {
 
       const remembered =
         // If the user has explicitly specified a "remember" preference, use it.
-        data.remember ??
+        input.remember ??
         // Fall back to checking if the account was previously remembered.
         deviceAccounts.some((da) => da.account.did === account.did)
 
@@ -257,8 +188,8 @@ export class AccountManager {
       }
 
       try {
-        await callAsync(this.hooks.onSignedIn, {
-          data,
+        await this.hooks.onSignedIn?.call(null, {
+          input,
           account,
           remembered,
           deviceId,
@@ -318,7 +249,10 @@ export class AccountManager {
     await this.store.setAuthorizedClient(account.did, client.id, data)
   }
 
-  public async getAccount(did: Did) {
+  public async getAccount(did: Did): Promise<{
+    account: Account
+    authorizedClients: AuthorizedClients
+  } | null> {
     return this.store.getAccount(did)
   }
 
@@ -345,32 +279,90 @@ export class AccountManager {
   public async resetPasswordRequest(
     deviceId: DeviceId,
     deviceMetadata: RequestMetadata,
-    input: ResetPasswordRequestInput,
-  ) {
-    return constantTime(TIMING_ATTACK_MITIGATION_DELAY, async () => {
-      await this.hooks.onResetPasswordRequest?.call(null, {
-        input,
-        deviceId,
-        deviceMetadata,
+    input: InitiatePasswordResetInput,
+  ): Promise<void> {
+    // @NOTE We won't be sending reset password emails for non-email identifiers
+    // (note that we might want to do that at some point, as other services,
+    // e.g. Instagram, allow password reset via username). Supporting this would
+    // require adding rate limiting + hCaptcha verification to prevent abuse.
+    // Once those defense mechanisms are implemented, the whole "if" here after
+    // can be removed as the "if" at the end of this function will handle
+    // unknown accounts.
+    if (isAtIdentifierString(input.identifier)) {
+      // We *DO* however return a specific error message for users identified by
+      // an at-identifier that are not hosted on this service.
+      const result = await this.store.getAccount(input.identifier)
+      if (!result) return this.throwUnknownAtmosphereAccount(input.identifier)
+
+      throw new UnknownAtprotoAccountError(
+        input.identifier,
+        undefined,
+        'An email address is required for password reset',
+      )
+    }
+
+    const account = await constantTime(
+      TIMING_ATTACK_MITIGATION_DELAY,
+      async () => {
+        await this.hooks.onResetPasswordRequest?.call(null, {
+          input,
+          deviceId,
+          deviceMetadata,
+        })
+
+        const account = await this.store.resetPasswordRequest(input)
+
+        // @NOTE Do not throw here, to prevent user enumeration
+
+        await this.hooks.onResetPasswordRequested?.call(null, {
+          input,
+          deviceId,
+          deviceMetadata,
+          account,
+        })
+
+        return account
+      },
+    )
+
+    // @NOTE This is currently a dead branch (because of the "if" above) but
+    // will become live once we support password reset via at-identifiers (by
+    // removing the "if" at the beginning of this function.
+    if (!account && isAtIdentifierString(input.identifier)) {
+      return this.throwUnknownAtmosphereAccount(input.identifier)
+    }
+  }
+
+  private async throwUnknownAtmosphereAccount(
+    identifier: AtIdentifierString,
+  ): Promise<never> {
+    const { metadata, identityInfo } = await this.oauthResolver
+      .resolve(identifier)
+      .catch((cause: unknown) => {
+        throw new UnknownAtprotoAccountError(
+          identifier,
+          undefined,
+          undefined,
+          cause,
+        )
       })
 
-      const account = await this.store.resetPasswordRequest(input)
+    const handle =
+      identityInfo?.handle === 'handle.invalid'
+        ? undefined
+        : identityInfo?.handle
 
-      // @NOTE Do not throw here, to prevent user enumeration
+    // The identity points back at this service (e.g. a taken-down account):
+    // there is no other service to direct the user to.
+    const issuer = metadata.issuer === this.issuer ? undefined : metadata.issuer
 
-      await this.hooks.onResetPasswordRequested?.call(null, {
-        input,
-        deviceId,
-        deviceMetadata,
-        account,
-      })
-    })
+    throw new UnknownAtprotoAccountError(handle ?? identifier, issuer)
   }
 
   public async resetPasswordConfirm(
     deviceId: DeviceId,
     deviceMetadata: RequestMetadata,
-    input: ResetPasswordConfirmInput,
+    input: ConfirmResetPasswordInput,
   ) {
     return constantTime(TIMING_ATTACK_MITIGATION_DELAY, async () => {
       await this.hooks.onResetPasswordConfirm?.call(null, {

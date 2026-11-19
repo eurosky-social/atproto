@@ -3,11 +3,18 @@ import { Trans, useLingui } from '@lingui/react/macro'
 import { useState } from 'react'
 import { AuthShell } from '#/components/layouts/auth-shell.tsx'
 import { Button } from '#/components/ui/button.tsx'
-import { ResetPasswordConfirmForm } from './reset-password-confirm-form.tsx'
-import { ResetPasswordRequestForm } from './reset-password-request-form.tsx'
+import {
+  type ResetPasswordConfirmData,
+  ResetPasswordConfirmForm,
+} from './reset-password-confirm-form.tsx'
+import {
+  type ResetPasswordRequestData,
+  ResetPasswordRequestForm,
+} from './reset-password-request-form.tsx'
 
 export type ResetPasswordViewProps = {
-  emailDefault?: string
+  hint?: string
+  domains?: readonly string[]
   /**
    * Sub-step to start on. Allows restoring the "confirm" step (the reset
    * code was already emailed) after a page refresh.
@@ -19,33 +26,37 @@ export type ResetPasswordViewProps = {
    * 'request'.
    */
   onViewChange?: (view: 'request' | 'confirm') => void
-  onResetPasswordRequest: (data: { email: string }) => void | PromiseLike<void>
-  onResetPasswordConfirm: (data: {
-    token: string
-    password: string
-  }) => void | PromiseLike<void>
+  onResetPasswordRequest: (
+    data: ResetPasswordRequestData,
+  ) => void | PromiseLike<void>
+  onResetPasswordConfirm: (
+    data: ResetPasswordConfirmData,
+  ) => void | PromiseLike<void>
   onBack?: () => void
 }
 
-enum View {
+const enum View {
   RequestReset,
   ConfirmReset,
   PasswordUpdated,
 }
 
 export function ResetPasswordView({
-  emailDefault,
+  hint,
   initialView,
   onViewChange,
   onResetPasswordRequest,
   onResetPasswordConfirm,
   onBack,
+  domains,
 }: ResetPasswordViewProps) {
   const { t } = useLingui()
   const [view, setViewState] = useState<View>(
     initialView === 'confirm' ? View.ConfirmReset : View.RequestReset,
   )
-  const [email, setEmail] = useState(emailDefault)
+
+  // preserve hint changes across view changes
+  const [currentHint, setCurrentHint] = useState(hint)
 
   const setView = (next: View) => {
     setViewState(next)
@@ -58,23 +69,22 @@ export function ResetPasswordView({
         title={t`Forgot Password`}
         subtitle={
           <Trans>
-            Enter your account's email and we'll send you a reset code.
+            Enter your account's identifier and we'll send you a reset code.
           </Trans>
         }
       >
         <ResetPasswordRequestForm
-          emailDefault={emailDefault}
+          hint={currentHint}
+          domains={domains}
           submitLabel={<Trans>Next</Trans>}
-          handler={async (data) => {
-            await onResetPasswordRequest(data)
-            setEmail(data.email)
+          handler={async (values) => {
+            await onResetPasswordRequest(values)
+            setCurrentHint(values.identifier)
             setView(View.ConfirmReset)
           }}
           onBack={onBack}
         />
 
-        {/* A plain link under the actions, like "Need an account?" on the
-          picker, rather than a divided-off ghost button. */}
         <p className="pt-4 text-center">
           <Button
             variant="link"
@@ -99,10 +109,10 @@ export function ResetPasswordView({
         }
       >
         <ResetPasswordConfirmForm
-          email={email}
+          currentUsername={currentHint}
           submitLabel={<Trans>Next</Trans>}
-          handler={async (data) => {
-            await onResetPasswordConfirm(data)
+          handler={async (values) => {
+            await onResetPasswordConfirm(values)
             setView(View.PasswordUpdated)
           }}
           onBack={() => setView(View.RequestReset)}
