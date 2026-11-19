@@ -66,8 +66,8 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          file: ./services/bsky/Dockerfile
-          target: eurosky
+          file: ./Dockerfile
+          target: zeppelin
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=eurosky-zeppelin-${{ steps.platform.outputs.safe }}
           cache-to: type=gha,mode=max,scope=eurosky-zeppelin-${{ steps.platform.outputs.safe }}

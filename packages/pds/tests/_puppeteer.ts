@@ -1,6 +1,9 @@
 import assert from 'node:assert'
 import {
   type Browser,
+  type BrowserContext,
+  type EvaluateFunc,
+  type HTTPResponse,
   type Handler,
   type Page,
   type Target,
@@ -29,6 +32,13 @@ export class PageHelper implements AsyncDisposable {
 
   async waitForNetworkIdle() {
     await this.page.waitForNetworkIdle()
+  }
+
+  async evaluate<Params extends unknown[], Func extends EvaluateFunc<Params>>(
+    pageFunction: Func,
+    ...args: Params
+  ) {
+    return this.page.evaluate(pageFunction, ...args)
   }
 
   async waitForPopup(run: () => Promise<unknown>): Promise<PageHelper> {
@@ -105,6 +115,113 @@ export class PageHelper implements AsyncDisposable {
     return this.typeIn(`input[name=${JSON.stringify(name)}]`, text)
   }
 
+  /**
+   * Sets an input's value the way a password manager fills it: without
+   * focusing (or blurring) it, followed by a bubbling `input` event.
+   */
+  async fillInput(name: string, value: string) {
+    const elementHandle = await this.getVisibleElement(
+      `input[name=${JSON.stringify(name)}]`,
+    )
+    await elementHandle.evaluate((input, value) => {
+      ;(input as HTMLInputElement).value = value
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }, value)
+    return elementHandle
+  }
+
+  async getInputState(name: string) {
+    const elementHandle = await this.getVisibleElement(
+      `input[name=${JSON.stringify(name)}]`,
+    )
+    return elementHandle.evaluate((input) => {
+      const { value, validity } = input as HTMLInputElement
+      return {
+        value,
+        valid: validity.valid,
+        patternMismatch: validity.patternMismatch,
+      }
+    })
+  }
+
+  /**
+   * Runs `run` and returns the first JSON response whose URL matches `match`.
+   */
+  async captureJsonResponse(
+    match: (url: URL) => boolean,
+    run: () => unknown | Promise<unknown>,
+  ) {
+    const promise = this.page.waitForResponse(
+      (res) => match(new URL(res.url())),
+      {
+        timeout: 10_000,
+      },
+    )
+    try {
+      await run()
+    } catch (err) {
+      promise.catch(() => {}) // Avoid an unhandled rejection on timeout
+      throw err
+    }
+    const response = await promise
+    return {
+      status: response.status(),
+      body: (await response.json()) as unknown,
+    }
+  }
+
+  /**
+   * Records, in order, the responses to the requests whose URL matches
+   * `match`, along with their JSON body (and the request's), until disposed.
+   */
+  recordJsonResponses(match: (url: URL) => boolean) {
+    const responses: Promise<{
+      status: number
+      body: unknown
+      requestBody: unknown
+    }>[] = []
+
+    const listener: Handler<HTTPResponse> = (response) => {
+      if (!match(new URL(response.url()))) return
+      const status = response.status()
+      const postData = response.request().postData()
+      const requestBody: unknown = postData ? JSON.parse(postData) : undefined
+      responses.push(
+        response.json().then(
+          (body: unknown) => ({ status, body, requestBody }),
+          () => ({ status, body: undefined, requestBody }),
+        ),
+      )
+    }
+
+    this.page.on('response', listener)
+
+    return {
+      [Symbol.dispose]: () => {
+        this.page.off('response', listener)
+      },
+      /**
+       * Waits for at least `count` responses, and returns all of them.
+       */
+      wait: async (count: number, timeout = 5_000) => {
+        const deadline = Date.now() + timeout
+        while (responses.length < count) {
+          if (Date.now() > deadline) {
+            throw new Error(
+              `Timeout waiting for ${count} responses (got ${responses.length})`,
+            )
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+        return Promise.all(responses)
+      },
+    }
+  }
+
+  async waitForVisible(selector: string, timeout = 5_000) {
+    await this.page.waitForSelector(selector, { visible: true, timeout })
+  }
+
   async waitForHidden(selector: string, timeout = 5_000) {
     await this.page.waitForSelector(selector, { hidden: true, timeout })
   }
@@ -139,7 +256,7 @@ export class PageHelper implements AsyncDisposable {
   }
 
   static async from(
-    browser: Browser,
+    browser: Browser | BrowserContext,
     options?: { languages?: readonly string[] },
   ) {
     const page = await browser.newPage()

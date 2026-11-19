@@ -1,48 +1,41 @@
 import { Trans } from '@lingui/react/macro'
+import type { ConfirmResetPasswordInput } from '@atproto/oauth-provider-api'
 import { NewPasswordField } from '#/components/forms/fields/new-password-field.tsx'
 import { TokenField } from '#/components/forms/fields/token-field.tsx'
 import {
-  FormShell,
-  type FormShellProps,
-} from '#/components/forms/form-shell.tsx'
+  RateLimitedForm,
+  type RateLimitedFormProps,
+} from '#/components/forms/rate-limited-form.tsx'
+import type { WithOptionalLocale } from '#/lib/api'
+import type { Override } from '#/lib/util'
 
-// @NOTE `code`, not `token`: the key becomes the rendered `name`, which is a
-// public contract. The view maps it to the API's `token` field.
-type Values = { code: string; password: string }
+export type ResetPasswordConfirmData =
+  WithOptionalLocale<ConfirmResetPasswordInput>
 
-export type ResetPasswordConfirmData = {
-  token: string
-  password: string
-}
-
-export type ResetPasswordConfirmFormProps = Omit<
-  FormShellProps<Values>,
-  'onSubmit'
-> & {
-  email?: string
-  onResend?: () => void | PromiseLike<void>
-  handler: (
-    data: ResetPasswordConfirmData,
-    signal: AbortSignal,
-  ) => void | PromiseLike<void>
-}
+export type ResetPasswordConfirmFormProps = Override<
+  RateLimitedFormProps<ResetPasswordConfirmData>,
+  {
+    onResend?: () => void | PromiseLike<void>
+    /** For password managers */
+    currentUsername?: string
+  }
+>
 
 export function ResetPasswordConfirmForm({
-  email,
+  currentUsername,
   onResend,
-  handler,
+
+  // RateLimitedFormProps
   ...props
 }: ResetPasswordConfirmFormProps) {
   return (
-    <FormShell<Values>
+    <RateLimitedForm<{
+      token: string
+      password: string
+    }>
       {...props}
-      onSubmit={(values, signal) =>
-        // @NOTE The API field is `token`; the form field stays `code` so the
-        // rendered input keeps its contracted name.
-        handler({ token: values.code, password: values.password }, signal)
-      }
     >
-      {email && (
+      {currentUsername && (
         // For better password managers integration, we include a hidden
         // username field with the email pre-filled. This allows password
         // managers to associate the reset token and new password with the
@@ -50,14 +43,14 @@ export function ResetPasswordConfirmForm({
         <input
           type="text"
           autoComplete="username"
-          defaultValue={email}
+          defaultValue={currentUsername}
           readOnly
           hidden
         />
       )}
 
       <TokenField
-        name="code"
+        name="token"
         label={<Trans>Reset code</Trans>}
         enterKeyHint="next"
         required
@@ -71,6 +64,6 @@ export function ResetPasswordConfirmForm({
         enterKeyHint="done"
         required
       />
-    </FormShell>
+    </RateLimitedForm>
   )
 }

@@ -1,7 +1,7 @@
 import { type Selectable, sql } from 'kysely'
 import { MINUTE } from '@atproto/common'
-import type { DatetimeString, DidString } from '@atproto/lex'
-import { currentDatetimeString, toDatetimeString } from '@atproto/lex'
+import type { DatetimeString, DidString } from '@atproto/lex-schema'
+import { currentDatetimeString, toDatetimeString } from '@atproto/lex-schema'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import type { Database } from '../db/index.js'
 import { ComputedAtIdKeyset, paginate } from '../db/pagination.js'
@@ -496,8 +496,17 @@ export class ReportStatsService {
         select
           r."queueId", r."reportType", r."assignedTo",
           r."createdAt", r."assignedAt", r."closedAt", r."priorityTargetMinutes",
-          -- @NOTE The final linked event determines the current closure outcome.
-          (r."actionEventIds" ->> -1)::integer as "actionEventId"
+          -- @NOTE Explicit no-action closures retain earlier action links as history.
+          case when (
+            select activity.meta ->> 'resolution'
+            from report_activity activity
+            where activity."reportId" = r.id
+              and activity."activityType" = 'closeActivity'
+            order by activity."createdAt" desc, activity.id desc
+            limit 1
+          ) = 'noAction' then null
+          else (r."actionEventIds" ->> -1)::integer
+          end as "actionEventId"
         from report r
         where r."closedAt" >= ${dayStart} and r."closedAt" < ${dayEnd}
       ), closure_outcomes as (

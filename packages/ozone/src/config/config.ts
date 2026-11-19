@@ -5,8 +5,10 @@ import {
   type DidString,
   type UriString,
   isDatetimeString,
+  isDidString,
+  isNsidString,
   toDatetimeString,
-} from '@atproto/lex'
+} from '@atproto/lex-schema'
 import type { OzoneEnvironment } from './env.js'
 import {
   type StrikeSuspensionConfig,
@@ -36,6 +38,9 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     labelStreamBackfillRate: env.labelStreamBackfillRate ?? 2000,
     labelQueryWildcardsEnabled: env.labelQueryWildcardsEnabled ?? false,
     reportTagsDisabled: env.reportTagsDisabled ?? false,
+    languageTagRecordTypes: parseLanguageTagRecordTypes(
+      env.languageTagRecordTypes,
+    ),
   }
 
   assert(env.dbPostgresUrl, 'dbPostgresUrl is required')
@@ -45,8 +50,6 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     poolSize: env.dbPoolSize,
     poolMaxUses: env.dbPoolMaxUses,
     poolIdleTimeoutMs: env.dbPoolIdleTimeoutMs,
-    materializedViewRefreshIntervalMs: env.dbMaterializedViewRefreshIntervalMs,
-    materializedViewRefreshTimeoutMs: env.dbMaterializedViewRefreshTimeoutMs,
     teamProfileRefreshIntervalMs: env.dbTeamProfileRefreshIntervalMs,
   }
 
@@ -87,13 +90,27 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     plcUrl: env.didPlcUrl,
     cacheMaxTTL: env.didCacheMaxTTL ?? DAY,
     cacheStaleTTL: env.didCacheStaleTTL ?? HOUR,
+    cacheMaxEntries: env.didCacheMaxEntries,
+    cacheMaxBytes: env.didCacheMaxBytes,
+    cacheMaxDocBytes: env.didCacheMaxDocBytes,
   }
 
+  const blobDivertMaxBytes = env.blobDivertMaxBytes
+    ? Number(env.blobDivertMaxBytes)
+    : 300 * 1024 * 1024
+  assert(
+    (env.blobDivertMaxBytes === undefined ||
+      /^\d+$/.test(env.blobDivertMaxBytes)) &&
+      Number.isSafeInteger(blobDivertMaxBytes) &&
+      blobDivertMaxBytes > 0,
+    'OZONE_BLOB_DIVERT_MAX_BYTES must be a positive integer',
+  )
   const blobDivertServiceCfg =
     env.blobDivertUrl && env.blobDivertAdminPassword
       ? {
           url: env.blobDivertUrl,
           adminPassword: env.blobDivertAdminPassword,
+          maxBytes: blobDivertMaxBytes,
         }
       : null
   const accessCfg: OzoneConfig['access'] = {
@@ -116,10 +133,28 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     reportDurationMs: env.assignmentReportDurationMs ?? 5 * MINUTE,
   }
 
+  const excludedDids = (env.onlineMembersExcludedDids ?? []).map((did) =>
+    did.trim(),
+  )
+  assert(
+    excludedDids.every(isDidString),
+    'OZONE_ONLINE_MEMBERS_EXCLUDED_DIDS must be a comma-separated list of DIDs',
+  )
+  const onlineMembersCfg: OzoneConfig['onlineMembers'] = {
+    excludedDids: [...new Set(excludedDids)],
+    activeWindowMs: env.onlineMembersActiveWindowMs ?? 5 * MINUTE,
+  }
+  assert(
+    Number.isSafeInteger(onlineMembersCfg.activeWindowMs) &&
+      onlineMembersCfg.activeWindowMs > 0,
+    'OZONE_ONLINE_MEMBERS_ACTIVE_WINDOW_MS must be a positive integer',
+  )
+
   const inboxCfg: OzoneConfig['inbox'] = {
     appealWindowMonths: env.inboxAppealWindowMonths ?? 6,
     policyDefaultUrl: env.inboxPolicyDefaultUrl ?? DEFAULT_INBOX_POLICY_URL,
     startAt: parseInboxStartAt(env.inboxStartAt),
+    pushEnabled: env.inboxPushEnabled ?? false,
   }
 
   const statsCfg: OzoneConfig['stats'] = {
@@ -144,6 +179,7 @@ export const envToCfg = (env: OzoneEnvironment): OzoneConfig => {
     access: accessCfg,
     verifier: verifierCfg,
     assignments: assignmentsCfg,
+    onlineMembers: onlineMembersCfg,
     inbox: inboxCfg,
     strikeSuspension: parseStrikeSuspensionConfig(env.strikeSuspensionConfig),
     stats: statsCfg,
@@ -162,11 +198,17 @@ export type OzoneConfig = {
   blobDivert: BlobDivertConfig | null
   access: AccessConfig
   assignments: AssignmentsConfig
+  onlineMembers: OnlineMembersConfig
   strikeSuspension: StrikeSuspensionConfig
   inbox: InboxConfig
   stats: StatsConfig
   jetstreamUrl?: string
   verifier: VerifierConfig | null
+}
+
+export type OnlineMembersConfig = {
+  excludedDids: DidString[]
+  activeWindowMs: number
 }
 
 export type StatsConfig = {
@@ -200,11 +242,47 @@ export type ServiceConfig = {
   labelQueryWildcardsEnabled?: boolean
   /** Disable automatic report-reason tags; false by default. */
   reportTagsDisabled?: boolean
+  /** Record collections eligible for automatic language tagging; unset allows all. */
+  languageTagRecordTypes?: string[]
+}
+
+function parseLanguageTagRecordTypes(
+  value: string | undefined,
+): string[] | undefined {
+  if (!value?.trim()) return undefined
+  const error =
+    'OZONE_LANGUAGE_TAG_RECORD_TYPES must be a comma-separated list or JSON array of record NSIDs or namespace wildcards'
+  let input: unknown
+  if (value.trim().startsWith('[')) {
+    try {
+      input = JSON.parse(value)
+    } catch {
+      assert.fail(error)
+    }
+  } else {
+    input = value.split(',')
+  }
+  assert(
+    Array.isArray(input) && input.every((item) => typeof item === 'string'),
+    error,
+  )
+  const patterns = input.map((pattern) => pattern.trim())
+  assert(
+    patterns.every((pattern) => {
+      if (pattern === '*') return true
+      return isNsidString(
+        pattern.endsWith('.*') ? `${pattern.slice(0, -2)}.record` : pattern,
+      )
+    }),
+    error,
+  )
+  return patterns
 }
 
 export type BlobDivertConfig = {
   url: UriString
   adminPassword: string
+  maxBytes: number
 }
 
 export type DatabaseConfig = {
@@ -213,8 +291,6 @@ export type DatabaseConfig = {
   poolSize?: number
   poolMaxUses?: number
   poolIdleTimeoutMs?: number
-  materializedViewRefreshIntervalMs?: number
-  materializedViewRefreshTimeoutMs?: number
   teamProfileRefreshIntervalMs?: number
 }
 
@@ -242,6 +318,9 @@ export type IdentityConfig = {
   plcUrl: string
   cacheStaleTTL: number
   cacheMaxTTL: number
+  cacheMaxEntries?: number
+  cacheMaxBytes?: number
+  cacheMaxDocBytes?: number
 }
 
 export type AccessConfig = {
@@ -259,6 +338,7 @@ export type VerifierConfig = {
 }
 
 export type InboxConfig = {
+  pushEnabled?: boolean
   /** Inclusive creation-time cutoff for inbox history; unset exposes all history. */
   startAt?: DatetimeString
   /**

@@ -65,7 +65,8 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          file: ./services/pds/Dockerfile
+          file: ./Dockerfile
+          target: pds
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=eurosky-pds-${{ steps.platform.outputs.safe }}
           cache-to: type=gha,mode=max,scope=eurosky-pds-${{ steps.platform.outputs.safe }}

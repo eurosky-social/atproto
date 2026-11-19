@@ -457,6 +457,50 @@ message GetNewUserCountForRangeResponse {
 }
 
 //
+// Feature Store
+//
+
+enum FeatureStore {
+  FEATURE_STORE_UNSPECIFIED = 0; // should throw an error (no default value)
+  FEATURE_STORE_AUTHOR = 1;
+  FEATURE_STORE_VIEWER = 2;
+  FEATURE_STORE_POST = 3;
+  FEATURE_STORE_CANDIDATE_GENERATOR = 4;
+  FEATURE_STORE_ATMOSPHERE_RECORD = 5;
+}
+
+message Feature {
+  string key = 1;
+  oneof value {
+    bool bool_val = 2;
+    string string_val = 3;
+    float float_val = 4;
+    sint32 sint_val = 5;
+    string json_val = 6;
+    sint64 sint64_val = 7;
+  }
+}
+
+message FeatureRequest {
+  string uid = 1;
+  repeated string keys = 2; // required, empty value throws an error
+}
+
+message GetFeaturesRequest {
+  FeatureStore store = 1;
+  repeated FeatureRequest requests = 2;
+}
+
+message FeatureResponse {
+  string uid = 1;
+  repeated Feature features = 2;
+}
+
+message GetFeaturesResponse {
+  repeated FeatureResponse entities = 1;
+}
+
+//
 // Reposts
 //
 
@@ -1440,6 +1484,37 @@ message GetLabelsResponse {
 }
 
 //
+// Tags
+//
+
+message Tag {
+  string subject = 1;
+  string issuer = 2; // DID of the moderator or service that created the event.
+  string value = 3;
+  google.protobuf.Timestamp indexed_at = 4; // Time Atlantis stored the tag.
+  TagEvent event = 5; // Ozone event metadata; absent for ordinary tag writes.
+  google.protobuf.Timestamp expires_at = 6; // absent means permanent
+  bool removed = 7; // Removal retained to ignore older events.
+}
+
+message GetTagsForSubjectsRequest {
+  repeated string subjects = 1;
+  repeated string sources = 2; // Ozone service DIDs; empty selects all sources.
+}
+
+message GetTagsForSubjectsResponse {
+  repeated Tag tags = 1;
+}
+
+// Ozone event that added or removed a tag.
+message TagEvent {
+  string source = 1; // Ozone service DID.
+  int64 event_id = 2; // Ozone moderation event ID.
+  google.protobuf.Timestamp created_at = 3; // Time Ozone created the event.
+  string cid = 4; // Subject record CID; empty for account tags.
+}
+
+//
 // Starter packs
 //
 
@@ -1834,6 +1909,9 @@ service Service {
   rpc GetListCounts(GetListCountsRequest) returns (GetListCountsResponse);
   rpc GetNewUserCountForRange(GetNewUserCountForRangeRequest) returns (GetNewUserCountForRangeResponse);
 
+  // Feature Store
+  rpc GetFeatures(GetFeaturesRequest) returns (GetFeaturesResponse);
+
   // Profile
   rpc GetActors(GetActorsRequest) returns (GetActorsResponse);
   rpc GetDidsByHandles(GetDidsByHandlesRequest) returns (GetDidsByHandlesResponse);
@@ -1916,6 +1994,9 @@ service Service {
 
   // Starter packs
   rpc GetActorStarterPacks(GetActorStarterPacksRequest) returns (GetActorStarterPacksResponse);
+
+  // Tags
+  rpc GetTagsForSubjects(GetTagsForSubjectsRequest) returns (GetTagsForSubjectsResponse);
 
   // Sync
   rpc GetLatestRev(GetLatestRevRequest) returns (GetLatestRevResponse);

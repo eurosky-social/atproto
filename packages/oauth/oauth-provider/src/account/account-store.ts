@@ -7,17 +7,27 @@ import type {
   ConfirmResetPasswordInput,
   DeactivateAccountInput,
   DisableEmailAuthFactorInput,
+  EmailString,
   EnableEmailAuthFactorInput,
+  IdentifierString,
   InitiateAccountDeletionInput,
   InitiateEmailUpdateInput,
   InitiateEmailUpdateOutput,
   InitiateEmailVerificationInput,
   InitiatePasswordResetInput,
   ReactivateAccountInput,
+  SignInInput,
+  SignUpInput,
   UpdateHandleInput,
 } from '@atproto/oauth-provider-api'
 import type { OAuthScope } from '@atproto/oauth-types'
-import type { DatetimeString, HandleString } from '@atproto/syntax'
+import {
+  type AtIdentifierString,
+  type DatetimeString,
+  type HandleString,
+  isAtIdentifierString,
+  isDidIdentifier,
+} from '@atproto/syntax'
 import type { ClientId } from '../client/client-id.js'
 import type { DeviceData } from '../device/device-data.js'
 import type { DeviceId } from '../device/device-id.js'
@@ -27,25 +37,30 @@ import type { HcaptchaVerifyResult } from '../lib/hcaptcha.js'
 import type { Awaitable } from '../lib/util/type.js'
 import { buildInterfaceChecker } from '../lib/util/type.js'
 import type { InviteCode } from '../types/invite-code.js'
-import type { SignUpInput } from './sign-up-input.js'
 
 // Export all types needed to implement the AccountStore interface
 export type {
   Account,
+  AtIdentifierString,
   ClientId,
   DeviceData,
   DeviceId,
   Did,
   DisableEmailAuthFactorInput,
+  EmailString,
   EnableEmailAuthFactorInput,
   HandleString,
   HandleUnavailableReason,
   HcaptchaVerifyResult,
+  IdentifierString,
   InviteCode,
   OAuthScope,
   SessionId,
+  SignInInput,
   SignUpInput,
 }
+
+export { isAtIdentifierString, isDidIdentifier }
 
 export type ResetPasswordRequestInput = InitiatePasswordResetInput
 export type ResetPasswordConfirmInput = ConfirmResetPasswordInput
@@ -77,9 +92,9 @@ export type CreateAccountData = {
 }
 
 export type AuthenticateAccountData = {
-  locale: string
+  identifier: IdentifierString
   password: string
-  username: string
+  locale: string
   emailOtp: string | undefined
   /**
    * Lists the accounts that were previously remembered on the device, allowing
@@ -125,11 +140,6 @@ export type DeviceAccount = {
   updatedAt: Date
 }
 
-export type SignUpData = SignUpInput & {
-  hcaptchaResult?: HcaptchaVerifyResult
-  inviteCode?: InviteCode
-}
-
 export interface AccountStore {
   /**
    * @throws {HandleUnavailableError} - To indicate that the handle is already taken
@@ -156,9 +166,10 @@ export interface AccountStore {
   ): Awaitable<void>
 
   /**
-   * @throws {InvalidRequestError} - When the credentials are not valid
+   * Retrieves the account and its authorized clients for the given handle or
+   * DID. Return `null` if the account is not found.
    */
-  getAccount(did: Did): Awaitable<{
+  getAccount(handleOrDid: AtIdentifierString): Awaitable<null | {
     account: Account
     authorizedClients: AuthorizedClients
   }>

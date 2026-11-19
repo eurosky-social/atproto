@@ -3,11 +3,8 @@ import { type Client, createOp as createPlcOp } from '@did-plc/lib'
 import type { Selectable } from 'kysely'
 import { DAY } from '@atproto/common'
 import { type Keypair, Secp256k1Keypair } from '@atproto/crypto'
-import {
-  type DidString,
-  type HandleString,
-  getBlobCidString,
-} from '@atproto/lex'
+import { getBlobCidString } from '@atproto/lex-data'
+import type { DidString, HandleString } from '@atproto/lex-schema'
 import {
   HandleUnavailableError,
   InvalidCredentialsError,
@@ -17,6 +14,7 @@ import {
 import type {
   Account,
   AccountStore,
+  AtIdentifierString,
   AuthenticateAccountData,
   AuthorizedClientData,
   AuthorizedClients,
@@ -31,6 +29,7 @@ import type {
   DeviceStore,
   Did,
   DisableEmailAuthFactorInput,
+  EmailString,
   EnableEmailAuthFactorInput,
   FoundRequestResult,
   HandleUnavailableReason,
@@ -44,7 +43,7 @@ import type {
   RequestStore,
   ResetPasswordConfirmInput,
   ResetPasswordRequestInput,
-  SignUpData,
+  SignUpInput,
   TokenData,
   TokenId,
   TokenInfo,
@@ -57,6 +56,7 @@ import type {
   VerifyEmailConfirmInput,
   VerifyEmailRequestInput,
 } from '@atproto/oauth-provider/store'
+import { isAtIdentifierString } from '@atproto/oauth-provider/store'
 import {
   AuthRequiredError as XrpcAuthRequiredError,
   InvalidRequestError as XrpcInvalidRequestError,
@@ -149,7 +149,7 @@ export class OAuthStore
     handle,
     email,
     password,
-  }: SignUpData): Promise<Account> {
+  }: SignUpInput): Promise<Account> {
     // @TODO Send an account creation confirmation email (+verification link) to the user (in their locale)
     // @NOTE Password strength & length already enforced by the OAuthProvider
 
@@ -252,7 +252,7 @@ export class OAuthStore
 
   async authenticateAccount({
     locale,
-    username: identifier,
+    identifier,
     password,
     emailOtp,
     deviceAccounts,
@@ -323,21 +323,21 @@ export class OAuthStore
     await authorizedClientHelper.upsert(this.db, did, clientId, data)
   }
 
-  async getAccount(did: Did): Promise<{
+  async getAccount(handleOrDid: AtIdentifierString): Promise<null | {
     account: Account
     authorizedClients: AuthorizedClients
   }> {
-    const accountRow = await this.accountManager.getAccount(did, {
+    const accountRow = await this.accountManager.getAccount(handleOrDid, {
       includeDeactivated: true,
       includeTakenDown: false,
     })
 
-    assert(accountRow, 'Account not found')
+    if (!accountRow) return null
 
     const account = await this.buildAccount(accountRow)
     const authorizedClients = await authorizedClientHelper.getAuthorizedClients(
       this.db,
-      did,
+      account.did,
     )
 
     return { account, authorizedClients }
@@ -412,13 +412,21 @@ export class OAuthStore
   }
 
   async resetPasswordRequest({
-    email,
+    identifier,
     locale,
   }: ResetPasswordRequestInput): Promise<Account | null> {
-    const account = await this.accountManager.getAccountByEmail(email, {
-      includeDeactivated: true,
-      includeTakenDown: false,
-    })
+    const isEmailIdentifier = identifier.includes('@')
+    const account = isEmailIdentifier
+      ? await this.accountManager.getAccountByEmail(identifier, {
+          includeDeactivated: true,
+          includeTakenDown: false,
+        })
+      : isAtIdentifierString(identifier)
+        ? await this.accountManager.getAccount(identifier, {
+            includeDeactivated: true,
+            includeTakenDown: false,
+          })
+        : null
 
     if (!account?.email || !account?.handle) return null
 
@@ -884,7 +892,7 @@ export class OAuthStore
     const account: Account = {
       did: row.did,
       pds: this.serviceDid,
-      email: row.email || undefined,
+      email: row.email ? (row.email as EmailString) : undefined,
       emailVerified: row.email ? row.emailConfirmedAt != null : undefined,
       emailAuthFactor: row.email ? row.emailAuthFactorAt != null : undefined,
       handle: row.handle || undefined,

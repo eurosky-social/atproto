@@ -1,4 +1,8 @@
-import { type AtUriString, type DidString, isDidString } from '@atproto/lex'
+import {
+  type AtUriString,
+  type DidString,
+  isDidString,
+} from '@atproto/lex-schema'
 import { AtUri } from '@atproto/syntax'
 import { InvalidRequestError, type Server } from '@atproto/xrpc-server'
 import type { AppContext } from '../../context.js'
@@ -11,7 +15,17 @@ export default function (server: Server, ctx: AppContext) {
     auth: ctx.authVerifier.modOrAdminToken,
     handler: async ({ input, auth }) => {
       const createdBy = getAuthDid(auth, ctx.cfg.service.did)
-      const { subject, reportTypes, internalNote, isAutomated } = input.body
+      const {
+        subject,
+        includeAllOwned,
+        reportId,
+        reportTypes,
+        excludedReportTypes,
+        actionEventId,
+        internalNote,
+        isAutomated,
+        meta,
+      } = input.body
 
       let subjectDid: DidString
       let subjectUri: AtUriString | null = null
@@ -29,14 +43,26 @@ export default function (server: Server, ctx: AppContext) {
         throw new InvalidRequestError('Subject must be a DID or an AT-URI')
       }
 
+      if (includeAllOwned && subjectUri) {
+        throw new InvalidRequestError(
+          'includeAllOwned is only valid for account subjects',
+        )
+      }
+
       const result = await closeReportsForSubject({
         inboxStartAt: ctx.cfg.inbox.startAt,
+        inboxPushEnabled: ctx.cfg.inbox.pushEnabled,
         db: ctx.db,
         subjectDid,
         subjectUri,
+        includeAllOwned,
+        reportId,
         reportTypes,
+        excludedReportTypes,
+        actionEventId,
         internalNote: internalNote ?? undefined,
         isAutomated: isAutomated ?? false,
+        meta,
         createdBy: createdBy ?? ctx.cfg.service.did,
       })
 
