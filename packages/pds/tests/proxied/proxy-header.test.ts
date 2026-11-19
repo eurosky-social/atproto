@@ -3,6 +3,7 @@ import { once } from 'node:events'
 import type http from 'node:http'
 import type { AddressInfo } from 'node:net'
 import * as plc from '@did-plc/lib'
+import { jest } from '@jest/globals'
 import express from 'express'
 import { type HttpTerminator, createHttpTerminator } from 'http-terminator'
 import type { Keypair } from '@atproto/crypto'
@@ -13,7 +14,12 @@ import {
 } from '@atproto/dev-env'
 import type { DidString } from '@atproto/syntax'
 import { verifyJwt } from '@atproto/xrpc-server'
+import { app, com } from '../../src/lexicons/index.js'
 import { parseProxyHeader } from '../../src/pipethrough.js'
+
+const FEEDGEN_DID = 'did:web:feedgen.test'
+const EXTERNAL_HANDLE = 'external.example.com'
+const EXTERNAL_DID = 'did:web:external.example.com'
 
 describe('proxy header', () => {
   let network: TestNetworkNoAppView
@@ -169,7 +175,171 @@ describe('proxy header', () => {
     await res.arrayBuffer() // drain
     expect(res.status).toBe(501)
   })
+
+  it('looks up the getFeed record on the service from the header', async () => {
+    // The configured appview is unreachable in this network, so this only
+    // succeeds if the feed record lookup follows the proxy header too.
+    const feed = `at://${alice}/${app.bsky.feed.generator.$type}/test`
+    const path = `/xrpc/${app.bsky.feed.getFeed.$lxm}?feed=${encodeURIComponent(feed)}`
+    const res = await fetch(`${network.pds.url}${path}`, {
+      headers: {
+        ...sc.getHeaders(alice),
+        'atproto-proxy': `${proxyServer.did}#atproto_test`,
+      },
+    })
+    await res.arrayBuffer() // drain
+    expect(res.status).toBe(200)
+
+    const [lookup, proxied] = proxyServer.requests.slice(-2)
+    assert(lookup && proxied)
+
+    const lookupUrl = new URL(lookup.url, proxyServer.url)
+    expect(lookupUrl.pathname).toBe(`/xrpc/${com.atproto.repo.getRecord.$lxm}`)
+    expect(Object.fromEntries(lookupUrl.searchParams)).toEqual({
+      repo: alice,
+      collection: app.bsky.feed.generator.$type,
+      rkey: 'test',
+    })
+
+    expect(proxied.url).toEqual(path)
+    assert(proxied.auth)
+    const verified = await verifyJwt(
+      proxied.auth.replace('Bearer ', ''),
+      FEEDGEN_DID,
+      app.bsky.feed.getFeedSkeleton.$lxm,
+      (iss) => network.pds.ctx.idResolver.did.resolveAtprotoKey(iss, true),
+    )
+    expect(verified.aud).toBe(FEEDGEN_DID)
+    expect(verified.iss).toBe(alice)
+  })
+
+  it('hydrates read-after-write embeds on the service from the header', async () => {
+    const quoted = await createPost({ text: 'quoted' })
+    proxyServer.state.repoRev = quoted.commit.rev
+    const post = await createPost({
+      text: 'quote',
+      embed: {
+        $type: app.bsky.embed.record.$type,
+        record: { uri: quoted.uri, cid: quoted.cid },
+      },
+    })
+
+    const res = await fetch(
+      `${network.pds.url}/xrpc/${app.bsky.feed.getTimeline.$lxm}`,
+      {
+        headers: {
+          ...sc.getHeaders(alice),
+          'atproto-proxy': `${proxyServer.did}#atproto_test`,
+        },
+      },
+    )
+    const body = (await res.json()) as { feed: { post: { uri: string } }[] }
+    expect(body.feed.map((item) => item.post.uri)).toEqual([post.uri])
+
+    const hydration = proxyServer.requests.at(-1)
+    assert(hydration)
+    const hydrationUrl = new URL(hydration.url, proxyServer.url)
+    expect(hydrationUrl.pathname).toBe(`/xrpc/${app.bsky.feed.getPosts.$lxm}`)
+    expect(hydrationUrl.searchParams.getAll('uris')).toEqual([quoted.uri])
+    await expectServiceAuth(hydration, app.bsky.feed.getPosts.$lxm)
+  })
+
+  it('fetches read-after-write thread parents on the service from the header', async () => {
+    const parent = await createPost({ text: 'parent' })
+    proxyServer.state.repoRev = parent.commit.rev
+    const ref = { uri: parent.uri, cid: parent.cid }
+    const reply = await createPost({
+      text: 'reply',
+      reply: { root: ref, parent: ref },
+    })
+
+    const path = `/xrpc/${app.bsky.feed.getPostThread.$lxm}?uri=${encodeURIComponent(reply.uri)}`
+    const res = await fetch(`${network.pds.url}${path}`, {
+      headers: {
+        ...sc.getHeaders(alice),
+        'atproto-proxy': `${proxyServer.did}#atproto_test`,
+      },
+    })
+    const body = (await res.json()) as { thread: { post: { uri: string } } }
+    expect(res.status).toBe(200)
+    expect(body.thread.post.uri).toBe(reply.uri)
+
+    const [proxied, parents] = proxyServer.requests.slice(-2)
+    assert(proxied && parents)
+    expect(proxied.url).toEqual(path)
+
+    const parentsUrl = new URL(parents.url, proxyServer.url)
+    expect(parentsUrl.pathname).toBe(
+      `/xrpc/${app.bsky.feed.getPostThread.$lxm}`,
+    )
+    expect(parentsUrl.searchParams.get('uri')).toBe(parent.uri)
+    await expectServiceAuth(parents, app.bsky.feed.getPostThread.$lxm)
+  })
+
+  it('resolves handles on the service from the header', async () => {
+    const path = `/xrpc/${com.atproto.identity.resolveHandle.$lxm}?handle=${EXTERNAL_HANDLE}`
+    const res = await fetch(`${network.pds.url}${path}`, {
+      headers: { 'atproto-proxy': `${proxyServer.did}#atproto_test` },
+    })
+    await expect(res.json()).resolves.toEqual({ did: EXTERNAL_DID })
+    expect(proxyServer.requests.at(-1)?.url).toEqual(path)
+  })
+
+  it('resolves handles directly when the appview is unreachable', async () => {
+    using resolve = jest
+      .spyOn(network.pds.ctx.idResolver.handle, 'resolve')
+      .mockResolvedValue(EXTERNAL_DID)
+
+    const path = `/xrpc/${com.atproto.identity.resolveHandle.$lxm}?handle=${EXTERNAL_HANDLE}`
+    const res = await fetch(`${network.pds.url}${path}`)
+    await expect(res.json()).resolves.toEqual({ did: EXTERNAL_DID })
+    expect(resolve).toHaveBeenCalledWith(EXTERNAL_HANDLE)
+  })
+
+  async function createPost(record: Record<string, unknown>) {
+    const res = await fetch(
+      `${network.pds.url}/xrpc/${com.atproto.repo.createRecord.$lxm}`,
+      {
+        method: 'POST',
+        headers: {
+          ...sc.getHeaders(alice),
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          repo: alice,
+          collection: app.bsky.feed.post.$type,
+          record: {
+            $type: app.bsky.feed.post.$type,
+            createdAt: new Date().toISOString(),
+            ...record,
+          },
+        }),
+      },
+    )
+    assert(res.ok)
+    return (await res.json()) as {
+      uri: string
+      cid: string
+      commit: { rev: string }
+    }
+  }
+
+  async function expectServiceAuth(req: ProxyReq, lxm: string) {
+    assert(req.auth)
+    const verified = await verifyJwt(
+      req.auth.replace('Bearer ', ''),
+      proxyServer.did,
+      lxm,
+      (iss) => network.pds.ctx.idResolver.did.resolveAtprotoKey(iss, true),
+    )
+    expect(verified.iss).toBe(alice)
+  }
 })
+
+type ProxyState = {
+  /** Sent as `atproto-repo-rev` on read-after-write endpoints */
+  repoRev: string
+}
 
 type ProxyReq = {
   url: string
@@ -184,6 +354,7 @@ class ProxyServer {
     public url: string,
     public did: string,
     public requests: ProxyReq[],
+    public state: ProxyState,
   ) {
     this.terminator = createHttpTerminator({ server })
   }
@@ -194,22 +365,62 @@ class ProxyServer {
     serviceId: string,
   ): Promise<ProxyServer> {
     const requests: ProxyReq[] = []
-    const app = express()
+    const state: ProxyState = { repoRev: '' }
+    const record = (req: express.Request) => {
+      requests.push({ url: req.url, auth: req.header('authorization') })
+    }
+    const expressApp = express()
 
     // This is a PDS endpoint which uses a manual pipethrough() in its handler
-    app.get('/xrpc/app.bsky.actor.getPreferences', (req, res) => {
+    expressApp.get('/xrpc/app.bsky.actor.getPreferences', (req, res) => {
       res.sendStatus(501)
     })
 
-    app.get('*', (req, res) => {
-      requests.push({
-        url: req.url,
-        auth: req.header('authorization'),
+    expressApp.get(`/xrpc/${com.atproto.repo.getRecord.$lxm}`, (req, res) => {
+      record(req)
+      const { repo, collection, rkey } = req.query
+      res.json({
+        uri: `at://${repo}/${collection}/${rkey}`,
+        value: {
+          $type: app.bsky.feed.generator.$type,
+          did: FEEDGEN_DID,
+          displayName: 'Test feed',
+          createdAt: new Date().toISOString(),
+        },
       })
+    })
+
+    expressApp.get(
+      `/xrpc/${com.atproto.identity.resolveHandle.$lxm}`,
+      (req, res) => {
+        record(req)
+        res.json({ did: EXTERNAL_DID })
+      },
+    )
+
+    expressApp.get(`/xrpc/${app.bsky.feed.getTimeline.$lxm}`, (req, res) => {
+      record(req)
+      res.setHeader('atproto-repo-rev', state.repoRev)
+      res.json({ feed: [] })
+    })
+
+    expressApp.get(`/xrpc/${app.bsky.feed.getPosts.$lxm}`, (req, res) => {
+      record(req)
+      res.json({ posts: [] })
+    })
+
+    expressApp.get(`/xrpc/${app.bsky.feed.getPostThread.$lxm}`, (req, res) => {
+      record(req)
+      res.setHeader('atproto-repo-rev', state.repoRev)
+      res.status(400).json({ error: 'NotFound', message: 'Post not found' })
+    })
+
+    expressApp.get('*', (req, res) => {
+      record(req)
       res.sendStatus(200)
     })
 
-    const server = app.listen(0)
+    const server = expressApp.listen(0)
     await once(server, 'listening')
 
     const { port } = server.address() as AddressInfo
@@ -233,7 +444,7 @@ class ProxyServer {
     )
     const did = await plc.didForCreateOp(plcOp)
     await plcClient.sendOperation(did, plcOp)
-    return new ProxyServer(server, url, did, requests)
+    return new ProxyServer(server, url, did, requests, state)
   }
 
   async close(): Promise<void> {
