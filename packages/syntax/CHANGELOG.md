@@ -1,5 +1,19 @@
 # @atproto/syntax
 
+## 0.7.9
+
+### Patch Changes
+
+- [#5958](https://github.com/bluesky-social/atproto/pull/5958) [`ee63e5e`](https://github.com/bluesky-social/atproto/commit/ee63e5ede255e40251a9e761befec9d623dfb1ec) Thanks [@mozzius](https://github.com/mozzius)! - Speed up `isDatetimeStringLenient()` by running the cheap AT Protocol datetime check before `iso-datestring-validator`. Results are unchanged.
+
+- [#5941](https://github.com/bluesky-social/atproto/pull/5941) [`33d620b`](https://github.com/bluesky-social/atproto/commit/33d620b2ffc4b9a5b4959cbcc1262c5138c8a506) Thanks [@Till3005](https://github.com/Till3005)! - Fix `isValidUri` scheme validation to follow RFC 3986 (`ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )`) instead of `\w+`, so URIs with `+`, `-`, or `.` in the scheme (e.g. `web+ap:`, `git+https:`, `content-type:`) are accepted and invalid schemes (leading digit, `_`, leading `+`/`-`/`.`) are rejected.
+
+## 0.7.8
+
+### Patch Changes
+
+- [#5950](https://github.com/bluesky-social/atproto/pull/5950) [`b9b1ca7`](https://github.com/bluesky-social/atproto/commit/b9b1ca7f176b93d12e39685799c5f2e1f9a63be7) Thanks [@matthieusieben](https://github.com/matthieusieben)! - Update `vitest` to v5, `vite` to v8.3.8 and `rolldown` to v1.3.3 (dev dependencies)
+
 ## 0.7.7
 
 ### Patch Changes

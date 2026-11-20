@@ -1,5 +1,54 @@
 # @atproto/bsky
 
+## 0.5.16
+
+### Patch Changes
+
+- [#5960](https://github.com/bluesky-social/atproto/pull/5960) [`2a3aa1d`](https://github.com/bluesky-social/atproto/commit/2a3aa1d1ae4b56c7a6db12d442e525ce951ba763) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - For a service JWT with `iss` `did:plc:x#atproto_labeler`, the `viewer` is set as `did:plc:x` instead of `did:plc:x#atproto_labeler`. Service JWTs with an `iss` service id other than `#atproto` and `#atproto_labeler` are rejected.
+
+- [#5961](https://github.com/bluesky-social/atproto/pull/5961) [`d9cdc54`](https://github.com/bluesky-social/atproto/commit/d9cdc5400d893880203bd625e0748434d99fd02b) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - getFeed rejects service JWTs whose `aud` doesn't match their `lxm`: the feed generator for getFeedSkeleton, AppView for getFeed.
+
+- [#5960](https://github.com/bluesky-social/atproto/pull/5960) [`2a3aa1d`](https://github.com/bluesky-social/atproto/commit/2a3aa1d1ae4b56c7a6db12d442e525ce951ba763) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Stop logging and counting labeler-signed service JWTs.
+
+- [#5961](https://github.com/bluesky-social/atproto/pull/5961) [`d9cdc54`](https://github.com/bluesky-social/atproto/commit/d9cdc5400d893880203bd625e0748434d99fd02b) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Service JWTs with `iss` `did:plc:x#atproto_labeler` now require `lxm`, like all other service JWTs.
+- Updated dependencies [[`ee63e5e`](https://github.com/bluesky-social/atproto/commit/ee63e5ede255e40251a9e761befec9d623dfb1ec), [`ee63e5e`](https://github.com/bluesky-social/atproto/commit/ee63e5ede255e40251a9e761befec9d623dfb1ec), [`33d620b`](https://github.com/bluesky-social/atproto/commit/33d620b2ffc4b9a5b4959cbcc1262c5138c8a506), [`1403383`](https://github.com/bluesky-social/atproto/commit/1403383ea89737ff1910346107a4ef822e4ef6d5)]:
+  - @atproto/syntax@0.7.9
+  - @atproto/lex-schema@0.3.1
+  - @atproto/api@0.32.4
+  - @atproto/repo@0.11.7
+  - @atproto/sync@0.4.29
+  - @atproto/lex-client@0.6.1
+  - @atproto/xrpc-server@0.13.15
+  - @atproto/common@0.8.12
+  - @atproto/identity@0.5.25
+  - @atproto-labs/xrpc-utils@0.1.36
+
+## 0.5.15
+
+### Patch Changes
+
+- [#5947](https://github.com/bluesky-social/atproto/pull/5947) [`57ac20d`](https://github.com/bluesky-social/atproto/commit/57ac20d8f387707e66fc88cdf57ff88b76678331) Thanks [@foysalit](https://github.com/foysalit)! - Include current account and record status in moderation inbox report details.
+
+- [#5950](https://github.com/bluesky-social/atproto/pull/5950) [`b9b1ca7`](https://github.com/bluesky-social/atproto/commit/b9b1ca7f176b93d12e39685799c5f2e1f9a63be7) Thanks [@matthieusieben](https://github.com/matthieusieben)! - Update `vitest` to v5, `vite` to v8.3.8 and `rolldown` to v1.3.3 (dev dependencies)
+
+- [#5944](https://github.com/bluesky-social/atproto/pull/5944) [`627b309`](https://github.com/bluesky-social/atproto/commit/627b30915833582c2dc8f8e32cac85d3516ffc20) Thanks [@estrattonbailey](https://github.com/estrattonbailey)! - Limit Atmosphere timeline actor groups to 150 activities to match the client ActivityList URL limit, preserving overflow in additional timeline entries.
+- Updated dependencies [[`57ac20d`](https://github.com/bluesky-social/atproto/commit/57ac20d8f387707e66fc88cdf57ff88b76678331), [`b9b1ca7`](https://github.com/bluesky-social/atproto/commit/b9b1ca7f176b93d12e39685799c5f2e1f9a63be7), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`6ee0f4d`](https://github.com/bluesky-social/atproto/commit/6ee0f4d7971dcc71efaab785aff4d4ef341a1c32), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`8a0e077`](https://github.com/bluesky-social/atproto/commit/8a0e077d4667a59df2aa10dfde0f9c4bc1a9fd1b)]:
+  - @atproto/api@0.32.3
+  - @atproto/common@0.8.11
+  - @atproto-labs/fetch-node@0.4.6
+  - @atproto-labs/opentelemetry-node@0.5.1
+  - @atproto-labs/xrpc-utils@0.1.35
+  - @atproto/lex-client@0.6.0
+  - @atproto/lex-data@0.1.11
+  - @atproto/lex-json@0.1.10
+  - @atproto/lex-schema@0.3.0
+  - @atproto/syntax@0.7.8
+  - @atproto/crypto@0.5.8
+  - @atproto/xrpc-server@0.13.14
+  - @atproto/repo@0.11.6
+  - @atproto/sync@0.4.28
+  - @atproto/identity@0.5.24
+
 ## 0.5.14
 
 ### Patch Changes

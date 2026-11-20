@@ -1,5 +1,33 @@
 # @atproto/xrpc-server
 
+## 0.13.15
+
+### Patch Changes
+
+- Updated dependencies [[`ee63e5e`](https://github.com/bluesky-social/atproto/commit/ee63e5ede255e40251a9e761befec9d623dfb1ec)]:
+  - @atproto/lex-schema@0.3.1
+  - @atproto/lexicon@0.7.21
+  - @atproto/lex-client@0.6.1
+  - @atproto/common@0.8.12
+  - @atproto/xrpc@0.8.20
+
+## 0.13.14
+
+### Patch Changes
+
+- [#5954](https://github.com/bluesky-social/atproto/pull/5954) [`8a0e077`](https://github.com/bluesky-social/atproto/commit/8a0e077d4667a59df2aa10dfde0f9c4bc1a9fd1b) Thanks [@sarahmaeve](https://github.com/sarahmaeve)! - Raise a response's listener limit before piping a stream into it, so streamed responses no longer log `MaxListenersExceededWarning`.
+- Updated dependencies [[`b9b1ca7`](https://github.com/bluesky-social/atproto/commit/b9b1ca7f176b93d12e39685799c5f2e1f9a63be7), [`6ee0f4d`](https://github.com/bluesky-social/atproto/commit/6ee0f4d7971dcc71efaab785aff4d4ef341a1c32), [`118a827`](https://github.com/bluesky-social/atproto/commit/118a82770430c01ed47ded26569fffcbd68afcf4), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`6ee0f4d`](https://github.com/bluesky-social/atproto/commit/6ee0f4d7971dcc71efaab785aff4d4ef341a1c32), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd), [`6ee0f4d`](https://github.com/bluesky-social/atproto/commit/6ee0f4d7971dcc71efaab785aff4d4ef341a1c32), [`6ee0f4d`](https://github.com/bluesky-social/atproto/commit/6ee0f4d7971dcc71efaab785aff4d4ef341a1c32), [`ce37237`](https://github.com/bluesky-social/atproto/commit/ce37237663b7ea87e8cc04cb995377d0ee5d2efd)]:
+  - @atproto/common@0.8.11
+  - @atproto/lex-cbor@0.1.11
+  - @atproto/lex-client@0.6.0
+  - @atproto/lex-data@0.1.11
+  - @atproto/lex-json@0.1.10
+  - @atproto/lex-schema@0.3.0
+  - @atproto/ws-client@0.2.2
+  - @atproto/crypto@0.5.8
+  - @atproto/lexicon@0.7.20
+  - @atproto/xrpc@0.8.19
+
 ## 0.13.13
 
 ### Patch Changes

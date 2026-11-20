@@ -1,3 +1,4 @@
+import * as jose from 'jose'
 import { mapDefined, noUndefinedVals } from '@atproto/common'
 import {
   XrpcInvalidResponseError,
@@ -55,9 +56,12 @@ export default function (server: Server, ctx: AppContext) {
         //
         // Cases:
         // 1. PDS with custom getFeed handler (like ours): `lxm` is getFeedSkeleton
-        //    and `aud` is the feed generator's DID (hence `skipAudCheck`).
-        // 2. PDS without custom getFeed handler: `lxm` is getFeed. The feed generator
-        //    gets the same token and may reject it.
+        //    and `aud` is the feed generator's DID.
+        // 2. PDS without custom getFeed handler: `lxm` is getFeed and `aud` is
+        //    AppView. The feed generator gets the same token and may reject it.
+        //
+        // `aud` is checked against `lxm` once the feed generator is known (hence
+        // `skipAudCheck`), in `assertServiceJwtAudience`.
         return (
           method === app.bsky.feed.getFeedSkeleton.$lxm ||
           method === app.bsky.feed.getFeed.$lxm
@@ -100,6 +104,7 @@ export default function (server: Server, ctx: AppContext) {
           ...params,
           hydrateCtx,
           stableDeviceId,
+          serviceJwt,
           headers,
           passthroughHeaders,
           signal,
@@ -215,6 +220,7 @@ type Context = AppContext
 type Params = app.bsky.feed.getFeed.$Params & {
   hydrateCtx: HydrateCtx
   stableDeviceId: string | null
+  serviceJwt?: string
   headers: HeadersMap
   passthroughHeaders: HeadersMap
   signal: AbortSignal
@@ -381,6 +387,12 @@ const skeletonFromFeedGen = async (
     ctx,
     params,
   )
+  if (params.serviceJwt) {
+    assertServiceJwtAudience(params.serviceJwt, {
+      feedDid,
+      appviewDids: ctx.authVerifier.standardAudienceDids,
+    })
+  }
   const requestHeaders = noUndefinedVals({
     ...headers,
     ...(feedDid && ctx.cfg.bskyFeedgenDids.has(feedDid)
@@ -459,6 +471,38 @@ const skeletonFromFeedGen = async (
     // Also prevent loops if the custom feed echoes the input cursor back.
     cursor:
       feedSkele.length === 0 || cursor === params.cursor ? undefined : cursor,
+  }
+}
+
+// The JWT was already verified, by AppView or by BSG, except for its `aud`,
+// which depends on its `lxm`:
+// 1. getFeedSkeleton: `aud` is the feed generator.
+// 2. getFeed: `aud` is AppView.
+const assertServiceJwtAudience = (
+  serviceJwt: string,
+  {
+    feedDid,
+    appviewDids,
+  }: { feedDid: DidString | undefined; appviewDids: Set<string> },
+) => {
+  let claims: jose.JWTPayload
+  try {
+    claims = jose.decodeJwt(serviceJwt)
+  } catch {
+    throw new AuthRequiredError('Malformed token', 'InvalidToken')
+  }
+  const audDid =
+    typeof claims.aud === 'string' ? claims.aud.split('#')[0] : undefined
+  const valid =
+    audDid !== undefined &&
+    ((claims.lxm === app.bsky.feed.getFeedSkeleton.$lxm &&
+      audDid === feedDid) ||
+      (claims.lxm === app.bsky.feed.getFeed.$lxm && appviewDids.has(audDid)))
+  if (!valid) {
+    throw new AuthRequiredError(
+      'jwt audience does not match service did',
+      'BadJwtAudience',
+    )
   }
 }
 

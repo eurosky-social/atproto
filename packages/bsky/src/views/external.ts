@@ -13,6 +13,7 @@ import { AtUri, normalizeDatetimeAlways } from '@atproto/syntax'
 import { type ExternalRecord, genericRecordKey } from '../hydration/external.js'
 import type { HydrationState } from '../hydration/hydrator.js'
 import { app, com, place, site, social } from '../lexicons/index.js'
+import { getRecordProviderId } from '../util/external/provider.js'
 import { buildExternalRecordUrl } from '../util/external/record-url.js'
 import { estimateReadingTimeMinutes } from '../util/external/standard-site.js'
 import { uriToDid } from '../util/uris.js'
@@ -138,6 +139,7 @@ function externalRecordViewOrRefs(
     if (refsOnly) return refs
     return app.bsky.embed.external.viewArticle.$build({
       ...commonFields(views, refs, state, info),
+      providerId: getRecordProviderId(record) ?? publisher?.providerId,
       uri: url,
       title: record.title,
       description: record.description ?? '',
@@ -154,6 +156,7 @@ function externalRecordViewOrRefs(
       readingTime: record.textContent
         ? estimateReadingTimeMinutes(record.textContent)
         : undefined,
+      viewer: likeViewerState(uri, state),
       likeCount: backlinkCount(uri, site.standard.graph.recommend.$type, state),
       likers: backlinkProfiles(views, uri, state, 'recommend'),
     })
@@ -228,12 +231,14 @@ function externalRecordViewOrRefs(
     if (refsOnly) return refs
     return app.bsky.embed.external.viewGallery.$build({
       ...commonFields(views, refs, state, info),
+      providerId: getRecordProviderId(record),
       uri: buildExternalRecordUrl(uri) ?? uri,
       title: record.title,
       description: record.description ?? '',
       createdAt: record.createdAt,
       items,
       photoCount: backlinkCount(uri, social.grain.gallery.item.$type, state),
+      viewer: likeViewerState(uri, state),
       likeCount: backlinkCount(uri, social.grain.favorite.$type, state),
       likers: backlinkProfiles(views, uri, state, 'favorite'),
     })
@@ -243,6 +248,7 @@ function externalRecordViewOrRefs(
     if (refsOnly) return [uri]
     return app.bsky.embed.external.viewLivestream.$build({
       ...commonFields(views, [uri], state, info),
+      providerId: getRecordProviderId(record),
       uri: httpUri(record.canonicalUrl) ?? httpUri(record.url) ?? uri,
       title: record.title,
       description: '',
@@ -264,6 +270,13 @@ function externalRecordViewOrRefs(
   }
 }
 
+function likeViewerState(uri: AtUriString, state: HydrationState) {
+  const like = state.ctx?.viewer
+    ? state.externalRecordLikes?.get(uri)
+    : undefined
+  return like == null ? undefined : { like: like || undefined }
+}
+
 function publicationView(
   views: Views,
   uri: AtUriString,
@@ -278,6 +291,7 @@ function publicationView(
     : undefined
   return app.bsky.embed.external.viewArticlePublication.$build({
     ...commonFields(views, [uri], state, info),
+    providerId: getRecordProviderId(record),
     uri: url,
     title: record.name,
     description: record.description ?? '',

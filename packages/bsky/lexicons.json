@@ -635,7 +635,7 @@
     },
     "app.bsky.embed.external": {
       "uri": "file://../../lexicons-overrides/app/bsky/embed/external.json",
-      "cid": "bafyreigywbqnjqqhwjsoaip7nvoubdimn3efbzm242u5ou3dllgjrlgtfq"
+      "cid": "bafyreiemp3zvmhsmc3dh67jjidtex5aemlwjrjq53uda4t22gpfepdbdqy"
     },
     "app.bsky.embed.gallery": {
       "uri": "https://raw.githubusercontent.com/bluesky-social/bsky/refs/heads/main/lexicons/app/bsky/embed/gallery.json",
@@ -1903,7 +1903,7 @@
     },
     "tools.ozone.inbox.getReport": {
       "uri": "file://../../lexicons/tools/ozone/inbox/getReport.json",
-      "cid": "bafyreidrfctwj5o7fpso7k4nyqeit7o3mk3e5neldpps4xodtw6w4h2ghq"
+      "cid": "bafyreiccjh3ugcewsjrqhwvwn3gd3zudt4sf33tvhl2vp2whilihjmqike"
     },
     "tools.ozone.inbox.getUnreadCount": {
       "uri": "file://../../lexicons/tools/ozone/inbox/getUnreadCount.json",
