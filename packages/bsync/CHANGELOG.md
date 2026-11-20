@@ -1,5 +1,23 @@
 # @atproto/bsync
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies [[`ee63e5e`](https://github.com/bluesky-social/atproto/commit/ee63e5ede255e40251a9e761befec9d623dfb1ec), [`33d620b`](https://github.com/bluesky-social/atproto/commit/33d620b2ffc4b9a5b4959cbcc1262c5138c8a506)]:
+  - @atproto/syntax@0.7.9
+  - @atproto/common@0.8.12
+
+## 0.1.11
+
+### Patch Changes
+
+- [#5934](https://github.com/bluesky-social/atproto/pull/5934) [`c310166`](https://github.com/bluesky-social/atproto/commit/c310166de0faf14674a22f0717f8f1260e2b64ff) Thanks [@treethought](https://github.com/treethought)! - Expose operation creation timestamps in Bsync responses.
+- Updated dependencies [[`b9b1ca7`](https://github.com/bluesky-social/atproto/commit/b9b1ca7f176b93d12e39685799c5f2e1f9a63be7)]:
+  - @atproto/common@0.8.11
+  - @atproto-labs/opentelemetry-node@0.5.1
+  - @atproto/syntax@0.7.8
+
 ## 0.1.10
 
 ### Patch Changes
